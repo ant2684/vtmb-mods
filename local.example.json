@@ -1,0 +1,13 @@
+{
+  "game_root": "LOCAL_GAME_ROOT_REQUIRED",
+  "releases": "LOCAL_RELEASE_DIRECTORY_REQUIRED",
+  "zig": "LOCAL_ZIG_0_15_2_EXECUTABLE_REQUIRED",
+  "powershell": "pwsh",
+  "dependencies": "",
+  "state_root": ".local/sessions",
+  "launch_user": "REAL_WINDOWS_DOMAIN_USER_REQUIRED",
+  "saves": {},
+  "gameplay_commands": {},
+  "audio_helper": "",
+  "notes": "Copy to ignored local.json. Nominate save paths explicitly; no video settings are changed."
+}

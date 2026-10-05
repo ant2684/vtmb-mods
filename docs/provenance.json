@@ -1,0 +1,2681 @@
+{
+  "basis": "Original workspace sources/recipes imported from frozen capsules; user authorized MIT. Complete game files, raw captures, private certificates and personal backups excluded. Native signatures are interoperability constants, not an ownership claim.",
+  "files": [
+    {
+      "file": "mods/console/Build.ps1",
+      "capsule": "_Source Capsules/Console Pause Fix 1.0.1 Source.zip",
+      "member": "Build.ps1",
+      "original_sha256": "B67DE9506DDB1B90216E2A48223A323F3FDE553DB7E99EACE7A79FEE515276D0",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "283A7019E973C94B88BD02F410B22AFE8299E3E479BC09E696E1825C1D599575",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/console/plugin/console_pause.c",
+      "capsule": "_Source Capsules/Console Pause Fix 1.0.1 Source.zip",
+      "member": "plugin/console_pause.c",
+      "original_sha256": "502B9AE25D4FE11602A685CB4979A2D2E85C84EE682490D729A677DE0343006F",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "85198F75FFBE4A2DA4FAD83CB889C2BE513A183FDB3AE1A899AE239DF7DEA291",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/console/README.md",
+      "capsule": "_Source Capsules/Console Pause Fix 1.0.1 Source.zip",
+      "member": "README.md",
+      "original_sha256": "366A2FCAD79496DFF28EBDEF9C07CF1D4F04530335F7160096C938EDB4B4D068",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "518B7F2AF912486C228F6896011267BE0929F753B7FFC3C158B536614748D564",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "maintenance documentation update"
+      ]
+    },
+    {
+      "file": "mods/console/reference/clean-verification.json",
+      "capsule": "_Source Capsules/Console Pause Fix 1.0.1 Source.zip",
+      "member": "reference/clean-verification.json",
+      "original_sha256": "18788E2D07F5887A190E86ED87A1C8DD74A86AFC38C4476256289A93AFD39EC4",
+      "classification": "local binary/certificate or superseded license statement",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": false
+    },
+    {
+      "file": "mods/console/reference/console-pause-fix.vtm",
+      "capsule": "_Source Capsules/Console Pause Fix 1.0.1 Source.zip",
+      "member": "reference/console-pause-fix.vtm",
+      "original_sha256": "9919EBFC7A0661F26C3EA1F203139BEA39AB5C4E24252312072315965945B1FA",
+      "classification": "local binary/certificate or superseded license statement",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": false
+    },
+    {
+      "file": "mods/console/reference/gameplay-verification.json",
+      "capsule": "_Source Capsules/Console Pause Fix 1.0.1 Source.zip",
+      "member": "reference/gameplay-verification.json",
+      "original_sha256": "78F1A28C1AABC2F2D524840A1C6BF5C0297AD2CAAE1A001F1C8F1FB21D85547B",
+      "classification": "local binary/certificate or superseded license statement",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": false
+    },
+    {
+      "file": "mods/console/reference/technical-verification.json",
+      "capsule": "_Source Capsules/Console Pause Fix 1.0.1 Source.zip",
+      "member": "reference/technical-verification.json",
+      "original_sha256": "A283773C12884BDCBEC3C833BB13261699C31471366831A44A4588278E6AAA0B",
+      "classification": "local binary/certificate or superseded license statement",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": false
+    },
+    {
+      "file": "mods/console/tests/clean_pe.py",
+      "capsule": "_Source Capsules/Console Pause Fix 1.0.1 Source.zip",
+      "member": "tests/clean_pe.py",
+      "original_sha256": "0E813C81A4BE2E23F59B07B0EF1744CE6C4720A48AB7D4958913C8449DD73417",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "E35DED5B188557FCD8C59158CAC6E74AB656036E96930AD1F246980D652003FC",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/clean_pe.py"
+    },
+    {
+      "file": "mods/console/tests/exact_harness.c",
+      "capsule": "_Source Capsules/Console Pause Fix 1.0.1 Source.zip",
+      "member": "tests/exact_harness.c",
+      "original_sha256": "B97DAAE82DAAB4490526453E3C3FDE882DD679EECDACED71E557AC80A66118C2",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "B97DAAE82DAAB4490526453E3C3FDE882DD679EECDACED71E557AC80A66118C2",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/console/tests/gameplay/audit_console.py",
+      "capsule": "_Source Capsules/Console Pause Fix 1.0.1 Source.zip",
+      "member": "tests/gameplay/audit_console.py",
+      "original_sha256": "D1326D4E8A2AC8C094047A6745CCE19A0ACD6D3A90703962503BA00337D7922A",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "D1326D4E8A2AC8C094047A6745CCE19A0ACD6D3A90703962503BA00337D7922A",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/console/tests/gameplay/console_clean.py",
+      "capsule": "_Source Capsules/Console Pause Fix 1.0.1 Source.zip",
+      "member": "tests/gameplay/console_clean.py",
+      "original_sha256": "99AB9BE3730BD83D09E146249B8FB07954DBB914D07CACE3730F4AD6AF2268C0",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "56700B3180EC1C8446F0597F62196397F872DA6472FD394EAFA98228FA764075",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/console/tests/gameplay/console_remaining.py",
+      "capsule": "_Source Capsules/Console Pause Fix 1.0.1 Source.zip",
+      "member": "tests/gameplay/console_remaining.py",
+      "original_sha256": "4CFC39751211EC77A921DBE10EA1440CA48921B6198F9B0D475F0E7BEDB94BA8",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "4CFC39751211EC77A921DBE10EA1440CA48921B6198F9B0D475F0E7BEDB94BA8",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/console/tests/gameplay/console_task_overlap.cfg",
+      "capsule": "_Source Capsules/Console Pause Fix 1.0.1 Source.zip",
+      "member": "tests/gameplay/console_task_overlap.cfg",
+      "original_sha256": "52D051683A5E0381599ACB36B73E0D21C71C73D3EC2B489DD8296B7A6B16D2CD",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "52D051683A5E0381599ACB36B73E0D21C71C73D3EC2B489DD8296B7A6B16D2CD",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/console/tests/gameplay/driver.py",
+      "capsule": "_Source Capsules/Console Pause Fix 1.0.1 Source.zip",
+      "member": "tests/gameplay/driver.py",
+      "original_sha256": "681A4A2FA09C725E21D35DD339CC8A473CA88CDE4356A05801F5171D1D2DFDCB",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "FC7C884703FEA9ABF15D2E47F1C38369D9FC1DF4330F67ADA2C623EC87464AC8",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/driver.py"
+    },
+    {
+      "file": "mods/console/tests/gameplay/observe.py",
+      "capsule": "_Source Capsules/Console Pause Fix 1.0.1 Source.zip",
+      "member": "tests/gameplay/observe.py",
+      "original_sha256": "579FA1E61E9E8B04C4CE1D8D65E385180A66DAFEF75E35D736FD330B90CF5F7F",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "77344D7326CFC701A74176C29DB60F1ACB5800971213807867C60A815A52770B",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/observe_579fa1e6.py"
+    },
+    {
+      "file": "mods/console/tests/gameplay/process_reader.py",
+      "capsule": "_Source Capsules/Console Pause Fix 1.0.1 Source.zip",
+      "member": "tests/gameplay/process_reader.py",
+      "original_sha256": "40ACF00886E0CB4B9F8BC73D5F98D561A59D4F255A28FFE2EACB9668DCBB99E8",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "5B882817DC97025FA8E45BE67EBFA68506699D0BE0C3DB249032A4C3D7F56528",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/process_reader.py"
+    },
+    {
+      "file": "mods/console/tests/gameplay/Session.ps1",
+      "capsule": "_Source Capsules/Console Pause Fix 1.0.1 Source.zip",
+      "member": "tests/gameplay/Session.ps1",
+      "original_sha256": "AA5556106096F3B3CE4FF0F2E760DAD112522C8CAFDABE8482621CDBF0ED4F04",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "3F5A0A99E78F6048EF0296B7B419F2A449B6694289709035FED5AD26B24DBD6E",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/console/tests/load_clean.c",
+      "capsule": "_Source Capsules/Console Pause Fix 1.0.1 Source.zip",
+      "member": "tests/load_clean.c",
+      "original_sha256": "7AE4E3852D98DDEBE170C53D58FC05F18F40800DF5CA82885B23821AE896C658",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "059E5D1A2125875CAC4CFF193BA41DEB5A43677DAFED1FBD385287452D86976B",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/load_clean.c"
+    },
+    {
+      "file": "mods/console/tests/native_harness.c",
+      "capsule": "_Source Capsules/Console Pause Fix 1.0.1 Source.zip",
+      "member": "tests/native_harness.c",
+      "original_sha256": "E6BF3680BD8B954EF85E1C44481A31F46692689718603CC466FDE12014ED8FAF",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "E6BF3680BD8B954EF85E1C44481A31F46692689718603CC466FDE12014ED8FAF",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/console/tests/package_audit.py",
+      "capsule": "_Source Capsules/Console Pause Fix 1.0.1 Source.zip",
+      "member": "tests/package_audit.py",
+      "original_sha256": "A488C809CE4CAC54A95DFA5495255029A23D6470DC1DCF973E0ABF02624999DF",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "092BFB7A326C980D233B65EF903352B8BB39AB949779E3F18054C46596EE6617",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/console/tests/verify_exact.py",
+      "capsule": "_Source Capsules/Console Pause Fix 1.0.1 Source.zip",
+      "member": "tests/verify_exact.py",
+      "original_sha256": "57D961DF31E93122C109E4CAA1E69BDA895905E5CF7825781EF488F402D77C20",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "1E4462FD8F996DBC27893002D14D1737C5EE8F5647D08EE7FC59E508AF86D7AC",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/console/tools/finalize_pe.py",
+      "capsule": "_Source Capsules/Console Pause Fix 1.0.1 Source.zip",
+      "member": "tools/finalize_pe.py",
+      "original_sha256": "945C6C21FC6E3ECF1B0C44E0E85E0F4FEC6995B3D3C91CB2E01C388D12014059",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "CC342CD09BCD2F93A2FFBE274D6B31C0587FCD533461F59A3F60A5B9E8BC3264",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/finalize_pe.py"
+    },
+    {
+      "file": "mods/console/Verify.ps1",
+      "capsule": "_Source Capsules/Console Pause Fix 1.0.1 Source.zip",
+      "member": "Verify.ps1",
+      "original_sha256": "C5C00FEB92D6BD94B5D01639ABBE25DA1364155384BFAE47CFC4549130A6CDDD",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "D883C3586C4E470870410474CA93DE31633AB30ED2A2D2BE0D4C7775028390D6",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/background/build/cutscene-subtitle-background-fix.vtm",
+      "capsule": "_Source Capsules/Cutscene Subtitle Background Fix 1.0.0 Source.zip",
+      "member": "build/cutscene-subtitle-background-fix.vtm",
+      "original_sha256": "4DB7B1FF346632282153C9AB5C11EA91BE724F143911C17FF26230A8BAC8FF7E",
+      "classification": "local binary/certificate or superseded license statement",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": false
+    },
+    {
+      "file": "mods/background/build/verification.json",
+      "capsule": "_Source Capsules/Cutscene Subtitle Background Fix 1.0.0 Source.zip",
+      "member": "build/verification.json",
+      "original_sha256": "7015DE9E06A39FC602B325224959F32D1B9946A008AA9FCF5BCFE93A21B37F55",
+      "classification": "local binary/certificate or superseded license statement",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": false
+    },
+    {
+      "file": "mods/background/Build.ps1",
+      "capsule": "_Source Capsules/Cutscene Subtitle Background Fix 1.0.0 Source.zip",
+      "member": "Build.ps1",
+      "original_sha256": "7A22B8C946F319766AA5AD1565EFAFDED05332FA70A487A6849CE5A412B21257",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "7A22B8C946F319766AA5AD1565EFAFDED05332FA70A487A6849CE5A412B21257",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/background/plugin/draw_reference.h",
+      "capsule": "_Source Capsules/Cutscene Subtitle Background Fix 1.0.0 Source.zip",
+      "member": "plugin/draw_reference.h",
+      "original_sha256": "37A31A74373A3277C971D7E298E4FDA14D17961A1161439B205FBF1A81F0849C",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "1E32081FEA39C051AF1F43F4D59FA7961ECAF4E7030D02910AE89AF1C183F1D7",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/background/plugin/subtitle_background.c",
+      "capsule": "_Source Capsules/Cutscene Subtitle Background Fix 1.0.0 Source.zip",
+      "member": "plugin/subtitle_background.c",
+      "original_sha256": "745C4A3580B5DC4F9BB370910C07CCADC8DFD03C46C9B865D7266AC7F690F6A7",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "745C4A3580B5DC4F9BB370910C07CCADC8DFD03C46C9B865D7266AC7F690F6A7",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/background/README.md",
+      "capsule": "_Source Capsules/Cutscene Subtitle Background Fix 1.0.0 Source.zip",
+      "member": "README.md",
+      "original_sha256": "FA625CC35CBE2BF37B09CF730206557B9A2468E0A4A4F754BDEBD280846AF448",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "ACD96085885CA567075B1D8F9CF139E655BE77ACE4CBE9D0EDAB9AB8F47E63EA",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "maintenance documentation update"
+      ]
+    },
+    {
+      "file": "mods/background/tests/audit_evidence.py",
+      "capsule": "_Source Capsules/Cutscene Subtitle Background Fix 1.0.0 Source.zip",
+      "member": "tests/audit_evidence.py",
+      "original_sha256": "AEDA2381E59FBB33A0D3A491A00BA36BFAAAE3A15424C6A5E7D81335E732905A",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "AEDA2381E59FBB33A0D3A491A00BA36BFAAAE3A15424C6A5E7D81335E732905A",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/background/tests/clean_payload.py",
+      "capsule": "_Source Capsules/Cutscene Subtitle Background Fix 1.0.0 Source.zip",
+      "member": "tests/clean_payload.py",
+      "original_sha256": "6ECB079249B00BB2C98221CF926D1177CD33CD3EC1FC03C7B1FB25DA79565C14",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "364EA872FA97EF70B67932FA827D474362DFFC009614C87AD781DE97B9A84BB9",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/clean_payload.py"
+    },
+    {
+      "file": "mods/background/tests/clean_regression.py",
+      "capsule": "_Source Capsules/Cutscene Subtitle Background Fix 1.0.0 Source.zip",
+      "member": "tests/clean_regression.py",
+      "original_sha256": "DCEFE0C1CF7F9786BC8E828298523E2AA88582C78BC148CBC6C099EEFDAB63B3",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "6FFCB65D5F7A2FA4F08A98E8B291AD2A089D2AC0852B6FFD2FD1246845D989F1",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/background/tests/CleanSession.ps1",
+      "capsule": "_Source Capsules/Cutscene Subtitle Background Fix 1.0.0 Source.zip",
+      "member": "tests/CleanSession.ps1",
+      "original_sha256": "3CFD2BE66069DFD7A114DABFB8D890F0736389282BAC83F251F465B53896D591",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "5E74447BE9306DE226DCD793B593614F97F5DFA24F258EACC1F73F41ED2DF6F8",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/background/tests/drive.py",
+      "capsule": "_Source Capsules/Cutscene Subtitle Background Fix 1.0.0 Source.zip",
+      "member": "tests/drive.py",
+      "original_sha256": "A139E11F89E0084AC84730C6387A545DA3D5442C9A57F34B72119581CCF97840",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "A139E11F89E0084AC84730C6387A545DA3D5442C9A57F34B72119581CCF97840",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/background/tests/finalize_pe.py",
+      "capsule": "_Source Capsules/Cutscene Subtitle Background Fix 1.0.0 Source.zip",
+      "member": "tests/finalize_pe.py",
+      "original_sha256": "945C6C21FC6E3ECF1B0C44E0E85E0F4FEC6995B3D3C91CB2E01C388D12014059",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "CC342CD09BCD2F93A2FFBE274D6B31C0587FCD533461F59A3F60A5B9E8BC3264",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/finalize_pe.py"
+    },
+    {
+      "file": "mods/background/tests/Install.ps1",
+      "capsule": "_Source Capsules/Cutscene Subtitle Background Fix 1.0.0 Source.zip",
+      "member": "tests/Install.ps1",
+      "original_sha256": "A44F0790FC082A3B53514A815FB91FF801D4211898D691959EE1DEBE75BDC783",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "27EB8F722E823FE244B6BD2122325E6C2D5C4289BB654421A6E4B7E668871D45",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/background/tests/InstallClean.ps1",
+      "capsule": "_Source Capsules/Cutscene Subtitle Background Fix 1.0.0 Source.zip",
+      "member": "tests/InstallClean.ps1",
+      "original_sha256": "391D62553CDB81470F62C40E105CD515388C2A5500E358F8F614E7A33C938963",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "D94357C281AE14658B4B9CFA79FF182DEB255AB33B139AB23CE4048D26772BDE",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/background/tests/load_clean.c",
+      "capsule": "_Source Capsules/Cutscene Subtitle Background Fix 1.0.0 Source.zip",
+      "member": "tests/load_clean.c",
+      "original_sha256": "7AE4E3852D98DDEBE170C53D58FC05F18F40800DF5CA82885B23821AE896C658",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "059E5D1A2125875CAC4CFF193BA41DEB5A43677DAFED1FBD385287452D86976B",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/load_clean.c"
+    },
+    {
+      "file": "mods/background/tests/native_harness.c",
+      "capsule": "_Source Capsules/Cutscene Subtitle Background Fix 1.0.0 Source.zip",
+      "member": "tests/native_harness.c",
+      "original_sha256": "783AE22FEFC8C361E9051754239E21D2EF5730AC18839735B3179945348907D3",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "783AE22FEFC8C361E9051754239E21D2EF5730AC18839735B3179945348907D3",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/background/tests/observe.py",
+      "capsule": "_Source Capsules/Cutscene Subtitle Background Fix 1.0.0 Source.zip",
+      "member": "tests/observe.py",
+      "original_sha256": "6108C7D6F7796941325690DAAE33DEFC2A3A0C4BBBFAC94F59B57B0F84FE6E3D",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "E1DE0307F200677CFFCC0A4846881E68A9E2C30191D86639A6A04268437E0549",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/observe.py"
+    },
+    {
+      "file": "mods/background/tests/process_reader.py",
+      "capsule": "_Source Capsules/Cutscene Subtitle Background Fix 1.0.0 Source.zip",
+      "member": "tests/process_reader.py",
+      "original_sha256": "40ACF00886E0CB4B9F8BC73D5F98D561A59D4F255A28FFE2EACB9668DCBB99E8",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "5B882817DC97025FA8E45BE67EBFA68506699D0BE0C3DB249032A4C3D7F56528",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/process_reader.py"
+    },
+    {
+      "file": "mods/background/tests/Session.ps1",
+      "capsule": "_Source Capsules/Cutscene Subtitle Background Fix 1.0.0 Source.zip",
+      "member": "tests/Session.ps1",
+      "original_sha256": "E5B2546AE703168A0AB6097803E792C7242D74119B556AC691FA26B0F72CB237",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "E49F1380FA40D17CC957AC26CF288C566A7A2A19D5906988E29E1CBE960303AC",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/background/tests/subtitle_bg_direct_a.cfg",
+      "capsule": "_Source Capsules/Cutscene Subtitle Background Fix 1.0.0 Source.zip",
+      "member": "tests/subtitle_bg_direct_a.cfg",
+      "original_sha256": "8D9050F99995FBB2B03E1957259DBB4B77A26B9E976409EF1B3971ACC7B900B2",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "8D9050F99995FBB2B03E1957259DBB4B77A26B9E976409EF1B3971ACC7B900B2",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/background/tests/verify.py",
+      "capsule": "_Source Capsules/Cutscene Subtitle Background Fix 1.0.0 Source.zip",
+      "member": "tests/verify.py",
+      "original_sha256": "1C1B6B754EBA4513BBB357918A2F44D31B500321413EA3B1D98EE2F72575C501",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "1C1B6B754EBA4513BBB357918A2F44D31B500321413EA3B1D98EE2F72575C501",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/background/tools/reference.py",
+      "capsule": "_Source Capsules/Cutscene Subtitle Background Fix 1.0.0 Source.zip",
+      "member": "tools/reference.py",
+      "original_sha256": "5B4F5C078C984F43056F19DE6DA6AEE73684193816C6F2292204D5F2AB17EBE5",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "5B4F5C078C984F43056F19DE6DA6AEE73684193816C6F2292204D5F2AB17EBE5",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/frenzy/Build.ps1",
+      "capsule": "_Source Capsules/Frenzy Fixes 1.2.1 Source.zip",
+      "member": "Build.ps1",
+      "original_sha256": "53E6746D7F53A47AA80DCF01CDFF6D964E8477662321D775E2F10DEBF36FD394",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "5B122BF50A72B9AE706FA74A8581307E117796363819A8DBD4D29EAA1D628F92",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/frenzy/LICENSE_STATUS.txt",
+      "capsule": "_Source Capsules/Frenzy Fixes 1.2.1 Source.zip",
+      "member": "LICENSE_STATUS.txt",
+      "original_sha256": "52962D9EFD91E314E46199D1D2FADBEE3706F8A106A1C34D2AE06B473540AF1E",
+      "classification": "local binary/certificate or superseded license statement",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": false
+    },
+    {
+      "file": "mods/frenzy/plugin/griffith_frenzy_werewolf_fix.c",
+      "capsule": "_Source Capsules/Frenzy Fixes 1.2.1 Source.zip",
+      "member": "plugin/griffith_frenzy_werewolf_fix.c",
+      "original_sha256": "8252832BBF12C84AC69998E0542677C951D6A902F0FF7C42D3CE2CC13C4364C0",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "BE14A2B7F3529F14C5A08706907AF86664A4072EA79D4FCBE242CD6BD22AB6B1",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/frenzy/README.md",
+      "capsule": "_Source Capsules/Frenzy Fixes 1.2.1 Source.zip",
+      "member": "README.md",
+      "original_sha256": "E083F17D066CEF83DDE336CD9ADC6D6B24BEC4BDDD9CA199A93BBD51DC7F8419",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "A0AA880B7F35164B91BF7EC4C0C7EC7E32FBBFCFA457E3FC6BBCEAA5931AB8C5",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "maintenance documentation update"
+      ]
+    },
+    {
+      "file": "mods/frenzy/reference/clean-verification.json",
+      "capsule": "_Source Capsules/Frenzy Fixes 1.2.1 Source.zip",
+      "member": "reference/clean-verification.json",
+      "original_sha256": "38E45DD39E6ABF1F63416687FFE4C5C698A5867EBE40602F86FD6CFCAE386A5A",
+      "classification": "local binary/certificate or superseded license statement",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": false
+    },
+    {
+      "file": "mods/frenzy/reference/gameplay-verification.json",
+      "capsule": "_Source Capsules/Frenzy Fixes 1.2.1 Source.zip",
+      "member": "reference/gameplay-verification.json",
+      "original_sha256": "C5F380E9A2D2D1879131EDDD42A3C409752C69F224BCBA16D1AA06F175A5178C",
+      "classification": "local binary/certificate or superseded license statement",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": false
+    },
+    {
+      "file": "mods/frenzy/reference/griffith-frenzy-werewolf-fix.vtm",
+      "capsule": "_Source Capsules/Frenzy Fixes 1.2.1 Source.zip",
+      "member": "reference/griffith-frenzy-werewolf-fix.vtm",
+      "original_sha256": "FD5FF2E0003FA712A73A5D92B88575B7920F7003789F4B7F27CA1B9FF539D38A",
+      "classification": "local binary/certificate or superseded license statement",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": false
+    },
+    {
+      "file": "mods/frenzy/reference/technical-verification.json",
+      "capsule": "_Source Capsules/Frenzy Fixes 1.2.1 Source.zip",
+      "member": "reference/technical-verification.json",
+      "original_sha256": "0B98A5F53658A3969F4E5B93AA193C52B03840D190E23AEE9F6AB21382087FF0",
+      "classification": "local binary/certificate or superseded license statement",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": false
+    },
+    {
+      "file": "mods/frenzy/tests/clean_pe.py",
+      "capsule": "_Source Capsules/Frenzy Fixes 1.2.1 Source.zip",
+      "member": "tests/clean_pe.py",
+      "original_sha256": "0E813C81A4BE2E23F59B07B0EF1744CE6C4720A48AB7D4958913C8449DD73417",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "E35DED5B188557FCD8C59158CAC6E74AB656036E96930AD1F246980D652003FC",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/clean_pe.py"
+    },
+    {
+      "file": "mods/frenzy/tests/exact_harness.c",
+      "capsule": "_Source Capsules/Frenzy Fixes 1.2.1 Source.zip",
+      "member": "tests/exact_harness.c",
+      "original_sha256": "20A2330129A64D43AFE92714D7879A25F0751077521C7C3FB6ED6AED74997403",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "20A2330129A64D43AFE92714D7879A25F0751077521C7C3FB6ED6AED74997403",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/frenzy/tests/gameplay/actors.py",
+      "capsule": "_Source Capsules/Frenzy Fixes 1.2.1 Source.zip",
+      "member": "tests/gameplay/actors.py",
+      "original_sha256": "241489F83A1CE2DEC3833F2EC98733AEA7DF4EB6D9AC00D6E53B65E1C439AE41",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "8C56D1FD5AB8EDD89E25C8C8212865340C8D80F9BC13356F0EA4F7A8DB8DE879",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/actors.py"
+    },
+    {
+      "file": "mods/frenzy/tests/gameplay/audit_frenzy.py",
+      "capsule": "_Source Capsules/Frenzy Fixes 1.2.1 Source.zip",
+      "member": "tests/gameplay/audit_frenzy.py",
+      "original_sha256": "0BB82B4A691F305648F641DFAC0BAA9BA9A35600B1D000FD8D3E8409A215B589",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "C65013B8131B7C9559557AD9D9781B24A83BC55647BCBD895D7C69BEE61278F5",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/frenzy/tests/gameplay/cleanup_aliases.cfg",
+      "capsule": "_Source Capsules/Frenzy Fixes 1.2.1 Source.zip",
+      "member": "tests/gameplay/cleanup_aliases.cfg",
+      "original_sha256": "9704D3172AAC4A39D7A8D3EE27B4E15C098E9C5237DAAF480DE4018E209A1212",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "9704D3172AAC4A39D7A8D3EE27B4E15C098E9C5237DAAF480DE4018E209A1212",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/frenzy/tests/gameplay/cleanup_probe.py",
+      "capsule": "_Source Capsules/Frenzy Fixes 1.2.1 Source.zip",
+      "member": "tests/gameplay/cleanup_probe.py",
+      "original_sha256": "D646F5F37D6631E23D7AE58FD9D9417F7E56DFBBBF9BA5F8CE6A9AE19341A065",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "80ADEEA68BEA9EC56B0ACFD4CA26585F01CEB1E4E471094CC74BA0A1606D576E",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/cleanup_probe.py"
+    },
+    {
+      "file": "mods/frenzy/tests/gameplay/driver.py",
+      "capsule": "_Source Capsules/Frenzy Fixes 1.2.1 Source.zip",
+      "member": "tests/gameplay/driver.py",
+      "original_sha256": "681A4A2FA09C725E21D35DD339CC8A473CA88CDE4356A05801F5171D1D2DFDCB",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "FC7C884703FEA9ABF15D2E47F1C38369D9FC1DF4330F67ADA2C623EC87464AC8",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/driver.py"
+    },
+    {
+      "file": "mods/frenzy/tests/gameplay/gp_clean.py",
+      "capsule": "_Source Capsules/Frenzy Fixes 1.2.1 Source.zip",
+      "member": "tests/gameplay/gp_clean.py",
+      "original_sha256": "349A2DC76FE28DE6B8B8DC4624A31813E2DC0A9CF89A9CF4B290B12A8A6818CC",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "7395AAFD99D7DD2E7BF7B243672E0352AF45A37B4135129CE57911E091A89099",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/frenzy/tests/gameplay/gp_context.py",
+      "capsule": "_Source Capsules/Frenzy Fixes 1.2.1 Source.zip",
+      "member": "tests/gameplay/gp_context.py",
+      "original_sha256": "B7050385AABC21FBF3297E70D9B1B9ED5F97F8DA670C589666950A2C1BECB5AE",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "C7F28EAD2CD9999A370B564D057776BC93E109E02490ECC7A6832A7296B8B995",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/frenzy/tests/gameplay/gp_map_context.py",
+      "capsule": "_Source Capsules/Frenzy Fixes 1.2.1 Source.zip",
+      "member": "tests/gameplay/gp_map_context.py",
+      "original_sha256": "4F077C18F18403406F6FBA0149F20881A75D6E7F430D5EE100725E538B463369",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "875CAAEB52BE158B422D4BD6248C4056FA959EA2E342E242624E9AF356A3743A",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/frenzy/tests/gameplay/observe.py",
+      "capsule": "_Source Capsules/Frenzy Fixes 1.2.1 Source.zip",
+      "member": "tests/gameplay/observe.py",
+      "original_sha256": "579FA1E61E9E8B04C4CE1D8D65E385180A66DAFEF75E35D736FD330B90CF5F7F",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "77344D7326CFC701A74176C29DB60F1ACB5800971213807867C60A815A52770B",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/observe_579fa1e6.py"
+    },
+    {
+      "file": "mods/frenzy/tests/gameplay/process_reader.py",
+      "capsule": "_Source Capsules/Frenzy Fixes 1.2.1 Source.zip",
+      "member": "tests/gameplay/process_reader.py",
+      "original_sha256": "40ACF00886E0CB4B9F8BC73D5F98D561A59D4F255A28FFE2EACB9668DCBB99E8",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "5B882817DC97025FA8E45BE67EBFA68506699D0BE0C3DB249032A4C3D7F56528",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/process_reader.py"
+    },
+    {
+      "file": "mods/frenzy/tests/gameplay/Session.ps1",
+      "capsule": "_Source Capsules/Frenzy Fixes 1.2.1 Source.zip",
+      "member": "tests/gameplay/Session.ps1",
+      "original_sha256": "00114B5A3CF01095A54DFF77278C5F77861A0BACC24063097BE8BC8F09E9513A",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "1545A1BCF959A1E0F0B1A48051479DCCEC36142FEBCD43FD151C6FDCF61956C6",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/frenzy/tests/gameplay/warehouse_gate.py",
+      "capsule": "_Source Capsules/Frenzy Fixes 1.2.1 Source.zip",
+      "member": "tests/gameplay/warehouse_gate.py",
+      "original_sha256": "6A382DE3315979706DCCDBC66A8B0FC47A969453456E857A6BBCE59C4367E74A",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "BC7F2D268F1E9B4F20BABE1AE1DE39ED21C44DD282AFCE29681F7A930FBD1E9B",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/warehouse_gate.py"
+    },
+    {
+      "file": "mods/frenzy/tests/load_clean.c",
+      "capsule": "_Source Capsules/Frenzy Fixes 1.2.1 Source.zip",
+      "member": "tests/load_clean.c",
+      "original_sha256": "7AE4E3852D98DDEBE170C53D58FC05F18F40800DF5CA82885B23821AE896C658",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "059E5D1A2125875CAC4CFF193BA41DEB5A43677DAFED1FBD385287452D86976B",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/load_clean.c"
+    },
+    {
+      "file": "mods/frenzy/tests/native_fixture.h",
+      "capsule": "_Source Capsules/Frenzy Fixes 1.2.1 Source.zip",
+      "member": "tests/native_fixture.h",
+      "original_sha256": "C96E22ADF564BA991D577AF2B3DC7E543C94B18FB331DEB0D5DD5B1564F6816A",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "E41A3F325A3D2D3039E6C0D8959EA14868DD601ADED71D3927E8D8A3EEB3A9BC",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/native_fixture.h"
+    },
+    {
+      "file": "mods/frenzy/tests/package_audit.py",
+      "capsule": "_Source Capsules/Frenzy Fixes 1.2.1 Source.zip",
+      "member": "tests/package_audit.py",
+      "original_sha256": "1C8CB6B14E6DD910E4BAC74FC55DD0B4B67C8256914435912946AF32E6D34125",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "D38EEEAB13EEAE023D52F1AB18E9BD19D4A8808DCFFE74582ED3DAE1D38A7ACD",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/frenzy/tests/verify_exact.py",
+      "capsule": "_Source Capsules/Frenzy Fixes 1.2.1 Source.zip",
+      "member": "tests/verify_exact.py",
+      "original_sha256": "AA4B9942C1163A1B714E776C6E0AD184119E6EAD3E26CBED302FB42CB479F663",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "F5B2BBD9FC9690A32FA73D00FF62327B2AA2ADA5ED507970F1423D8EA289C561",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/frenzy/tools/finalize_pe.py",
+      "capsule": "_Source Capsules/Frenzy Fixes 1.2.1 Source.zip",
+      "member": "tools/finalize_pe.py",
+      "original_sha256": "945C6C21FC6E3ECF1B0C44E0E85E0F4FEC6995B3D3C91CB2E01C388D12014059",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "CC342CD09BCD2F93A2FFBE274D6B31C0587FCD533461F59A3F60A5B9E8BC3264",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/finalize_pe.py"
+    },
+    {
+      "file": "mods/frenzy/Verify.ps1",
+      "capsule": "_Source Capsules/Frenzy Fixes 1.2.1 Source.zip",
+      "member": "Verify.ps1",
+      "original_sha256": "F960D1733C83ADC4B8AE24C261279DC421524072BA262DAB0A3AA9251DC4101E",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "B0E8FB02F3D125F1642207CBEFB14F90D1CED28FE574777ADF322587D5A4498E",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/history/Build.ps1",
+      "capsule": "_Source Capsules/History Stat Reset Fix 1.5.1 Source.zip",
+      "member": "Build.ps1",
+      "original_sha256": "C19AB813329562088B5AB42D78F6B3C5C67469037BCCF5C40988C80822A50285",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "C19AB813329562088B5AB42D78F6B3C5C67469037BCCF5C40988C80822A50285",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/history/LICENSE_STATUS.txt",
+      "capsule": "_Source Capsules/History Stat Reset Fix 1.5.1 Source.zip",
+      "member": "LICENSE_STATUS.txt",
+      "original_sha256": "52962D9EFD91E314E46199D1D2FADBEE3706F8A106A1C34D2AE06B473540AF1E",
+      "classification": "local binary/certificate or superseded license statement",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": false
+    },
+    {
+      "file": "mods/history/plugin/history_stat_reset_fix.c",
+      "capsule": "_Source Capsules/History Stat Reset Fix 1.5.1 Source.zip",
+      "member": "plugin/history_stat_reset_fix.c",
+      "original_sha256": "EF3CC90383DE9F7BC97FD12142205399C414233A46CCCD3A8D3A3CDCD97D0955",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "EF3CC90383DE9F7BC97FD12142205399C414233A46CCCD3A8D3A3CDCD97D0955",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/history/plugin/install_hooks.h",
+      "capsule": "_Source Capsules/History Stat Reset Fix 1.5.1 Source.zip",
+      "member": "plugin/install_hooks.h",
+      "original_sha256": "DA6A0CE901E74766769520659C0EB44E3717866F981D01D7DF2A2D072453488E",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "DA6A0CE901E74766769520659C0EB44E3717866F981D01D7DF2A2D072453488E",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/history/README.md",
+      "capsule": "_Source Capsules/History Stat Reset Fix 1.5.1 Source.zip",
+      "member": "README.md",
+      "original_sha256": "4781685839BF28A0105C610642418FA22D6CC8E4C1182D66926A47569D50B1E3",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "DB1FE9E6279C3365C15ACD249C69BB8A6849517E72DEA9563152215A89DFB9A7",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "maintenance documentation update"
+      ]
+    },
+    {
+      "file": "mods/history/reference/gameplay-verification.json",
+      "capsule": "_Source Capsules/History Stat Reset Fix 1.5.1 Source.zip",
+      "member": "reference/gameplay-verification.json",
+      "original_sha256": "9802CD8E9D327923A40A3BF86F4FF6484845858B40EF8098A62A2BE445BC7154",
+      "classification": "local binary/certificate or superseded license statement",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": false
+    },
+    {
+      "file": "mods/history/reference/history-stat-reset-fix.vtm",
+      "capsule": "_Source Capsules/History Stat Reset Fix 1.5.1 Source.zip",
+      "member": "reference/history-stat-reset-fix.vtm",
+      "original_sha256": "B7669393E9C8E93D38DFB8F5B08340964F581CCFACF7D539198AB16927DEC49B",
+      "classification": "local binary/certificate or superseded license statement",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": false
+    },
+    {
+      "file": "mods/history/reference/technical-verification.json",
+      "capsule": "_Source Capsules/History Stat Reset Fix 1.5.1 Source.zip",
+      "member": "reference/technical-verification.json",
+      "original_sha256": "A2DD9057858664E306A0729D6F1C61C988E711C06857BCF5B89564A4013D0D33",
+      "classification": "local binary/certificate or superseded license statement",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": false
+    },
+    {
+      "file": "mods/history/tests/audit_scenarios.py",
+      "capsule": "_Source Capsules/History Stat Reset Fix 1.5.1 Source.zip",
+      "member": "tests/audit_scenarios.py",
+      "original_sha256": "AF5D786294C90E941B46EAA3625F57DCD2CDCA942A2E34595C86DE7304FBAC2F",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "AF5D786294C90E941B46EAA3625F57DCD2CDCA942A2E34595C86DE7304FBAC2F",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/history/tests/drive.py",
+      "capsule": "_Source Capsules/History Stat Reset Fix 1.5.1 Source.zip",
+      "member": "tests/drive.py",
+      "original_sha256": "C9BF7E1E85A0E61BB8D58CF4CAC2F82491474086A334FBE27A35F5909E49808F",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "C9BF7E1E85A0E61BB8D58CF4CAC2F82491474086A334FBE27A35F5909E49808F",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/history/tests/gameplay.py",
+      "capsule": "_Source Capsules/History Stat Reset Fix 1.5.1 Source.zip",
+      "member": "tests/gameplay.py",
+      "original_sha256": "B6D59EA17CBB51B470E7222F1FB7452DC1C70DC2A218830C62543AF7E799E249",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "223535CA3F0768199736D7F9BEC937544E17BA4C6B8927E5E2ECFC2764FCF9BE",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/history/tests/gender_regression.py",
+      "capsule": "_Source Capsules/History Stat Reset Fix 1.5.1 Source.zip",
+      "member": "tests/gender_regression.py",
+      "original_sha256": "D16CA22F1186F210507C44873F9E0205C43F1BC2D4F21BD5311B6010F1762779",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "D16CA22F1186F210507C44873F9E0205C43F1BC2D4F21BD5311B6010F1762779",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/history/tests/InstallClean.ps1",
+      "capsule": "_Source Capsules/History Stat Reset Fix 1.5.1 Source.zip",
+      "member": "tests/InstallClean.ps1",
+      "original_sha256": "4E540925D5F77CD9563227B46F2EBA7986A6B36B07C8F641A141BBF6D196459D",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "9330A1B15637C019D11933429E1D0566080D00464B79EF19A65A0D5DBE6B5EC2",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/history/tests/load_clean.c",
+      "capsule": "_Source Capsules/History Stat Reset Fix 1.5.1 Source.zip",
+      "member": "tests/load_clean.c",
+      "original_sha256": "7AE4E3852D98DDEBE170C53D58FC05F18F40800DF5CA82885B23821AE896C658",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "059E5D1A2125875CAC4CFF193BA41DEB5A43677DAFED1FBD385287452D86976B",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/load_clean.c"
+    },
+    {
+      "file": "mods/history/tests/observe.py",
+      "capsule": "_Source Capsules/History Stat Reset Fix 1.5.1 Source.zip",
+      "member": "tests/observe.py",
+      "original_sha256": "6108C7D6F7796941325690DAAE33DEFC2A3A0C4BBBFAC94F59B57B0F84FE6E3D",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "E1DE0307F200677CFFCC0A4846881E68A9E2C30191D86639A6A04268437E0549",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/observe.py"
+    },
+    {
+      "file": "mods/history/tests/offline_getter.py",
+      "capsule": "_Source Capsules/History Stat Reset Fix 1.5.1 Source.zip",
+      "member": "tests/offline_getter.py",
+      "original_sha256": "9A270DC1634630B90191000A7B3CFFF7B447B68F3DAB783F9035B7AA9B628211",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "9A270DC1634630B90191000A7B3CFFF7B447B68F3DAB783F9035B7AA9B628211",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/history/tests/package_gate.py",
+      "capsule": "_Source Capsules/History Stat Reset Fix 1.5.1 Source.zip",
+      "member": "tests/package_gate.py",
+      "original_sha256": "F38B757D22B884232A3A361D51E849CFB8F9C4FDDC8FF457DA82CC73E46DD81D",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "F38B757D22B884232A3A361D51E849CFB8F9C4FDDC8FF457DA82CC73E46DD81D",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/history/tests/Preserve.ps1",
+      "capsule": "_Source Capsules/History Stat Reset Fix 1.5.1 Source.zip",
+      "member": "tests/Preserve.ps1",
+      "original_sha256": "A2009C12ABF6523A2E79CEFC565E9C55BD2D37C06B0E6568EC150C10E6CB00C1",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "139CCF08B374B739701F2F810DC84B9549C878273CA8325CBC87F4EFE6F62375",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/history/tests/process_reader.py",
+      "capsule": "_Source Capsules/History Stat Reset Fix 1.5.1 Source.zip",
+      "member": "tests/process_reader.py",
+      "original_sha256": "24692D00292930E016F419B39CDE1E1EC02F3BD8546FF66AE1CE1B85502EF52B",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "24692D00292930E016F419B39CDE1E1EC02F3BD8546FF66AE1CE1B85502EF52B",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/history/tests/RunScenarios.ps1",
+      "capsule": "_Source Capsules/History Stat Reset Fix 1.5.1 Source.zip",
+      "member": "tests/RunScenarios.ps1",
+      "original_sha256": "085E156316D1A5888CFC69F95C9CEB9167E9C3BB0F43DEC20440811D35E417AE",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "4465415B338A149647C533CAA0C674A4AA9A8733E664CCE271C02938B45F6569",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/history/tests/Session.ps1",
+      "capsule": "_Source Capsules/History Stat Reset Fix 1.5.1 Source.zip",
+      "member": "tests/Session.ps1",
+      "original_sha256": "038C05C8444B1F2167634191992E3C99665314C513EF21A19B54955B22344BAE",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "82C879362FA9C695E334D841110F2520A07C8FAEC4CC19FEE103653076A23346",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/history/tests/verify.py",
+      "capsule": "_Source Capsules/History Stat Reset Fix 1.5.1 Source.zip",
+      "member": "tests/verify.py",
+      "original_sha256": "068D10DCCC1D04CDEC7F219DF9F4C86546041E8F078FFBF77D70BAB68C46EEE2",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "068D10DCCC1D04CDEC7F219DF9F4C86546041E8F078FFBF77D70BAB68C46EEE2",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/history/tools/finalize_pe.py",
+      "capsule": "_Source Capsules/History Stat Reset Fix 1.5.1 Source.zip",
+      "member": "tools/finalize_pe.py",
+      "original_sha256": "945C6C21FC6E3ECF1B0C44E0E85E0F4FEC6995B3D3C91CB2E01C388D12014059",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "CC342CD09BCD2F93A2FFBE274D6B31C0587FCD533461F59A3F60A5B9E8BC3264",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/finalize_pe.py"
+    },
+    {
+      "file": "mods/history/Verify.ps1",
+      "capsule": "_Source Capsules/History Stat Reset Fix 1.5.1 Source.zip",
+      "member": "Verify.ps1",
+      "original_sha256": "6A59F1E6E4434DF8DB920E7420941803135A99449501438655667B9F8ACA27D9",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "6A59F1E6E4434DF8DB920E7420941803135A99449501438655667B9F8ACA27D9",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/protean/Build.ps1",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "Build.ps1",
+      "original_sha256": "AB101F0C15D9AF887DE9923D181E44B7BC58EC4D13727F68DCC99A4BF40AC110",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "F6F4B03341C4650A096509DC152A25E3F7AA19D74D23A84D503C94E3E118F428",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/protean/models/rebuild_models.py",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "models/rebuild_models.py",
+      "original_sha256": "870638482B0D39D81621F8165C7D6500AFD1ACB4859231009B4906D7DD88DA65",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "870638482B0D39D81621F8165C7D6500AFD1ACB4859231009B4906D7DD88DA65",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/protean/models/reference/combo_models.py",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "models/reference/combo_models.py",
+      "original_sha256": "74EE5A6B0AE159AAEB84E15CA0A13CBD8ECE88431B310AF7FDF69A02B8C7F89A",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "74EE5A6B0AE159AAEB84E15CA0A13CBD8ECE88431B310AF7FDF69A02B8C7F89A",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/protean/models/reference/test_combo_models.py",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "models/reference/test_combo_models.py",
+      "original_sha256": "63680CEB6B0260D4FCD862E8642425DABE0610EFEC70B543788950F7FF339B75",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "63680CEB6B0260D4FCD862E8642425DABE0610EFEC70B543788950F7FF339B75",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/protean/models/reference/verify_packages.py",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "models/reference/verify_packages.py",
+      "original_sha256": "7DA621E6A67FB0DA6F0D10C2AEDBD075C68701886D7400F2E26F8C82659D1693",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "7DA621E6A67FB0DA6F0D10C2AEDBD075C68701886D7400F2E26F8C82659D1693",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/protean/models/test_release_models.py",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "models/test_release_models.py",
+      "original_sha256": "E9E247DECB7BB4E0BC746DE2AD427C7C6BC6DCEB4AEEE25176340EB4A2AB891B",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "E9E247DECB7BB4E0BC746DE2AD427C7C6BC6DCEB4AEEE25176340EB4A2AB891B",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/protean/plugin/generated_client.h",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "plugin/generated_client.h",
+      "original_sha256": "F823FAF29593CBE0F14D7576EE722D41B8617F203FC5243494E10C953B0A649B",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "60CE873E5DA31E28831710B5A25D776ED482BE6DA93535A75A791CA8F87AAA07",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/protean/plugin/generated_server.h",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "plugin/generated_server.h",
+      "original_sha256": "717D103DA524E6FC27224F1964B6204015DD124EB1D1EA699B5D59CC41A22E11",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "2B6D69F284C22C8FBA72DBDBD6637DAF6171CAD9E2846FB0F6487953EDDFE080",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/protean/plugin/protean_improved.c",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "plugin/protean_improved.c",
+      "original_sha256": "D79AB71A65FA526FF4F177B7FD3A68BC8D627F44AE6D964D8861D52D7C4631D3",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "12FC39CABDE5DD1339A22E5672FDA52ADCE5D432659250090DED376E3FB94B5F",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/protean/README.md",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "README.md",
+      "original_sha256": "72F8CC695BC0D3B0EC61E4FEF6BDFC071EDCB31EF4133EA53C4CCB835E817A56",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "F0800B485CC2EB92FC1CC4F4F812CE53A7F4671630AE55F935F4B3F803AA270C",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "maintenance documentation update"
+      ]
+    },
+    {
+      "file": "mods/protean/reference/clean-verification.json",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "reference/clean-verification.json",
+      "original_sha256": "2D003CD2DE2B583602C540A6F0029A0DF0FAE3607AE750F2F7946316EA3F3F38",
+      "classification": "local binary/certificate or superseded license statement",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": false
+    },
+    {
+      "file": "mods/protean/reference/gameplay-verification.json",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "reference/gameplay-verification.json",
+      "original_sha256": "0DC8DB0D94A798C80A551DB6EFB83725137889858CBAC71996A1845C93AA88F0",
+      "classification": "local binary/certificate or superseded license statement",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": false
+    },
+    {
+      "file": "mods/protean/reference/protean-improved.vtm",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "reference/protean-improved.vtm",
+      "original_sha256": "14A68F6A1B61FBFD5F3A125AB59BA622B0670786693BDD05A7D13909A1199099",
+      "classification": "local binary/certificate or superseded license statement",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": false
+    },
+    {
+      "file": "mods/protean/reference/technical-verification.json",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "reference/technical-verification.json",
+      "original_sha256": "CABC566EBE663C85508BAA7DA3D25B5AD1EB5DF180C40580178FF3124C658333",
+      "classification": "local binary/certificate or superseded license statement",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": false
+    },
+    {
+      "file": "mods/protean/tests/clean_pe.py",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "tests/clean_pe.py",
+      "original_sha256": "0E813C81A4BE2E23F59B07B0EF1744CE6C4720A48AB7D4958913C8449DD73417",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "E35DED5B188557FCD8C59158CAC6E74AB656036E96930AD1F246980D652003FC",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/clean_pe.py"
+    },
+    {
+      "file": "mods/protean/tests/emitted_feats.py",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "tests/emitted_feats.py",
+      "original_sha256": "B73DB8B4D80A16E8AD46F469DBD4E141D8D9BDADEA40905D733180BF1DD3311F",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "11344F1BBFCA84E21D422BD2E4EA932224C0D1AE913F74CC0A291B269DFB032A",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/protean/tests/emitted_filter_sync.py",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "tests/emitted_filter_sync.py",
+      "original_sha256": "9ADDF346F2CBF9F0CC93350EE5DF797401BC7AF0E5FA408355B5113860CF36D2",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "9ADDF346F2CBF9F0CC93350EE5DF797401BC7AF0E5FA408355B5113860CF36D2",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/protean/tests/emitted_warform.py",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "tests/emitted_warform.py",
+      "original_sha256": "1E1B0169BB95E3A755AA491FD5C0E75C9E27B4C1B785EA7D629DE5D99605B614",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "111F45006C2F312C71F1C69E66395D808A80C65245A1E0E618D6597ECBFDFBEE",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/protean/tests/exact_harness.c",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "tests/exact_harness.c",
+      "original_sha256": "A389C4DE16DC88663592708A10DE209C507EF49C1C57767B5D8F4E78BE7A215A",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "A389C4DE16DC88663592708A10DE209C507EF49C1C57767B5D8F4E78BE7A215A",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/protean/tests/gameplay/actors.py",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "tests/gameplay/actors.py",
+      "original_sha256": "241489F83A1CE2DEC3833F2EC98733AEA7DF4EB6D9AC00D6E53B65E1C439AE41",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "8C56D1FD5AB8EDD89E25C8C8212865340C8D80F9BC13356F0EA4F7A8DB8DE879",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/actors.py"
+    },
+    {
+      "file": "mods/protean/tests/gameplay/audit_protean.py",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "tests/gameplay/audit_protean.py",
+      "original_sha256": "841B296BE03761CA2D80627CCF9FC09B7D99EAD2548D24C1AC3171346280ABF3",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "120CB921638000BBE14FBE0EE4E34CDE4196AD05393EA7391FA17A2194A7F581",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/protean/tests/gameplay/cleanup_aliases.cfg",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "tests/gameplay/cleanup_aliases.cfg",
+      "original_sha256": "9704D3172AAC4A39D7A8D3EE27B4E15C098E9C5237DAAF480DE4018E209A1212",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "9704D3172AAC4A39D7A8D3EE27B4E15C098E9C5237DAAF480DE4018E209A1212",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/protean/tests/gameplay/cleanup_probe.py",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "tests/gameplay/cleanup_probe.py",
+      "original_sha256": "D646F5F37D6631E23D7AE58FD9D9417F7E56DFBBBF9BA5F8CE6A9AE19341A065",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "80ADEEA68BEA9EC56B0ACFD4CA26585F01CEB1E4E471094CC74BA0A1606D576E",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/cleanup_probe.py"
+    },
+    {
+      "file": "mods/protean/tests/gameplay/driver.py",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "tests/gameplay/driver.py",
+      "original_sha256": "681A4A2FA09C725E21D35DD339CC8A473CA88CDE4356A05801F5171D1D2DFDCB",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "FC7C884703FEA9ABF15D2E47F1C38369D9FC1DF4330F67ADA2C623EC87464AC8",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/driver.py"
+    },
+    {
+      "file": "mods/protean/tests/gameplay/observe.py",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "tests/gameplay/observe.py",
+      "original_sha256": "579FA1E61E9E8B04C4CE1D8D65E385180A66DAFEF75E35D736FD330B90CF5F7F",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "77344D7326CFC701A74176C29DB60F1ACB5800971213807867C60A815A52770B",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/observe_579fa1e6.py"
+    },
+    {
+      "file": "mods/protean/tests/gameplay/process_reader.py",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "tests/gameplay/process_reader.py",
+      "original_sha256": "40ACF00886E0CB4B9F8BC73D5F98D561A59D4F255A28FFE2EACB9668DCBB99E8",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "5B882817DC97025FA8E45BE67EBFA68506699D0BE0C3DB249032A4C3D7F56528",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/process_reader.py"
+    },
+    {
+      "file": "mods/protean/tests/gameplay/protean_clean.py",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "tests/gameplay/protean_clean.py",
+      "original_sha256": "9F5A28DD7E377B947349348E101F3BD9488C9A25B5B065427DC5D1E68DC0D9E3",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "AB478CCCA734D4C94189EB24F0CD2E83022621C21DFA26B25F89767F18833513",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/protean/tests/gameplay/protean_filter.py",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "tests/gameplay/protean_filter.py",
+      "original_sha256": "0AD923D923DDED930927FA95F45759D3DB1DAA269E7FAAE5223007DE51A1BDE3",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "A9B15B71CCCCF2B6C6B0D63E17FBA61CE0D91B1BB53B57AF6D6853DF6CFFE482",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/protean/tests/gameplay/protean_remaining.py",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "tests/gameplay/protean_remaining.py",
+      "original_sha256": "FF202256A984BAE88B7AC599E7C38C146B66F43947F00B6D7953A425666FF398",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "7DB2576A211A543CF1C19AAF7643EEF16571BDFBCDC3ED7BCC9BC599A508CC6F",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/protean/tests/gameplay/protean_saved_active.py",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "tests/gameplay/protean_saved_active.py",
+      "original_sha256": "FE9EF4841B38F0599C2D55E8E1BE9577A830CA286F668D29C88D8C5B1C3B7E1E",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "CE5A9715325DF626E5404FCCB9C691A57094F282A6DB06AD25D566F7B4477565",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/protean/tests/gameplay/Session.ps1",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "tests/gameplay/Session.ps1",
+      "original_sha256": "67BCF5283C9DDF8CC9B42DDBC7CBF973BF67F4275469F99E816E2D1FCC8DD2C7",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "2207D55F1A6275513078B56F3CFE28369479F761F63AC0BDF9B50DAED412C44C",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/protean/tests/gameplay/warehouse_gate.py",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "tests/gameplay/warehouse_gate.py",
+      "original_sha256": "6A382DE3315979706DCCDBC66A8B0FC47A969453456E857A6BBCE59C4367E74A",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "BC7F2D268F1E9B4F20BABE1AE1DE39ED21C44DD282AFCE29681F7A930FBD1E9B",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/warehouse_gate.py"
+    },
+    {
+      "file": "mods/protean/tests/load_clean.c",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "tests/load_clean.c",
+      "original_sha256": "7AE4E3852D98DDEBE170C53D58FC05F18F40800DF5CA82885B23821AE896C658",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "059E5D1A2125875CAC4CFF193BA41DEB5A43677DAFED1FBD385287452D86976B",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/load_clean.c"
+    },
+    {
+      "file": "mods/protean/tests/native_fixture.h",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "tests/native_fixture.h",
+      "original_sha256": "C96E22ADF564BA991D577AF2B3DC7E543C94B18FB331DEB0D5DD5B1564F6816A",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "E41A3F325A3D2D3039E6C0D8959EA14868DD601ADED71D3927E8D8A3EEB3A9BC",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/native_fixture.h"
+    },
+    {
+      "file": "mods/protean/tests/package_audit.py",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "tests/package_audit.py",
+      "original_sha256": "7022D0C71826FC8B32B2A93C8C04F21C787D2D82FE21B304CE725FC3F0154E62",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "E18F722EE81BA3C1E3824F88B3E8AF019BAB735652B5F75AB96DBA2FFDEA429D",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/protean/tests/verify_exact.py",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "tests/verify_exact.py",
+      "original_sha256": "82012B78B3E6F11726F8029CCE07879B93008DD798C4157EBA15E981756D53AB",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "ADC7D2DA9C091C03EFB2BDC9FAC29A5516ACB1848A902630E27A39FA76831012",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/protean/tools/finalize_pe.py",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "tools/finalize_pe.py",
+      "original_sha256": "945C6C21FC6E3ECF1B0C44E0E85E0F4FEC6995B3D3C91CB2E01C388D12014059",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "CC342CD09BCD2F93A2FFBE274D6B31C0587FCD533461F59A3F60A5B9E8BC3264",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/finalize_pe.py"
+    },
+    {
+      "file": "mods/protean/tools/generate_blobs.py",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "tools/generate_blobs.py",
+      "original_sha256": "CD41DE3886E307DEB2FC8B80E13B2C06DF29D6C3A3466D2C48EC9CED7EA50648",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "CD41DE3886E307DEB2FC8B80E13B2C06DF29D6C3A3466D2C48EC9CED7EA50648",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/protean/tools/native_warform.py",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "tools/native_warform.py",
+      "original_sha256": "5178C65F5844B911A59CFAB15835B7AE39959F1DA6D36033BF6D8E9B5FC4CD76",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "5178C65F5844B911A59CFAB15835B7AE39959F1DA6D36033BF6D8E9B5FC4CD76",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/protean/tools/pe_utils.py",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "tools/pe_utils.py",
+      "original_sha256": "C70676BB860EEF49ABCA41293954B8800CB1F738D5226EC2C13AAF2F34F85DAB",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "C70676BB860EEF49ABCA41293954B8800CB1F738D5226EC2C13AAF2F34F85DAB",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/protean/Verify.ps1",
+      "capsule": "_Source Capsules/Protean Improved 1.2.2 Source.zip",
+      "member": "Verify.ps1",
+      "original_sha256": "690F4CFD52A705C421926E4193C7069691A43EACBE352A0A9C195954BE365AB3",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "6E877763A4548737C0EFCC6BA68C273BB1D848F51FCB66E09D1710789209E421",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/subtitle/build/subtitle-pause-fix.vtm",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "build/subtitle-pause-fix.vtm",
+      "original_sha256": "E1A388F72911523B1A6459B027329277EBFF3D47D49B0737E6B0040A3F1EFD0D",
+      "classification": "local binary/certificate or superseded license statement",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": false
+    },
+    {
+      "file": "mods/subtitle/build/technical-verification.json",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "build/technical-verification.json",
+      "original_sha256": "5FA0A0E1604FE21E477B7CD408B3E6E9D2A9706941C0D37B2A15407FF8C1BB45",
+      "classification": "local binary/certificate or superseded license statement",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": false
+    },
+    {
+      "file": "mods/subtitle/Build.ps1",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "Build.ps1",
+      "original_sha256": "2C19CA74E36A66D76C7A2158DBB1D46F3AAB429FF6A3F865C74089B653DBC927",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "2C19CA74E36A66D76C7A2158DBB1D46F3AAB429FF6A3F865C74089B653DBC927",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/subtitle/BuildDiagnostics.ps1",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "BuildDiagnostics.ps1",
+      "original_sha256": "44D4B8917B2AAE76A2A89303668D3B9B12F8C5E6559B90A2A9EDE202BC015DB4",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "44D4B8917B2AAE76A2A89303668D3B9B12F8C5E6559B90A2A9EDE202BC015DB4",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/subtitle/LICENSE",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "LICENSE",
+      "original_sha256": "388EEDBC0E1792D50BB411FC2BD584A6DF21DF7FE9F84D362C45F158E155C49C",
+      "classification": "local binary/certificate or superseded license statement",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": false
+    },
+    {
+      "file": "mods/subtitle/NOTICE",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "NOTICE",
+      "original_sha256": "C96F0FB3E038070D21F85A9C67B01A6F21FEBD1BC8835071A768F2617D549774",
+      "classification": "local binary/certificate or superseded license statement",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": false
+    },
+    {
+      "file": "mods/subtitle/plugin/generated_clock.h",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "plugin/generated_clock.h",
+      "original_sha256": "1D587151A79D2C2C7AE11E1570660EBCE03EEE584E0A9BEEB6E2F30A807D55E0",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "5795505B627B257DBF134B8E8F90AD0D7E72CD0AA830849E886074A2C563F2A7",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/subtitle/plugin/install_hooks.h",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "plugin/install_hooks.h",
+      "original_sha256": "0698CAB4118D5CBA876F45BF49C2B2CA7FC058B1337DA19E662CA635E937B4B3",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "0698CAB4118D5CBA876F45BF49C2B2CA7FC058B1337DA19E662CA635E937B4B3",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/subtitle/plugin/radio_loop.h",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "plugin/radio_loop.h",
+      "original_sha256": "5E56591423B8ED54F14F64B952563ACF1E62D617D125B491AC21D70746362F26",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "5E56591423B8ED54F14F64B952563ACF1E62D617D125B491AC21D70746362F26",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/subtitle/plugin/radio_sync.h",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "plugin/radio_sync.h",
+      "original_sha256": "99D8F1F41067F9CF06A3D590DCC8BCFF2014B39D338FB0453BBB46AE7B22FA55",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "99D8F1F41067F9CF06A3D590DCC8BCFF2014B39D338FB0453BBB46AE7B22FA55",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/subtitle/plugin/subtitle_pause.c",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "plugin/subtitle_pause.c",
+      "original_sha256": "79EC56BFE49B7B9DEB3AC08C8C6E8209FC95C5153E9135B95CA25CE122CF2862",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "E924B56336DFEB5356929CE75C31FB64461F188FE6F6196190960F73EB659281",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/subtitle/README.md",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "README.md",
+      "original_sha256": "A0181F3ADFA0E8E389EB10C3858C450C1ED8F757911B9BF0726909F93AFBE03F",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "96B22B0AC68B4B2AA129B3EFC85476DBE3446D10A1C29EFE8A1354F292A68239",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "maintenance documentation update"
+      ]
+    },
+    {
+      "file": "mods/subtitle/tests/audit_evidence.py",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "tests/audit_evidence.py",
+      "original_sha256": "B84E000356EEA2EA2A56CDB5144A726C9762374A1E8E07A72A400C841601D349",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "0758CC244240923CA919EA132DA8CD81E2A74CB503C740AB0AB04BB37A1A84BC",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/subtitle/tests/baseline.py",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "tests/baseline.py",
+      "original_sha256": "C5D3DDE0F88CF7F781312A380DE220C4F4544C94D59EA74FE112B4FB841152B7",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "74C35A1E0A7170A813916D538BAD26A9745CE55898810BB6B5D3A4839C5ECC02",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/subtitle/tests/capture_audio.cpp",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "tests/capture_audio.cpp",
+      "original_sha256": "637F4D972C1803463496A5CEB2AE2FC198B756F4C5789412EDDB5B80AB75F655",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "637F4D972C1803463496A5CEB2AE2FC198B756F4C5789412EDDB5B80AB75F655",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/subtitle/tests/clean_payload.py",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "tests/clean_payload.py",
+      "original_sha256": "6ECB079249B00BB2C98221CF926D1177CD33CD3EC1FC03C7B1FB25DA79565C14",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "364EA872FA97EF70B67932FA827D474362DFFC009614C87AD781DE97B9A84BB9",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/clean_payload.py"
+    },
+    {
+      "file": "mods/subtitle/tests/clean_regression.py",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "tests/clean_regression.py",
+      "original_sha256": "DCEFE0C1CF7F9786BC8E828298523E2AA88582C78BC148CBC6C099EEFDAB63B3",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "6FFCB65D5F7A2FA4F08A98E8B291AD2A089D2AC0852B6FFD2FD1246845D989F1",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/subtitle/tests/CleanSession.ps1",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "tests/CleanSession.ps1",
+      "original_sha256": "3CFD2BE66069DFD7A114DABFB8D890F0736389282BAC83F251F465B53896D591",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "5E74447BE9306DE226DCD793B593614F97F5DFA24F258EACC1F73F41ED2DF6F8",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/subtitle/tests/controls.py",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "tests/controls.py",
+      "original_sha256": "896EEFDE27EF3F0829200EAC037E784285B6580A8E36A5FCCB82629DE74BF493",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "BD364E401D3538C621367A91255371EB8823B7E4013E578907740DF75FE9E325",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/subtitle/tests/correlate.py",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "tests/correlate.py",
+      "original_sha256": "8DC1619356308161B32356F0F9CED4DEA1D8712A511351E450F07A2CAE54D632",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "8DC1619356308161B32356F0F9CED4DEA1D8712A511351E450F07A2CAE54D632",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/subtitle/tests/dispatcher_harness.py",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "tests/dispatcher_harness.py",
+      "original_sha256": "13BF872F8ECC8B64DC21781A6A3010C2113BBD72BB63F2783B2A15A0735FBCCB",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "253072A1DA7CF753DA83CDE18BB60E6B79B2C996F8367200B63A895ECDBD3FE0",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/subtitle/tests/extract_audio.py",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "tests/extract_audio.py",
+      "original_sha256": "89F63F9B7AFFC98B984296F0F854347FACD0F30183B58A1227801B3A9869D8B3",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "89F63F9B7AFFC98B984296F0F854347FACD0F30183B58A1227801B3A9869D8B3",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/subtitle/tests/inspect_assets.py",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "tests/inspect_assets.py",
+      "original_sha256": "F829B873DE49C55A4717E3307BD1B5D4F961F56F28666F7A8D7147CFB4DFAFA4",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "C14B7A0CD76CE0007CFD5F162AFC2A3041635DBC05DFDABE5D7996EB5EF6BFC8",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/subtitle/tests/inspect_code.py",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "tests/inspect_code.py",
+      "original_sha256": "BE6F5511606D117C644F1A6C7FA4027EE4FF3779A1E7ED4ED1A9EF9E7C9A83E5",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "429A9DC7162121E5D1F8A36989F79ED11C1B316E7C6D015EE3D43C6F5ED86AD9",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/subtitle/tests/inspect_decoder.py",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "tests/inspect_decoder.py",
+      "original_sha256": "64B2B7CBA60117812F1ACC878049EC521373322F6ED10F32CE70AD1AEFAA8101",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "64B2B7CBA60117812F1ACC878049EC521373322F6ED10F32CE70AD1AEFAA8101",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/subtitle/tests/Install.ps1",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "tests/Install.ps1",
+      "original_sha256": "DC0D8F12FD5D15A4CF99948A2F9F0127CCE9640CBF2137BC380080F75D005168",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "FF5E1A923621CDC0F4B96F8EB609DE7700318EBEDB89C3B3D8EA472AE6E33B3D",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/subtitle/tests/InstallClean.ps1",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "tests/InstallClean.ps1",
+      "original_sha256": "391D62553CDB81470F62C40E105CD515388C2A5500E358F8F614E7A33C938963",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "D94357C281AE14658B4B9CFA79FF182DEB255AB33B139AB23CE4048D26772BDE",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/subtitle/tests/load_clean.c",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "tests/load_clean.c",
+      "original_sha256": "7AE4E3852D98DDEBE170C53D58FC05F18F40800DF5CA82885B23821AE896C658",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "059E5D1A2125875CAC4CFF193BA41DEB5A43677DAFED1FBD385287452D86976B",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/load_clean.c"
+    },
+    {
+      "file": "mods/subtitle/tests/loop_diagnostic.py",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "tests/loop_diagnostic.py",
+      "original_sha256": "1CE42E4059BD6EFBC49C16D05C483755F07FDD454617E7F8BB5119137FC52D85",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "1CE42E4059BD6EFBC49C16D05C483755F07FDD454617E7F8BB5119137FC52D85",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/subtitle/tests/loop_final.py",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "tests/loop_final.py",
+      "original_sha256": "3E89484ACDC6433351385DA42606529737FD47D02EEB248B2793F9EB5E46434F",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "942ED305F8F1DAA722E48BF092617589E08257FB0B19763CD23BFBDE1A9B9E90",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/subtitle/tests/mf_decode.cpp",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "tests/mf_decode.cpp",
+      "original_sha256": "1E769133D42524E2BABB6E7D2287951A67E3278C7B0D5261B1FDB663256112FC",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "1E769133D42524E2BABB6E7D2287951A67E3278C7B0D5261B1FDB663256112FC",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/subtitle/tests/native_harness.c",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "tests/native_harness.c",
+      "original_sha256": "80475018CF2FB6E7626AA3BBCA62525611250C9506669209ADB7FE759C2403BB",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "80475018CF2FB6E7626AA3BBCA62525611250C9506669209ADB7FE759C2403BB",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/subtitle/tests/observe.py",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "tests/observe.py",
+      "original_sha256": "6108C7D6F7796941325690DAAE33DEFC2A3A0C4BBBFAC94F59B57B0F84FE6E3D",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "E1DE0307F200677CFFCC0A4846881E68A9E2C30191D86639A6A04268437E0549",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/observe.py"
+    },
+    {
+      "file": "mods/subtitle/tests/probe.py",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "tests/probe.py",
+      "original_sha256": "DB5B3EEBA69649608C47B2ADC316F56E2D6CCBB23D15CE59E79492063381088B",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "DB5B3EEBA69649608C47B2ADC316F56E2D6CCBB23D15CE59E79492063381088B",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/subtitle/tests/process_reader.py",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "tests/process_reader.py",
+      "original_sha256": "40ACF00886E0CB4B9F8BC73D5F98D561A59D4F255A28FFE2EACB9668DCBB99E8",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "5B882817DC97025FA8E45BE67EBFA68506699D0BE0C3DB249032A4C3D7F56528",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/process_reader.py"
+    },
+    {
+      "file": "mods/subtitle/tests/Session.ps1",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "tests/Session.ps1",
+      "original_sha256": "F8759E1D6713ECAB996F021154103DA39E5474A97E51571D989D5517FCACB508",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "0FA98CE4583BDB097E6BFFD60265FCDC8DB902E7E1225FCE96F037898BD47E27",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/subtitle/tests/summarize.py",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "tests/summarize.py",
+      "original_sha256": "B74D5E14337160CEDACC8331EA649CDD58C161885812C8F81AA6CA289966EA6A",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "B74D5E14337160CEDACC8331EA649CDD58C161885812C8F81AA6CA289966EA6A",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/subtitle/tests/verify.py",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "tests/verify.py",
+      "original_sha256": "4117A56D509C24197891952EA209D69CB0110A5DAC1A8EF814EAFE383D91C0BF",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "A5910A32640EC9E5448A8B4486B9A6A1BF7D3704D9D952DA205768FB6DE5F6C6",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/subtitle/tools/finalize_pe.py",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "tools/finalize_pe.py",
+      "original_sha256": "945C6C21FC6E3ECF1B0C44E0E85E0F4FEC6995B3D3C91CB2E01C388D12014059",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "CC342CD09BCD2F93A2FFBE274D6B31C0587FCD533461F59A3F60A5B9E8BC3264",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable",
+        "shared helper adapter"
+      ],
+      "shared": "infra/common/finalize_pe.py"
+    },
+    {
+      "file": "mods/subtitle/tools/generate_blobs.py",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "tools/generate_blobs.py",
+      "original_sha256": "5A0EBBBBAD6201C7CFEE8D65982785CB0D93E773D357793664A0350B99A3A1C6",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "5A0EBBBBAD6201C7CFEE8D65982785CB0D93E773D357793664A0350B99A3A1C6",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/subtitle/tools/generated_clock.h",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "tools/generated_clock.h",
+      "original_sha256": "1D587151A79D2C2C7AE11E1570660EBCE03EEE584E0A9BEEB6E2F30A807D55E0",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "5795505B627B257DBF134B8E8F90AD0D7E72CD0AA830849E886074A2C563F2A7",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/subtitle/tools/native_clock.py",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "tools/native_clock.py",
+      "original_sha256": "054E5D126543CBF69A9D71D093501E0A12D51AC0BEA467D4B0012D5DC013DBB4",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "054E5D126543CBF69A9D71D093501E0A12D51AC0BEA467D4B0012D5DC013DBB4",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/subtitle/tools/test_native_clock.py",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "tools/test_native_clock.py",
+      "original_sha256": "79CF342E8DFC53C3EFA8894214237B316E41FC6FD87573B35120C58098BF51E5",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "79CF342E8DFC53C3EFA8894214237B316E41FC6FD87573B35120C58098BF51E5",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    },
+    {
+      "file": "mods/subtitle/Verify.ps1",
+      "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
+      "member": "Verify.ps1",
+      "original_sha256": "C01D071AC9D549D51D8492DC7A4D53DFFBE02F6C3701721A219E59BDDD0841DA",
+      "classification": "original workspace source/patch recipe",
+      "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "2C606873E1D320ED120D7228621A4E5B527A409E08B69D8813808E44639265E7",
+      "transforms": [
+        "UTF-8/LF",
+        "private-path placeholders",
+        "historical-script notice when applicable"
+      ]
+    }
+  ]
+}

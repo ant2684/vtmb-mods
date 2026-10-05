@@ -1,0 +1,16 @@
+The MIT license covers the original mod source, test infrastructure and
+documentation in this repository. Source origins and import transformations
+are recorded in docs/provenance.json.
+
+Vampire: The Masquerade - Bloodlines, its engine and game modules, maps,
+models, dialogue, audio, saves and the Unofficial Patch belong to their
+respective owners. They are not included or relicensed here. Interoperability
+constants, signatures and minimal instruction fixtures identify supported
+local modules; they do not grant rights to distribute those modules.
+
+Python, Zig, pefile, Capstone, Unicorn and Pillow are separately licensed
+dependencies installed from their upstream distributions. Their licenses
+remain applicable. No third-party library implementation is vendored.
+
+Historical source certificates describe specific past tests. They do not
+certify a different binary, game build, resource or new gameplay session.
