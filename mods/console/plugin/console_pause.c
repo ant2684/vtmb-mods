@@ -16,6 +16,7 @@ typedef void (__thiscall *HideFn)(void *,int);
 typedef void (__cdecl *EngineHideFn)(int);
 typedef const char *(__thiscall *LevelFn)(void *);
 typedef int (__thiscall *ActivateFn)(void *);
+typedef void *(__thiscall *FindFn)(void *,const char *,int);
 typedef struct { uint8_t *site,*trampoline; size_t length; uint8_t old[16]; } Hook;
 static Hook hooks[4];
 static uint8_t *engine,*ui;
@@ -31,6 +32,7 @@ static void *context_dialog;
 static double context_time;
 static char context_level[128];
 static EngineHideFn engine_hide;
+static VisibleFn minimize_visible;
 static void *console_dialog(void);
 static void *menu_panel(void) { return *(void **)(ui+0x6c338); }
 static const char *level_name(void) {
@@ -56,6 +58,21 @@ static int visible(void *panel) {
     return ((IsVisibleFn)v[0x58/4])(panel)!=0;
 }
 
+static void hide_minimize(void *dialog) {
+    void *menu,*item;void **v;
+    if(!dialog)return;
+    minimize_visible(dialog,0);
+    /* New native title menus derive Minimize availability from this button.
+       An existing menu is cached, so update its one item explicitly. */
+    menu=*(void **)((uint8_t *)dialog+0xcc);
+    if(!menu)return;
+    v=*(void ***)menu;
+    item=((FindFn)v[0x98/4])(menu,"Minimize",0);
+    if(item) {
+        v=*(void ***)item;
+        ((VisibleFn)v[0xb8/4])(item,0);
+    }
+}
 
 static int __fastcall command(void *self,void *unused,const char *text) {
     (void)unused;
@@ -87,6 +104,7 @@ static void __cdecl show_console(void) {
     }
     show_scope=1;
     original_show();
+    hide_minimize(console_dialog());
     show_scope=previous_scope;show_was_visible=previous_visible;
 }
 static void __fastcall set_visible(void *self,void *unused,int value) {
@@ -179,6 +197,9 @@ __declspec(dllexport) void loaded_gameui(void) {
     uint8_t resume_sig[]={0x8b,0x0d,0,0,0,0,0x85,0xc9,0x0f,0x84,0x83,0,0,0,0x8b,0x54,0x24,0x04};
     static const uint8_t cmd_sig[]={0x8b,0x44,0x24,0x04,0x50,0xe8,0xe6,0x1c,0,0,0x83,0xc4,0x04,0xc2,0x04,0};
     static const uint8_t vis_sig[]={0x8b,0x44,0x24,0x04,0x56,0x50,0x8b,0xf1,0xe8,0x03,0xac,0xff,0xff};
+    static const uint8_t min_sig[]={0x8b,0x89,0xb4,0,0,0,0x8b,0x54,0x24,0x04,0x89,0x54,0x24,0x04,0x8b,0x01,0xff,0x60,0x54};
+    static const uint8_t menu_sig[]={0x53,0x56,0x8b,0xf1,0x57,0x8b,0x86,0xcc,0,0,0,0x85,0xc0,0x0f,0x85,0x37,0x01,0,0};
+    uint8_t item_sig[]={0x8b,0x8e,0xcc,0,0,0,0x6a,0,0x68,0,0,0,0,0x8b,0x11,0xff,0x92,0x98,0,0,0,0x8b,0xf8,0x85,0xff,0x74,0x16,0x8b,0x8e,0xb4,0,0,0,0x8b,0x1f,0x8b,0x01,0xff,0x50,0x58,0x50,0x8b,0xcf,0xff,0x93,0xb8,0,0,0};
     uint32_t ptr;uint8_t patch[16];unsigned i,applied=0;int rollback=1;
     void *destinations[4]={(void *)show_console,(void *)command,(void *)set_visible,(void *)hide_gameui};
     if(installed)return;
@@ -187,10 +208,14 @@ __declspec(dllexport) void loaded_gameui(void) {
     ptr=(uint32_t)(uintptr_t)(engine+0x13064a4);memcpy(show_sig+2,&ptr,4);
     memcpy(resume_sig+2,&ptr,4);
     ptr=(uint32_t)(uintptr_t)(ui+0x6c330);memcpy(hide_sig+5,&ptr,4);
+    ptr=(uint32_t)(uintptr_t)(ui+0x66b0c);memcpy(item_sig+9,&ptr,4);
     if(!unique(engine,show_sig,sizeof(show_sig),0x10dc10) || !unique(engine,cmd_sig,sizeof(cmd_sig),0x1a570) ||
        !unique(ui,vis_sig,sizeof(vis_sig),0x22070) || !unique(ui,hide_sig,sizeof(hide_sig),0x59d0) ||
-       !unique(engine,resume_sig,sizeof(resume_sig),0x10d650))return;
+       !unique(engine,resume_sig,sizeof(resume_sig),0x10d650) ||
+       !unique(ui,min_sig,sizeof(min_sig),0x220e0) || !unique(ui,menu_sig,sizeof(menu_sig),0x21e30) ||
+       !unique(ui,item_sig,sizeof(item_sig),0x21ee7))return;
     engine_hide=(EngineHideFn)(engine+0x10d650);
+    minimize_visible=(VisibleFn)(ui+0x220e0);
     if(!prepare(hooks,engine+0x10dc10,6) || !prepare(hooks+1,engine+0x1a570,5) ||
        !prepare(hooks+2,ui+0x22070,5) || !prepare(hooks+3,ui+0x59d0,9))goto fail;
     original_show=(ShowFn)hooks[0].trampoline;original_command=(CommandFn)hooks[1].trampoline;

@@ -1,6 +1,16 @@
 # Gameplay collection and recovery
 
 Fresh gameplay contracts are listed by `./RunTests.ps1 -Suite gameplay -List`.
+`console.minimize` observes the hidden native button, former button position and
+cached title-menu availability, including reopening and reload. It uses the
+supported five-second input scope, with an independent control audit; it does
+not certify immediate input. It never creates a title menu by a memory write.
+`console.minimize_remaining` is a bounded follow-up for a recorded early
+menu-to-console opening failure: one first opening after a measured five-second
+menu exit wait, then script pause and reload. It does not replay the full matrix.
+`infra.console_minimize.audit_completion` independently audits the completed
+workflows from both exact-candidate sessions while retaining the first FAIL and
+its timing limitation. It never changes that first session into a PASS.
 Each requires the exact supported modules, temporarily installed artifact and
 actually selected resources. Nominate a save in local.json; do not substitute
 the user's current quicksave or manufacture a PASS from a historical log.

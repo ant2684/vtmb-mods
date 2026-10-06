@@ -59,7 +59,7 @@ def rows(path):
     return [json.loads(line) for line in path.read_text().splitlines() if line]
 
 
-def evaluate(folder):
+def evaluate(folder, remaining=False, initial_only=False):
     identity=read_json(folder/'identity.json');controls=rows(folder/'controls.jsonl');inputs=rows(folder/'input.jsonl')
     observations=[]
     def group(label):
@@ -78,20 +78,22 @@ def evaluate(folder):
         return sample
     def record(check,before,after):
         observations.append({'check':check,'expected':True,'observed':True,'before':before,'after':after,'elapsed_seconds':max(0,after['wall']-before['wall']),'source':'native-process-read'})
-    for closing in ['x','tilde']:
-        a=frozen(closing+'_open');b=running(closing+'_resumed')
-        require(a[0]['console']['visible'] and not b[-1]['console']['visible'],'Native console visibility transition absent')
-        record('console_'+closing,a[0],b[-1])
-    a=frozen('ordinary_before');b=frozen('ordinary_after');running('ordinary_resumed')
-    record('ordinary_pause',a[0],b[-1])
-    a=frozen('menu_restored');b=running('menu_resumed')
-    require(all(r['menu']['visible'] and r['menu_pause_depth']==1 for r in a),'Prior menu not restored')
-    record('prior_menu',a[0],b[-1])
-    a=frozen('script_preserved');b=running('script_audio_resumed')
-    require(all(r['pause_depth']==1 and r['menu_pause_depth']==0 and not r['console']['visible'] for r in a),'Script pause not independently retained')
-    record('script_pause',a[0],b[-1])
+    if not remaining:
+        for closing in ['x','tilde']:
+            a=frozen(closing+'_open');b=running(closing+'_resumed')
+            require(a[0]['console']['visible'] and not b[-1]['console']['visible'],'Native console visibility transition absent')
+            record('console_'+closing,a[0],b[-1])
+        a=frozen('ordinary_before');b=frozen('ordinary_after');running('ordinary_resumed')
+        record('ordinary_pause',a[0],b[-1])
+        a=frozen('menu_restored');b=running('menu_resumed')
+        require(all(r['menu']['visible'] and r['menu_pause_depth']==1 for r in a),'Prior menu not restored')
+        record('prior_menu',a[0],b[-1])
+    if not initial_only:
+        a=frozen('script_preserved');b=running('script_audio_resumed')
+        require(all(r['pause_depth']==1 and r['menu_pause_depth']==0 and not r['console']['visible'] for r in a),'Script pause not independently retained')
+        record('script_pause',a[0],b[-1])
     metrics=None;first_before=None;first_after=None
-    for label in ['after_x','after_tilde','script_resumed','after_reload']:
+    for label in (['after_x','after_tilde'] if initial_only else ['script_resumed','after_reload'] if remaining else ['after_x','after_tilde','script_resumed','after_reload']):
         mouse=[r for r in inputs if r['label']==label+'_mouse'];moves=[r for r in inputs if r['label']==label+'_move']
         require(len(mouse)==len(moves)==2,'Missing independent input records: '+label)
         signed=[];receipts=[];camera=[]
@@ -112,9 +114,10 @@ def evaluate(folder):
                      'camera_left':min(camera),'camera_right':max(camera),'world_time_delta':b['client_time']-a['client_time'],'external_wait_seconds':elapsed}
             first_before,first_after=a,b
     record('first_input',first_before,first_after)
-    a=next(r for r in inputs if r['label']=='console_command' and r['command'].startswith('load rc_'))
-    require(a['before']['player_handle']!=a['after']['player_handle'],'Fresh native reload missing')
-    running('reload_audio');record('reload',a['before'],a['after'])
+    if not initial_only:
+        a=next(r for r in inputs if r['label']=='console_command' and r['command'].startswith('load rc_'))
+        require(a['before']['player_handle']!=a['after']['player_handle'],'Fresh native reload missing')
+        running('reload_audio');record('reload',a['before'],a['after'])
     return {**identity,'resolved_resources':identity['resources'],'first_result_preserved':True,'observations':observations,'metrics':metrics}
 
 

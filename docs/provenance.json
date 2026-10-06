@@ -24,11 +24,12 @@
       "classification": "original workspace source/patch recipe",
       "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
       "published": true,
-      "public_sha256": "85198F75FFBE4A2DA4FAD83CB889C2BE513A183FDB3AE1A899AE239DF7DEA291",
+      "public_sha256": "CB5B307D02A1A70509BC1A4DC68BC2DB6309A966CE13D3821202634C2A088929",
       "transforms": [
         "UTF-8/LF",
         "private-path placeholders",
-        "historical-script notice when applicable"
+        "historical-script notice when applicable",
+        "console minimize maintenance: guarded native button/menu control and matching regression checks"
       ]
     },
     {
@@ -39,12 +40,13 @@
       "classification": "original workspace source/patch recipe",
       "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
       "published": true,
-      "public_sha256": "518B7F2AF912486C228F6896011267BE0929F753B7FFC3C158B536614748D564",
+      "public_sha256": "9BDFD0D3AB714B20C3B502185516A2A0077AA8627CA6F238C45FDACE2005FBE9",
       "transforms": [
         "UTF-8/LF",
         "private-path placeholders",
         "historical-script notice when applicable",
-        "maintenance documentation update"
+        "maintenance documentation update",
+        "console minimize maintenance: guarded native button/menu control and matching regression checks"
       ]
     },
     {
@@ -108,11 +110,12 @@
       "classification": "original workspace source/patch recipe",
       "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
       "published": true,
-      "public_sha256": "B97DAAE82DAAB4490526453E3C3FDE882DD679EECDACED71E557AC80A66118C2",
+      "public_sha256": "BCAD39B7074F205842B390A9C49BBC93DE4FA1199BF0E48CCCB9684EF36419BC",
       "transforms": [
         "UTF-8/LF",
         "private-path placeholders",
-        "historical-script notice when applicable"
+        "historical-script notice when applicable",
+        "console minimize maintenance: guarded native button/menu control and matching regression checks"
       ]
     },
     {
@@ -266,11 +269,12 @@
       "classification": "original workspace source/patch recipe",
       "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
       "published": true,
-      "public_sha256": "E6BF3680BD8B954EF85E1C44481A31F46692689718603CC466FDE12014ED8FAF",
+      "public_sha256": "F1D15278332175E137D234BD18CF19F6EAF916E3397F7813CCD7F96C10B8C4FE",
       "transforms": [
         "UTF-8/LF",
         "private-path placeholders",
-        "historical-script notice when applicable"
+        "historical-script notice when applicable",
+        "console minimize maintenance: guarded native button/menu control and matching regression checks"
       ]
     },
     {

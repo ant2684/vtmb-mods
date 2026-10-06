@@ -80,6 +80,24 @@ def source_identity(mod):
     return {p.relative_to(ROOT).as_posix():digest(p) for p in sorted(paths) if p.is_file()}
 
 
+CONSOLE_FROZEN_TEST_FILES = ('plugin/console_pause.c', 'tests/verify_exact.py',
+    'tests/clean_pe.py', 'tests/load_clean.c', 'tests/exact_harness.c', 'tests/native_harness.c')
+
+
+def frozen_console_tests(config, work):
+    """The unchanged release uses its pinned tests; candidates use this checkout."""
+    name = catalog()['mods']['console']['capsule']
+    archive = Path(need(config,'releases'))/name
+    if not archive.is_file():raise Blocked('Frozen Console source capsule absent: '+name)
+    pin = catalog()['archives'][name]
+    require(digest(archive)==pin['sha256'], 'Frozen Console source capsule changed')
+    files = members(archive); code = work/'frozen-console'
+    for name in CONSOLE_FROZEN_TEST_FILES:
+        require(name in files and sha(files[name])==pin['members'][name], 'Frozen Console test/source changed: '+name)
+        target=code/name;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(files[name])
+    return code
+
+
 def exact(mod, config, candidate=None):
     info = catalog()['mods'][mod]
     game = Path(need(config,'game_root'))
@@ -105,12 +123,16 @@ def exact(mod, config, candidate=None):
             archive=Path(need(config,'releases'))/info['archive']
             if not archive.is_file():raise Blocked('Frozen archive absent: '+info['archive'])
             files = members(archive)
+            if mod=='console':
+                code=frozen_console_tests(config,work)
+                (code/'build').mkdir(exist_ok=True)
             plugin = code/'build'/info['filename']
             plugin.write_bytes(files['Bin/loader/'+info['filename']])
             frozen = digest(plugin)
             require(frozen == info['plugin_sha256'], 'Frozen release identity mismatch')
             env = environment(config,work)
             provenance = {'mode':'frozen release','sha256':frozen}
+            if mod=='console':provenance['tests_capsule']=info['capsule']
         clean_pe(plugin.read_bytes(),info['exports'],mod)
         zig = need(config,'zig')
         logs=[]

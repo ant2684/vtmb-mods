@@ -14,6 +14,8 @@ from infra.release import members
 from infra.session import Transaction
 
 SCENARIOS = [
+    {'id':'console.minimize_remaining','mod':'console','timeout':180,'save':'console','expected':'Targeted first console opening after measured five-second menu exit wait, script pause and reload; hidden minimize controls and resumed input','checks':['menu_first_delayed_open','script_pause','first_input','reload','minimize_controls']},
+    {'id':'console.minimize','mod':'console','timeout':240,'save':'console','expected':'Console minimize button hidden, cached Minimize disabled; X/tilde, pause/menu/script/reload and signed input after external five-second wait remain usable','checks':['console_x','console_tilde','ordinary_pause','prior_menu','script_pause','first_input','reload','minimize_controls']},
     {'id':'console.supported','version':2,'mod':'console','timeout':240,'save':'console','expected':'X/tilde preserve owned ordinary/menu/script pauses; after measured five-second external wait first signed movement/camera succeeds; reload remains usable','checks':['console_x','console_tilde','ordinary_pause','prior_menu','script_pause','first_input','reload']},
     {'id':'console.immediate','mod':'console','timeout':120,'save':'console','expected':'First movement/camera event following native observed close is received without readiness wait; record actual delay and first failure','checks':['close_observed','first_input']},
     {'id':'protean.lifecycle','mod':'protean','timeout':300,'save':'warehouse','expected':'P5 plus native Frenzy owns one Shadow; repeated request has no extra bonus; either state ends first; nominated archival load/map clear stale state','checks':['single_shadow','no_bonus_growth','protean_ends_first','frenzy_ends_first','active_load','active_map','cleanup']},
@@ -49,6 +51,9 @@ def audit(scenario, evidence, identity):
         require(row.get('source') in ['native-process-read','native-console-readback','offline-native-getter','process-wasapi-plus-native'],'Unproven observation source: '+name)
     # Requirement-specific metrics prevent a generic passed=True replacing proof.
     metrics=evidence.get('metrics',{})
+    if scenario['id'] in ['console.minimize','console.minimize_remaining']:
+        from infra.console_minimize import audit_controls
+        audit_controls(evidence)
     if scenario['id'].startswith('console.'):
         require(metrics.get('native_back_held') is True and metrics.get('native_forward_held') is True,'OS input alone is insufficient')
         require(metrics.get('signed_back',0)<0<metrics.get('signed_forward',0),'Signed movement missing')
@@ -156,6 +161,8 @@ def execute(name,config,run_id,historical=False,candidate=None):
         command=['{python}','-B','-m','infra.console_immediate','{session}']
     if not command and name=='console.supported':
         command=['{python}','-B','-m','infra.console_supported','{session}']
+    if not command and name in ['console.minimize','console.minimize_remaining']:
+        command=['{python}','-B','-m','infra.console_minimize','{session}']
     if not command and name=='history.bounded_resets':
         command=['{python}','-B','-m','infra.history_bounded','{session}']
     if not command and name=='history.transitions':
@@ -172,7 +179,7 @@ def execute(name,config,run_id,historical=False,candidate=None):
         try:run([sys.executable,'-B','-c','import unicorn, pefile, capstone, PIL'],env=collector_env)
         except __import__('infra.core',fromlist=['Failure']).Failure as error:raise Blocked('Collector dependencies unavailable before launch: '+str(error))
     game=Path(need(config,'game_root')).resolve()
-    if name=='console.supported':
+    if name in ['console.supported','console.minimize','console.minimize_remaining']:
         import re
         cfg=game/'Unofficial_Patch/cfg/config.cfg'
         if cfg.exists() and re.search(r'bind "F11"',cfg.read_text(encoding='cp1252'),re.I):
@@ -191,7 +198,7 @@ def execute(name,config,run_id,historical=False,candidate=None):
         require(not settings['Processes'],'User game running; refuse mutation')
         atomic_json(folder/'settings.json',settings)
         transaction.watch_inventory()
-        if name=='console.supported':
+        if name in ['console.supported','console.minimize','console.minimize_remaining']:
             transaction.write('Unofficial_Patch/cfg/console_task_overlap.cfg',(ROOT/'mods/console/tests/gameplay/console_task_overlap.cfg').read_bytes())
         for directory in ['Bin/loader','Unofficial_Patch/cfg','Vampire/cfg','Unofficial_Patch/save','Vampire/save','Unofficial_Patch/python','Vampire/python','Unofficial_Patch/resource']:
             for file in (game/directory).rglob('*'):
@@ -225,6 +232,7 @@ def execute(name,config,run_id,historical=False,candidate=None):
         for file in (game/'Unofficial_Patch/cfg').glob('*.cfg'):transaction.allow_runtime(file.relative_to(game).as_posix())
         stem='rc_'+transaction.data['id'][:12]
         args=['-game','Unofficial_Patch','-dev','-novid','-console']
+        if name in ['console.minimize','console.minimize_remaining']:args+=['+developer','0']
         if save:
             relative='Unofficial_Patch/save/'+stem+'.sav'
             transaction.write(relative,save.read_bytes());args+=['+load',stem]
