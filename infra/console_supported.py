@@ -3,8 +3,56 @@ import json
 import math
 import runpy
 import sys
+import time
+import traceback
 from pathlib import Path
-from infra.core import ROOT, Failure, atomic_json, read_json, require
+from infra.core import ROOT, Blocked, Failure, atomic_json, read_json, require
+
+
+def supported_recipe(source,save):
+    """Fail closed if the retained recipe's explicit phase boundaries change."""
+    require(isinstance(save,str) and __import__('re').fullmatch(r'rc_[a-z0-9_]+',save),'Unsupported task save name')
+    replacements={"'load rc_console'":repr('load '+save),
+        'time.sleep(25);d=Driver(session)':'time.sleep(25);d=_prepare_driver(session,Driver)',
+        " for closing in ('x','tilde'):":" _start_behavior(d)\n for closing in ('x','tilde'):"}
+    for old,new in replacements.items():
+        require(source.count(old)==1,'Retained Console recipe boundary missing/ambiguous: '+old)
+        source=source.replace(old,new,1)
+    return source
+
+
+def foreground_receipt(folder,state):
+    """Read current window ownership only; never retry or reacquire foreground."""
+    owned=read_json(folder/'process.json');driver=state.get('driver')
+    receipt={'owned_pid':owned['Id'],'owned_start_ticks':owned['Ticks'],
+             'requested_hwnd':getattr(driver,'hwnd',None)}
+    try:
+        module=sys.modules['driver'];hwnd=module.u.GetForegroundWindow();pid=module.W.DWORD()
+        thread=module.u.GetWindowThreadProcessId(hwnd,module.C.byref(pid)) if hwnd else 0
+        receipt.update(foreground_hwnd=hwnd,foreground_pid=pid.value if thread else None,
+                       owned_foreground=bool(driver and hwnd==driver.hwnd and pid.value==driver.p.pid))
+    except Exception as error:receipt['readback_error']=repr(error)
+    return receipt
+
+
+def preserve_first_error(folder,error,state):
+    path=folder/'console-first-error.json'
+    if path.exists():return  # A later inspection must not rewrite the first FAIL.
+    row={'status':'FAIL','error':repr(error),'traceback':traceback.format_exc(),
+         'phase':'behavior' if state['behavior_started'] else 'preparation',
+         'behavior_started':state['behavior_started'],'wall_seconds':time.time()}
+    try:row['foreground']=foreground_receipt(folder,state)
+    except Exception as diagnostic:row['foreground']={'readback_error':repr(diagnostic)}
+    try:atomic_json(path,row)
+    except Exception as diagnostic:error.add_note('First Console error receipt unavailable: '+repr(diagnostic))
+
+
+def preparation_error(error,state):
+    # These precondition/OS guards precede any Console behavioral workflow.
+    # After the explicit boundary all original errors retain their first FAIL.
+    if not state['behavior_started'] and not isinstance(error,Failure) and isinstance(error,(AssertionError,OSError,RuntimeError,KeyError)):
+        return Blocked('Preparation: Console workflow did not start: '+repr(error))
+    return error
 
 
 def rows(path):
@@ -73,13 +121,30 @@ def evaluate(folder):
 def collect(folder):
     source=ROOT/'mods/console/tests/gameplay/console_clean.py'
     launch=read_json(folder/'launch.json')
-    modified=source.read_text().replace("'load rc_console'",repr('load '+launch['Save']))
-    modified=modified.replace('time.sleep(25);d=Driver(session)','time.sleep(25);d=Driver(session);_verify_loaded(d.p)')
+    modified=supported_recipe(source.read_text(),launch['Save'])
     runner=folder/'console_fresh_recipe.py';runner.write_text(modified,encoding='utf-8')
-    sys.path.insert(0,str(source.parent));sys.argv=[str(runner),str(folder)]
     from infra.gameplay import loaded_inputs
-    identity=read_json(folder/'identity.json')
-    runpy.run_path(str(runner),run_name='__main__',init_globals={'_verify_loaded':lambda process:atomic_json(folder/'loaded-inputs.json',loaded_inputs(process,identity))})
+    identity=read_json(folder/'identity.json');state={'behavior_started':False,'driver':None}
+    def prepare(session,factory):
+        driver=factory(session);state['driver']=driver
+        atomic_json(folder/'loaded-inputs.json',loaded_inputs(driver.p,identity))
+        require(all(isinstance(driver.bindings.get(name),str) and len(driver.bindings[name])==1 and driver.bindings[name].isascii() and driver.bindings[name].isalnum() for name in ['+back','+forward']),'Preparation: Console requires supported single-character forward/back bindings')
+        return driver
+    def start(driver):
+        driver.focus()  # No retry: preserve the first foreground failure.
+        state['behavior_started']=True
+        atomic_json(folder/'console-phase.json',{'phase':'behavior','wall_seconds':time.time()})
+    original_argv=sys.argv;original_path=sys.path[:]
+    sys.path.insert(0,str(source.parent));sys.argv=[str(runner),str(folder)]
+    try:
+        runpy.run_path(str(runner),run_name='__main__',init_globals={'_prepare_driver':prepare,'_start_behavior':start})
+    except Exception as error:
+        preserve_first_error(folder,error,state)
+        classified=preparation_error(error,state)
+        if classified is error:raise
+        raise classified from error
+    finally:
+        sys.argv=original_argv;sys.path[:]=original_path
     evidence=evaluate(folder);atomic_json(folder/'observations.json',evidence)
     return {'status':'PASS','scope':'Independent named native audit; no requirement to reproduce earlier failed runs'}
 
@@ -87,7 +152,8 @@ def collect(folder):
 if __name__=='__main__':
     folder=Path(sys.argv[1])
     try:result=collect(folder)
+    except Blocked as error:result={'status':'BLOCKED','reason':str(error)}
     except Exception as error:result={'status':'FAIL','reason':repr(error)}
     atomic_json(folder/'collector-result.json',result)
     print(json.dumps(result),flush=True)
-    raise SystemExit(0 if result['status']=='PASS' else 1)
+    raise SystemExit(0 if result['status']=='PASS' else 75 if result['status']=='BLOCKED' else 1)

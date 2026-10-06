@@ -90,9 +90,9 @@ native costs from raw states rather than accepting a collector summary.
 
 | Scenario | Collector | Fresh result / limitation | Command |
 | --- | --- | --- | --- |
-| Console supported | Built-in | BLOCKED: nominated console save absent; retained five-second evidence remains historical | `./RunTests.ps1 -Suite gameplay -Scenario console.supported` |
-| Console immediate | Built-in | BLOCKED: nominated console save absent; no immediate acceptance | `./RunTests.ps1 -Suite gameplay -Scenario console.immediate` |
-| History bounded resets v2 | Built-in | FAIL: new physical purchase after two resets; exact release, observed slot growth and verified restoration | `./RunTests.ps1 -Suite gameplay -Scenario history.bounded_resets` |
+| Console supported | Built-in | Preparation failed before the first Console action after loading the verified archival nominee; first FAIL retained. Own plugin/save/CFG/caches restored; later config decision remains BLOCKED. Retained five-second evidence remains historical | `./RunTests.ps1 -Suite gameplay -Scenario console.supported` |
+| Console immediate | Built-in | BLOCKED by unfinished supported-run recovery; immediate workflow did not start | `./RunTests.ps1 -Suite gameplay -Scenario console.immediate` |
+| History bounded resets | Built-in (current v3) | FAIL: new physical purchase after two resets; exact release, observed slot growth and verified restoration | `./RunTests.ps1 -Suite gameplay -Scenario history.bounded_resets` |
 | History transitions | Built-in | FAIL: first fresh purchase after actual bonus History/repeated selection and gender reset; preservation PASS. Later None/Accept portions were not reached | `./RunTests.ps1 -Suite gameplay -Scenario history.transitions` |
 | Protean lifecycle/filter/fourhit | External contract; adapter incomplete | BLOCKED: fresh collector and nominated warehouse/claws saves absent | `./RunTests.ps1 -Suite gameplay -Mod protean` |
 | Frenzy Library/Griffith | External contract; adapter incomplete | BLOCKED: fresh collectors and nominated distinct saves absent; Griffith cannot certify Library | `./RunTests.ps1 -Suite gameplay -Mod frenzy` |
@@ -102,3 +102,36 @@ native costs from raw states rather than accepting a collector summary.
 The repository and hosted CI are published. CI checks technical/source and
 infrastructure coverage only. The new faults suite remains visibly failing on
 the unchanged releases. No release version or acceptance has been advanced.
+
+
+## Latest infrastructure and evidence changes
+
+The latest History pool audit binds each attempted purchase to its exact category,
+native before/after state, owned PID/start time, foreground, cursor target,
+actual SendInput receipt and distinct action identity. Unchanged stats alone
+cannot prove an exhausted-category rejection. Full rejection certification
+requires an action-bound native UI command observer; that collector is still
+missing and produces BLOCKED. Earlier fresh purchase failures remain FAIL.
+History bounded scenario v3 and transitions v2 record these stricter receipts;
+the retained actual game failures were collected with their earlier versions.
+
+Console supported v2 explicitly separates preparation from the first Console
+action. A lost-foreground guard before that boundary yields BLOCKED with the
+first error and available foreground-owner readback preserved. After the
+boundary, an unmet behavior remains FAIL. The original v1 run is retained
+unchanged: it lost foreground before any Console action. There is no proof
+of its cause or successful immediate-input behavior.
+
+Process inspection now retains access-denied/null-start observations as
+UNVERIFIED and blocks mutation, instead of crashing on null StartTime. A
+historical parent PID is insufficient to terminate an unverified descendant.
+Session journals are retained separately so starting another session cannot
+overwrite the prior session's final intents and recovery history.
+
+The current isolated infrastructure suite passes 73 tests, including actual
+typed registry interruption/recovery in new owned fixture keys, uninspectable
+process observations, explicit per-file decisions and partial recovery that
+cannot release the installation lock. Console recovery verified owned cache
+bytes, original source/header and creation times before removal. The original
+installed plugin, task save and CFG were restored/removed as recorded; only
+the later existing config.cfg is left untouched pending an operator choice.

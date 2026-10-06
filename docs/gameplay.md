@@ -76,3 +76,31 @@ Subtitle additionally requires `assets`; Background requires `game_snapshot`
 from that historical run. The runner copies evidence before running the
 retained auditor. Original first failures remain unchanged. Partial/PENDING
 certificates are not PASS, and a dated audit never establishes fresh acceptance.
+
+
+Current History audits require real action receipts and an independent native
+UI command readback for rejected purchases. The latter observer is unfinished;
+unchanged stats plus successful OS input cannot certify rejection. See the
+review's scenario table for remaining collector gaps and fresh failures.
+
+An unreadable process remains present in Inspect with Inspection=UNVERIFIED.
+Do not assume a null StartTime means it exited. Such an observation blocks
+launch and restoration until Windows no longer reports the process or an
+operator resolves ownership. Console preparation failures retain their first
+receipt separately from behavioral results; the collector does not retry
+foreground acquisition or silently delay the immediate-input test.
+
+After inspecting an unknown change, an operator can record an exact per-file
+decision with `python -m infra.reconcile --config local.json --file <relative>
+--sha256 <inspected-hash> --action keep-current --reason <decision>`.
+This archives the current bytes and retains the original backup. Recovery
+leaves that file untouched, verifies its approved hash/timestamp and reports
+it separately. `restore-recorded` explicitly approves restoration of one
+declared mutable output. Neither command accepts an unregistered path, a
+changed inspected hash or a present/unverifiable game process. This is an
+operator decision, never automatic ownership inference.
+
+Partial restoration retains the installation lock and an explicit remaining
+path list. Each restoration records its intent before replacing/removing bytes.
+An incomplete partial restoration never reports a completed session or allows
+another gameplay run.

@@ -7,7 +7,7 @@ from infra.core import ROOT, read_json, run, need
 from infra.session import Transaction
 
 
-def settings_restore_allowed(folder,current):
+def settings_restore_allowed(folder,current,registry_base='Software\\Troika\\Vampire'):
     """A historical owned PID does not own later personal settings."""
     from infra.core import Blocked
     original=read_json(folder/'settings.json')
@@ -15,8 +15,34 @@ def settings_restore_allowed(folder,current):
     snapshot=folder/'settings-after-stop.json'
     frozen=read_json(snapshot) if snapshot.exists() else None
     matches=frozen is not None and all(current[k]==frozen[k] for k in ['Video','Shortcuts'])
-    if not unchanged and not matches:
-        raise Blocked('Settings changed without a matching after-stop snapshot; preserve newer user values and reconcile explicitly before recovery')
+    if unchanged or matches:return
+    intents=folder/'settings-intents.jsonl'
+    if frozen is None or not intents.exists():raise Blocked('Settings changed without a matching after-stop snapshot/intents; preserve newer user values and reconcile explicitly before recovery')
+    import json
+    records=[json.loads(line) for line in intents.read_text(encoding='utf-8-sig').splitlines() if line]
+    missing={'@missing':True}
+    def fields(snapshot):
+        out={}
+        for sub in snapshot['Video']:
+            out[('key',sub['Sub'])]=sub['Exists']
+            for value in sub['Values']:out[('value',sub['Sub'],value['Name'])]=value
+        for link in snapshot['Shortcuts']:
+            out[('shortcut',link['Path'])]=link
+        return out
+    before,after,now=map(fields,[original,frozen,current])
+    for key in before.keys()|after.keys()|now.keys():
+        a,b,c=before.get(key,missing),after.get(key,missing),now.get(key,missing)
+        if c==b or c==a==b:continue
+        if c!=a:raise Blocked('Unknown later setting change retained: '+str(key))
+        if key[0]=='shortcut':
+            operation='RestoreShortcut';target=key[1];value=a
+        else:
+            target='HKCU:\\'+registry_base+'\\'+key[1]
+            if key[0]=='key':operation='CreateOriginalKey' if a is True else 'DeleteNewKey';value=None
+            else:
+                target+='\\'+key[2];operation='DeleteNewValue' if a==missing else 'RestoreOriginalValue';value=None if a==missing else a
+        if not any(r.get('Operation')==operation and r.get('Target')==target and r.get('Value')==value for r in records):
+            raise Blocked('Partial restoration lacks a matching write-ahead intent: '+str(key))
 
 
 def recover(config):
@@ -28,6 +54,8 @@ def recover(config):
     transaction.acquire_installation()
     folder=transaction.state/transaction.data['id']
     if transaction.data['owned_process']:
+        from infra.gameplay import verify_process_record
+        verify_process_record(transaction,folder)
         run([config.get('powershell','pwsh'),'-NoProfile','-File',ROOT/'infra/windows.ps1','-Action','Stop','-GameRoot',config['game_root'],'-LaunchUser',need(config,'launch_user'),'-InputFile',folder/'process.json'])
     from infra.gameplay import windows
     windows(config,'Inspect',folder)

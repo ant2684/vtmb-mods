@@ -19,6 +19,14 @@ class Transaction:
         self.journal = self.state/'journal.json'
         self.installation_file = self.game/'.vtmb-regression.lock'
         self.data = read_json(self.journal) if self.journal.exists() else None
+        if self.data:
+            import re
+            require(re.fullmatch(r'[0-9a-f]{32}',self.data['id']) is not None,'Invalid session identity in current journal')
+            retained=self.state/self.data['id']/'journal.json'
+            if retained.exists():
+                saved=read_json(retained)
+                require(saved['id']==self.data['id'] and saved['game_root']==self.data['game_root'],'Retained journal identity differs')
+                self.data=saved
 
     def acquire_installation(self):
         # An installation-wide Windows mutex prevents different state_root
@@ -70,7 +78,7 @@ class Transaction:
         label=uuid.uuid4().hex
         self.data={'id':label,'state':'PREPARING','game_root':str(self.game),'operations':[],'owned_process':None,'launch_intent':None}
         (self.state/label/'originals').mkdir(parents=True)
-        atomic_json(self.journal,self.data)
+        self.save()
         try:
             fd=os.open(self.installation_file,os.O_CREAT|os.O_EXCL|os.O_WRONLY)
         except FileExistsError as e:
@@ -86,6 +94,7 @@ class Transaction:
         self.save()
 
     def save(self):
+        atomic_json(self.state/self.data['id']/'journal.json',self.data)
         atomic_json(self.journal,self.data)
 
     def preserve(self, relative):
@@ -143,9 +152,41 @@ class Transaction:
                                  'mtime_ns':target.stat().st_mtime_ns if target.exists() else None}
         self.data['runtime_after_stop']=frozen;self.save()
 
-    def restore(self, process_stopped=False, runtime_safe=False, finalize=True):
+    def reconcile_file(self, relative, expected_sha256, action, reason):
+        """Explicit operator decision for one inspected, journaled file.
+
+        The caller must separately verify no game runs. This never infers
+        ownership from a stale PID and never accepts unregistered paths.
+        """
+        require(self.data and self.data['state']!='RESTORED','No unfinished session')
+        require(action in ['keep-current','restore-recorded'],'Unknown reconciliation action')
+        require(isinstance(reason,str) and reason.strip(),'Record the decision and its evidence')
+        row=next((r for r in self.data['operations'] if r['path']==relative),None)
+        require(row is not None and not row['restored'],'Only an unrestored journaled path can be reconciled')
+        target=self.path(relative)
+        require(target.is_file() and digest(target)==expected_sha256,'Inspected file changed; reconciliation refused')
+        if action=='keep-current':require(row['exists'],'Keep-current only applies to a previously existing user file')
+        if action=='restore-recorded':require(row['kind']=='runtime_intent','Only declared mutable output requires restore reconciliation')
+        if row['exists']:
+            backup=self.state/self.data['id']/'originals'/relative
+            require(backup.is_file() and digest(backup)==row['before'],'Original backup damaged; reconciliation refused')
+        observed={'sha256':expected_sha256,'mtime_ns':target.stat().st_mtime_ns}
+        receipt={'path':relative,'action':action,'reason':reason,'observed':observed,'state':'INTENT'}
+        self.data.setdefault('reconciliations',[]).append(receipt);self.save()
+        archive=self.state/self.data['id']/'reconciled'/expected_sha256/relative
+        archive.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(target,archive)
+        require(digest(archive)==expected_sha256,'Reconciliation archive mismatch')
+        require(digest(target)==expected_sha256 and target.stat().st_mtime_ns==observed['mtime_ns'],'File changed during reconciliation')
+        if action=='keep-current':row['keep_current']=observed
+        else:self.data.setdefault('runtime_after_stop',{})[relative]=observed
+        receipt['state']='RECORDED';receipt['archive']=str(archive);self.save()
+
+    def restore(self, process_stopped=False, runtime_safe=False, finalize=True, paths=None):
         require(self.data is not None,'Journal missing; lock alone needs manual inspection')
         require(self.data['game_root']==str(self.game),'Journal belongs to different installation')
+        if paths is not None:
+            require(not finalize and bool(paths),'Partial recovery cannot release the installation lock')
+            require(set(paths)<={r['path'] for r in self.data['operations']},'Partial recovery includes unregistered paths')
         if self.data['state']=='RESTORED':
             self.finish()
             return {'state':'RESTORED','idempotent':True}
@@ -164,11 +205,17 @@ class Transaction:
             if unknown:raise Blocked('Unregistered new files kept intact; reconcile before recovery: '+', '.join(sorted(unknown)))
         archive=self.state/self.data['id']/'after-tests'
         for row in reversed(self.data['operations']):
+            if paths is not None and row['path'] not in paths:continue
             target=self.path(row['path'])
             backup=self.state/self.data['id']/'originals'/row['path']
             if row['exists']:
                 require(backup.is_file() and digest(backup)==row['before'],'Backup damaged; preserved current file: '+row['path'])
             current=digest(target) if target.exists() else None
+            if row.get('keep_current'):
+                observed={'sha256':current,'mtime_ns':target.stat().st_mtime_ns if target.exists() else None}
+                require(observed==row['keep_current'],'Retained user file changed after reconciliation; stop before overwrite')
+                row['restored']=True;self.save()
+                continue
             known=current in [row['before'],row['after']]
             if row['kind']=='runtime_intent':
                 stamp=target.stat().st_mtime_ns if target.exists() else None
@@ -182,6 +229,8 @@ class Transaction:
                 evidence=archive/row['path'];evidence.parent.mkdir(parents=True,exist_ok=True)
                 shutil.copy2(target,evidence)
                 require(digest(evidence)==current,'Evidence archive mismatch')
+            row['restore_intent']={'current_sha256':current,'target_sha256':row['before'],'action':'restore-original' if row['exists'] else 'remove-owned-output'}
+            self.save()
             if row['exists']:
                 if current!=row['before']:shutil.copy2(backup,target)
                 os.utime(target,ns=(row['atime_ns'],row['mtime_ns']))
@@ -189,9 +238,15 @@ class Transaction:
             elif target.exists():
                 target.unlink()  # Only a journaled task/runtime file, after evidence verification.
             row['restored']=True;self.save()
+        remaining=[r['path'] for r in self.data['operations'] if not r['restored']]
+        if remaining:
+            require(paths is not None,'Full recovery left unrestored paths')
+            self.data['state']='PARTIALLY_RESTORED';self.save()
+            return {'state':'PARTIALLY_RESTORED','remaining':remaining}
         self.data['state']='FILES_RESTORED';self.save()
         if finalize:self.finish()
-        return {'state':'RESTORED','operations':len(self.data['operations'])}
+        return {'state':'RESTORED','operations':len(self.data['operations']),
+                'kept_current':[r['path'] for r in self.data['operations'] if r.get('keep_current')]}
 
     def finish(self):
         require(self.data['state'] in ['FILES_RESTORED','RESTORED'],'File restoration must finish before releasing installation lock')

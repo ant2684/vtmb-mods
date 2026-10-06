@@ -47,7 +47,23 @@ def execute(mod,config):
     if not output.exists():raise Blocked('Dated auditor did not produce a complete certificate; partial/PENDING result is not PASS')
     result=read_json(output)
     require(result.get('result')=='PASS' or result.get('passed') is True,'Dated auditor did not confirm PASS')
+    require_historical_identity(mod,copied,result,digest(binary))
     require(all(digest(source/name)==value for name,value in identity.items()),'Original historical evidence changed')
     receipt={'status':'PASS','scope':'Dated evidence only; no new game run, no new gameplay acceptance','artifact_sha256':digest(binary),'evidence':identity,'audit':result,'session_directory':str(folder)}
     atomic_json(folder/'result.json',receipt)
     return receipt
+
+
+def require_historical_identity(mod,evidence,result,expected):
+    if mod=='background':
+        require(result.get('plugin_sha256')==expected,'Historical Background certificate belongs to another binary')
+    if mod=='subtitle':
+        require(result.get('binary_sha256')==expected,'Historical Subtitle report belongs to another binary')
+        launches=list(evidence.rglob('launch.json'))
+        if not launches:raise Blocked('Historical Subtitle launch identity absent; raw audio traces alone cannot bind the tested binary')
+        for file in launches:
+            launch=read_json(file)
+            hashes=[r['Hash'] for r in launch.get('Candidates',[]) if Path(r['Path'].replace('\\','/')).name.lower()=='subtitle-pause-fix.vtm']
+            if launch.get('PluginHash'):hashes.append(launch['PluginHash'])
+            if not hashes:raise Blocked('Historical Subtitle session has no tested-plugin identity: '+file.parent.name)
+            require(all(h.upper()==expected for h in hashes),'Historical Subtitle launch belongs to another binary')

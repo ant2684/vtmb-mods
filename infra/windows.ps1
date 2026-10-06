@@ -1,10 +1,11 @@
 [CmdletBinding()]
 param([ValidateSet('Inspect','Launch','Stop','RestoreSettings')][string]$Action,
       [string]$GameRoot, [string]$LaunchUser, [string]$InputFile, [string]$OutputFile,
-      [string]$FixtureRegistry='')
+      [string]$FixtureRegistry='', [int]$FixtureCrashAfterWrites=0)
 $ErrorActionPreference='Stop'
 if((whoami.exe).Trim() -ne $LaunchUser){throw 'Real Windows launch user required; sandbox HKCU is not evidence'}
 $registryBase='Software\Troika\Vampire'
+if($FixtureCrashAfterWrites -and (-not $FixtureRegistry -or $Action -ne 'RestoreSettings')){throw 'Injected crash only allowed for an isolated owned registry fixture'}
 if($FixtureRegistry){
     if($FixtureRegistry -notmatch '^Software\\VTMBRegressionFixture_[0-9a-f]{32}$' -or $Action -notin @('Inspect','RestoreSettings')){throw 'Only isolated owned registry fixtures are supported'}
     $registryBase=$FixtureRegistry
@@ -27,8 +28,21 @@ function Links {
         }
     }
 }
+function GameProcesses {
+    # Access-denied/terminating objects must still block mutation. A missing
+    # StartTime is not proof that the game has exited, nor PID ownership.
+    foreach($process in Get-Process Vampire -ErrorAction SilentlyContinue) {
+        $ticks=$null;$path=$null;$inspection='UNVERIFIED'
+        try {
+            $start=$process.StartTime
+            $path=$process.Path
+            if($start -and $path){$ticks=$start.ToUniversalTime().Ticks;$inspection='VERIFIED'}
+        } catch {}
+        [pscustomobject]@{Id=$process.Id;Ticks=$ticks;Path=$path;Inspection=$inspection}
+    }
+}
 if($Action -eq 'Inspect') {
-    @{User=(whoami.exe).Trim();Video=@(Video);Shortcuts=@(Links);Processes=@(Get-Process Vampire -ErrorAction SilentlyContinue | ForEach-Object {@{Id=$_.Id;Ticks=$_.StartTime.ToUniversalTime().Ticks}})} | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $OutputFile
+    @{User=(whoami.exe).Trim();Video=@(Video);Shortcuts=@(Links);Processes=@(GameProcesses)} | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $OutputFile
 } elseif($Action -eq 'Launch') {
     if(Get-Process Vampire -ErrorAction SilentlyContinue){throw 'User game is already running'}
     $launchData=Get-Content -LiteralPath $InputFile -Raw | ConvertFrom-Json
@@ -39,11 +53,25 @@ if($Action -eq 'Inspect') {
 } elseif($Action -eq 'Stop') {
     $owned=Get-Content -LiteralPath $InputFile -Raw | ConvertFrom-Json
     $process=Get-Process -Id $owned.Id -ErrorAction SilentlyContinue
-    if($process){if($process.ProcessName -ne 'vampire' -or $process.StartTime.ToUniversalTime().Ticks -ne $owned.Ticks){throw 'PID/start-time ownership differs'};Stop-Process -Id $process.Id;$process.WaitForExit(10000)|Out-Null}
+    if($process){
+        $process.Refresh()
+        if($process.HasExited -eq $true){return}
+        $start=$process.StartTime;$path=$process.Path
+        if(-not $start -or -not $path){throw 'Owned process cannot be inspected; refuse uncertain termination'}
+        if([IO.Path]::GetFullPath($path) -ne [IO.Path]::GetFullPath((Join-Path $GameRoot 'Vampire.exe'))){throw 'Owned process executable differs from recorded installation'}
+        if($process.ProcessName -ne 'vampire' -or $start.ToUniversalTime().Ticks -ne $owned.Ticks){throw 'PID/start-time ownership differs'}
+        Stop-Process -Id $process.Id
+        if(-not $process.WaitForExit(10000)){throw 'Owned process did not finish within stop timeout'}
+    }
 } elseif($Action -eq 'RestoreSettings') {
     if(-not $FixtureRegistry -and (Get-Process Vampire -ErrorAction SilentlyContinue)){throw 'Refuse settings restoration while game runs'}
     $snapshot=Get-Content -LiteralPath $InputFile -Raw|ConvertFrom-Json
     if($snapshot.User -ne $LaunchUser){throw 'Settings snapshot belongs to another Windows user'}
+    $script:fixtureWriteCount=0
+    function AfterWrite {
+        $script:fixtureWriteCount++
+        if($FixtureCrashAfterWrites -gt 0 -and $script:fixtureWriteCount -eq $FixtureCrashAfterWrites){throw 'Injected isolated fixture interruption after confirmed write'}
+    }
     function Intent($operation,$target,$value) {
         $record=@{Operation=$operation;Target=$target;Value=$value;UTC=[DateTime]::UtcNow.ToString('o')}|ConvertTo-Json -Depth 10 -Compress
         $bytes=[Text.Encoding]::UTF8.GetBytes($record+[Environment]::NewLine)
@@ -65,7 +93,7 @@ if($Action -eq 'Inspect') {
                 $exists=$value.Name -in $key.GetValueNames()
                 $actual=$key.GetValue($value.Name,$null,[Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)
                 $equal=$exists -and $key.GetValueKind($value.Name) -eq $kind -and (ConvertTo-Json -InputObject $actual -Compress) -eq (ConvertTo-Json -InputObject $typed -Compress)
-                if(-not $equal){Intent 'RestoreOriginalValue' ($path+'\'+$value.Name) $value;$key.SetValue($value.Name,$typed,$kind)}
+                if(-not $equal){Intent 'RestoreOriginalValue' ($path+'\'+$value.Name) $value;$key.SetValue($value.Name,$typed,$kind);AfterWrite}
             }
         } finally{$key.Dispose()}
     }

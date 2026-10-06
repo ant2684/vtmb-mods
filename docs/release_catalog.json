@@ -1,4 +1,8 @@
 {
+  "scenario_resources": {
+    "frenzy.library": "Unofficial_Patch/maps/la_library_1.bsp",
+    "frenzy.griffith": "Unofficial_Patch/maps/sp_observatory_2.bsp"
+  },
   "mods": {
     "console": {
       "title": "Console Pause Fix",

@@ -4,13 +4,13 @@ import sys
 import time
 from pathlib import Path
 from infra.core import ROOT, Blocked, atomic_json, read_json, require
-from infra.history_observations import allocation, pool_proof
+from infra.history_observations import allocation, pool_proof, collect_pool
 
 
 def collect(folder):
     sys.path.insert(0,str(ROOT/'mods/history/tests'))
     from drive import Driver,W,u,C
-    from gender_regression import initial,full_pool
+    from gender_regression import initial
     from gameplay import gender,sheet,base,purchase,select_history
     identity=read_json(folder/'identity.json');d=Driver(folder)
     rect=W.RECT();u.GetWindowRect(d.hwnd,C.byref(rect))
@@ -47,7 +47,7 @@ def collect(folder):
     atomic_json(folder/'after_history_gender.json',{'before':before,'after':after})
     require(allocation(after)==allocation(neutral) and state(after)['history_bonus']==0 and state(after)['history']==-1,'Non-None gender reset retained allocation or bonus')
     # The category pool is proved by native purchases, never an XP constant.
-    full_pool(d);proof=pool_proof(folder);proofs.append(proof)
+    collect_pool(d);proof=pool_proof(folder);proofs.append(proof)
     a=state(after);a.update(pool=proof['new_purchases'],native_pool_proof=proof)
     record('non_none_gender',state(before),a)
     first_pool=folder/'pool_after_history';first_pool.mkdir()
@@ -61,7 +61,7 @@ def collect(folder):
     before=returned;gender(d,False);sheet(d);after=d.snap(True)
     atomic_json(folder/'after_none_reverse_gender.json',{'before':before,'after':after})
     require(state(before)['history'] in [-1,0] and allocation(after)==allocation(neutral) and state(after)['history_bonus']==0,'None/reverse reset retained allocation')
-    full_pool(d);proof=pool_proof(folder);proofs.append(proof)
+    collect_pool(d);proof=pool_proof(folder);proofs.append(proof)
     a=state(after);a.update(pool=proof['new_purchases'],native_pool_proof=proof)
     record('none_gender',state(before),a);record('reverse_gender',state(before),a)
     funded=d.snap(True)

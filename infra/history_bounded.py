@@ -10,7 +10,7 @@ def collect(folder):
     sys.path.insert(0,str(ROOT/'mods/history/tests'))
     from drive import Driver,W,u,C
     from gender_regression import initial,allocation
-    from gender_regression import full_pool
+    from infra.history_observations import collect_pool
     from gameplay import gender,sheet,purchase
     identity=read_json(folder/'identity.json');d=Driver(folder)
     rect=W.RECT();u.GetWindowRect(d.hwnd,C.byref(rect))
@@ -32,7 +32,7 @@ def collect(folder):
     # Stock XP need not return to 9000. The user requires a complete spendable
     # category pool, established by ten purchases and seven rejected extras.
     try:
-        full_pool(d)
+        collect_pool(d)
     except Exception as error:
         # Preserve the original failure. A delayed diagnostic click cannot
         # certify the first input or turn this scenario into a success.

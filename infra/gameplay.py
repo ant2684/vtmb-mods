@@ -14,7 +14,7 @@ from infra.release import members
 from infra.session import Transaction
 
 SCENARIOS = [
-    {'id':'console.supported','mod':'console','timeout':240,'save':'console','expected':'X/tilde preserve owned ordinary/menu/script pauses; after measured five-second external wait first signed movement/camera succeeds; reload remains usable','checks':['console_x','console_tilde','ordinary_pause','prior_menu','script_pause','first_input','reload']},
+    {'id':'console.supported','version':2,'mod':'console','timeout':240,'save':'console','expected':'X/tilde preserve owned ordinary/menu/script pauses; after measured five-second external wait first signed movement/camera succeeds; reload remains usable','checks':['console_x','console_tilde','ordinary_pause','prior_menu','script_pause','first_input','reload']},
     {'id':'console.immediate','mod':'console','timeout':120,'save':'console','expected':'First movement/camera event following native observed close is received without readiness wait; record actual delay and first failure','checks':['close_observed','first_input']},
     {'id':'protean.lifecycle','mod':'protean','timeout':300,'save':'warehouse','expected':'P5 plus native Frenzy owns one Shadow; repeated request has no extra bonus; either state ends first; nominated archival load/map clear stale state','checks':['single_shadow','no_bonus_growth','protean_ends_first','frenzy_ends_first','active_load','active_map','cleanup']},
     {'id':'protean.filter','mod':'protean','timeout':240,'save':'warehouse','expected':'Saved-active P4 filter survives two reloads; off restores mat_fullbright=0; independent RedVision remains intact','checks':['filter_reload_1','filter_reload_2','filter_off','redvision_reload']},
@@ -23,8 +23,8 @@ SCENARIOS = [
     {'id':'frenzy.griffith','mod':'frenzy','timeout':240,'save':'griffith','expected':'Exact Griffith BSP and native living Werewolf; damaging approach <160 XY, no original-player ground support, ordinary/P5 contexts, end/load/map cleanup','checks':['normal_contact','warform_contact','no_body_support','scope_forwarding','end','load','map','cleanup','resolved_resource']},
     {'id':'subtitle.radio','mod':'subtitle','timeout':720,'save':'radio','expected':'Pause/on/off/repeat/TV transitions/saved-on/load and an unaccelerated real loop preserve correlated PCM/decoder/caption coordinates','checks':['pause','first_on','repeat_on','off_epoch','tv_radio','radio_tv','saved_on','load_return','real_loop','audio_caption_correlation']},
     {'id':'background.cinematics','mod':'background','timeout':240,'save':'radio','expected':'Two actual native cutscenes omit fill/border while text, placement, wrapping and ordinary dialogue remain; save/map retain patch','checks':['scene_a','scene_b','same_text_bounds','ordinary_dialogue','load','map']},
-    {'id':'history.transitions','mod':'history','timeout':300,'save':None,'expected':'Non-None/None purchases to gender reset removes allocation/bonus; complete fresh pool is spendable, extras rejected; Base/Sheet/Accept retain new purchases','checks':['non_none_gender','none_gender','reverse_gender','fresh_pool','exhausted_reject','base_sheet','accept','repeat_history_once']},
-    {'id':'history.bounded_resets','version':2,'mod':'history','timeout':240,'save':None,'expected':'Two forward/reverse resets record entity slots, clear allocation and grant a complete new spendable pool; ten purchases and seven rejected extras, without an XP=9000 or unlimited-endurance expectation','checks':['allocation_reset','pool_reset','entity_budget']},
+    {'id':'history.transitions','version':2,'mod':'history','timeout':300,'save':None,'expected':'Non-None/None purchases to gender reset removes allocation/bonus; complete fresh pool is spendable, extras rejected; Base/Sheet/Accept retain new purchases','checks':['non_none_gender','none_gender','reverse_gender','fresh_pool','exhausted_reject','base_sheet','accept','repeat_history_once']},
+    {'id':'history.bounded_resets','version':3,'mod':'history','timeout':240,'save':None,'expected':'Two forward/reverse resets record entity slots, clear allocation and grant a complete new spendable pool; ten purchases and seven rejected extras, without an XP=9000 or unlimited-endurance expectation','checks':['allocation_reset','pool_reset','entity_budget']},
 ]
 
 
@@ -80,7 +80,8 @@ def audit(scenario, evidence, identity):
             require(after.get('frenzy_active') is False and after.get('owned_shadow_count')==0,'Stale Frenzy/Shadow after '+key)
         require(by['scope_forwarding']['after'].get('unrelated_calls_forwarded') is True,'Unrelated scope forwarding unproven')
         require(by['cleanup']['after'].get('owned_shadow_count')==0,'Final Shadow cleanup unproven')
-        griffith={p:h for p,h in identity['resources'].items() if 'griffith' in p.lower() and p.endswith('.bsp')}
+        resource=catalog()['scenario_resources']['frenzy.griffith']
+        griffith={resource:identity['resources'][resource]} if resource in identity['resources'] else {}
         require(len(griffith)==1 and by['resolved_resource']['after'].get('resources')==griffith,'Exact selected Griffith BSP unproven')
     if scenario['id']=='frenzy.library':
         require(by['permission']['after'].get('nofrenzyarea')==0,'Library permission not observed')
@@ -88,7 +89,8 @@ def audit(scenario, evidence, identity):
         require(native.get('command')=='frenzyplayer' and native.get('owned_shadow_count')==1,'Native Library Frenzy not established')
         require(native.get('shadow_handle') and native.get('player_handle') and native['shadow_handle']!=native['player_handle'],'Independent owned Shadow missing')
         require(by['cleanup']['after'].get('owned_shadow_count')==0,'Library Shadow cleanup incomplete')
-        library={p:h for p,h in identity['resources'].items() if 'library' in p.lower() and p.endswith('.bsp')}
+        resource=catalog()['scenario_resources']['frenzy.library']
+        library={resource:identity['resources'][resource]} if resource in identity['resources'] else {}
         require(len(library)==1 and by['resolved_resource']['after'].get('resources')==library,'Exact selected Library BSP unproven')
     if scenario['id']=='history.bounded_resets':
         slots=metrics.get('entity_slots',[])
@@ -276,6 +278,7 @@ def execute(name,config,run_id,historical=False,candidate=None):
 
 def preserve_session(transaction,config,folder):
     if transaction.data['owned_process']:
+        verify_process_record(transaction,folder)
         windows(config,'Stop',folder,folder/'process.json')
     if transaction.data['launch_intent'] and not transaction.data['owned_process']:
         raise Blocked('Interrupted launch before PID record: manual ownership resolution required; journal/backups retained')
@@ -298,6 +301,13 @@ def preserve_session(transaction,config,folder):
         require(current['Video']==original['Video'] and current['Shortcuts']==original['Shortcuts'] and not current['Processes'],'Real-user settings/process restoration differs')
     atomic_json(folder/'preserved.json',{'Result':'PASS','NoGame':True,'Journal':str(transaction.journal)})
     transaction.finish()
+
+
+def verify_process_record(transaction,folder):
+    owned=transaction.data['owned_process']
+    process=read_json(folder/'process.json')
+    require(process==owned,'Process record changed; refuse process control until ownership is reconciled')
+    require(Path(transaction.data['launch_intent']['executable']).resolve()==transaction.game/'Vampire.exe','Owned launch belongs to another executable')
 
 
 def loaded_inputs(process,identity):
