@@ -21,16 +21,23 @@ class Process:
         self.pid = pid
         self.h = k.OpenProcess(0x410, False, pid)
         if not self.h: raise C.WinError(C.get_last_error())
-        sh = k.CreateToolhelp32Snapshot(0x18, pid)
+        try:
+            self.refresh()
+            if 'engine.dll' not in self.modules: raise RuntimeError('Engine module unavailable in this user context')
+        except Exception:
+            k.CloseHandle(self.h)
+            raise
+    def refresh(self):
+        sh = k.CreateToolhelp32Snapshot(0x18, self.pid)
         if sh == C.c_void_p(-1).value: raise C.WinError(C.get_last_error())
-        m = MODULE(); m.dwSize = C.sizeof(m); self.modules = {}
+        m = MODULE(); m.dwSize = C.sizeof(m); self.modules = {}; self.module_paths = {}
         try:
             ok = k.Module32FirstW(sh, C.byref(m))
             while ok:
                 self.modules[m.szModule.lower()] = m.modBaseAddr
+                self.module_paths[m.szModule.lower()] = m.szExePath
                 ok = k.Module32NextW(sh, C.byref(m))
         finally: k.CloseHandle(sh)
-        if 'engine.dll' not in self.modules: raise RuntimeError('Engine module unavailable in this user context')
     def read(self, address, size):
         buf = C.create_string_buffer(size); done = C.c_size_t()
         if not k.ReadProcessMemory(self.h, address, buf, size, C.byref(done)) or done.value != size:

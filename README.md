@@ -5,8 +5,9 @@ alternatives, Frenzy Fixes, Subtitle Pause, Cutscene Subtitle Background and
 History Stat Reset. Current release archives remain frozen; this repository
 does not change their versions or gameplay behavior.
 
-On Windows, install Python 3.12.10 and run `./Setup.ps1`. Copy
-`local.example.json` to the ignored `local.json`, configure local paths, then:
+On Windows, install Python 3.12.10 and run `./Setup.ps1`. It creates the
+ignored local environment and creates local.json only when absent. Configure
+its local paths; RunTests.ps1 uses that environment and configuration by default:
 
 ```powershell
 ./RunTests.ps1 -Suite ci -Config ./local.json

@@ -6,7 +6,7 @@ Windows hosted runners, commit-pinned Actions and read-only repository rights.
 Public PRs never run against the owner's game or a self-hosted game machine.
 
 `RunTests.ps1 -Suite <suite> -List` lists mandatory scenarios and finite
-timeouts. `-Mod` selects one family. `-Scenario` selects one gameplay contract.
+timeouts. `-Mod` selects one family. `-Scenario` selects one named check in any suite.
 The JSON report records a unique session, scenario version, expected/observed
 behavior, duration and input identity. `PASS`, `FAIL`, `BLOCKED` and `SKIPPED`
 are reserved statuses; no selected required test is silently skipped. Missing

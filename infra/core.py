@@ -59,17 +59,27 @@ def need(config, key):
     return value
 
 
-def run(command, timeout=180, env=None, cwd=None):
+def run(command, timeout=180, env=None, cwd=None, process_tree=False):
     merged = dict(os.environ, PYTHONDONTWRITEBYTECODE='1', PYTHONOPTIMIZE='0')
     if env:
         merged.update(env)
     try:
-        p = subprocess.run([str(a) for a in command], cwd=cwd, env=merged,
-                           capture_output=True, text=True, timeout=timeout,
-                           creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
+        if process_tree:
+            from infra.job_process import run as run_tree
+            p = run_tree([str(a) for a in command], cwd=cwd, env=merged, timeout=timeout)
+        else:
+            p = subprocess.run([str(a) for a in command], cwd=cwd, env=merged,
+                               capture_output=True, text=True, timeout=timeout,
+                               creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
     except FileNotFoundError as e:
         raise Blocked('Executable missing: ' + str(command[0])) from e
     except subprocess.TimeoutExpired as e:
-        raise Blocked('Preparation or verifier timeout; no behavioral PASS: ' + str(command[0])) from e
+        def text(value):
+            return value.decode(errors='replace') if isinstance(value, bytes) else value or ''
+        stdout, stderr = text(e.output), text(e.stderr)
+        error = Blocked('Preparation or verifier timeout; no behavioral PASS: ' + str(command[0])
+                        + '\nFirst stdout:\n' + stdout + '\nFirst stderr:\n' + stderr)
+        error.stdout, error.stderr, error.timeout_seconds = stdout, stderr, timeout
+        raise error from e
     require(p.returncode == 0, 'Command failed: ' + ' '.join(map(str, command)) + '\n' + p.stdout + '\n' + p.stderr)
     return p.stdout + p.stderr

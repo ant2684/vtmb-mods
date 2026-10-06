@@ -5,6 +5,7 @@ The historical recipes remain available, but their dated PASS certificates are
 never consumed by this fresh-run interface.
 """
 import json
+import os
 import sys
 import time
 from pathlib import Path
@@ -23,14 +24,14 @@ SCENARIOS = [
     {'id':'subtitle.radio','mod':'subtitle','timeout':720,'save':'radio','expected':'Pause/on/off/repeat/TV transitions/saved-on/load and an unaccelerated real loop preserve correlated PCM/decoder/caption coordinates','checks':['pause','first_on','repeat_on','off_epoch','tv_radio','radio_tv','saved_on','load_return','real_loop','audio_caption_correlation']},
     {'id':'background.cinematics','mod':'background','timeout':240,'save':'radio','expected':'Two actual native cutscenes omit fill/border while text, placement, wrapping and ordinary dialogue remain; save/map retain patch','checks':['scene_a','scene_b','same_text_bounds','ordinary_dialogue','load','map']},
     {'id':'history.transitions','mod':'history','timeout':300,'save':None,'expected':'Non-None/None purchases to gender reset removes allocation/bonus; complete fresh pool is spendable, extras rejected; Base/Sheet/Accept retain new purchases','checks':['non_none_gender','none_gender','reverse_gender','fresh_pool','exhausted_reject','base_sheet','accept','repeat_history_once']},
-    {'id':'history.bounded_resets','mod':'history','timeout':180,'save':None,'expected':'Bounded reset sequence records entity-slot growth without claiming unlimited endurance; every reset retains correct allocation and fresh pool','checks':['allocation_reset','pool_reset','entity_budget']},
+    {'id':'history.bounded_resets','version':2,'mod':'history','timeout':240,'save':None,'expected':'Two forward/reverse resets record entity slots, clear allocation and grant a complete new spendable pool; ten purchases and seven rejected extras, without an XP=9000 or unlimited-endurance expectation','checks':['allocation_reset','pool_reset','entity_budget']},
 ]
 
 
 def audit(scenario, evidence, identity):
     """A fresh certificate binds each native before/after record to its inputs."""
     require(evidence.get('session')==identity['session'],'Evidence from another session')
-    require(evidence.get('scenario')==scenario['id'] and evidence.get('scenario_version')==1,'Wrong scenario/version')
+    require(evidence.get('scenario')==scenario['id'] and evidence.get('scenario_version')==scenario.get('version',1),'Wrong scenario/version')
     require(evidence.get('artifacts')==identity['artifacts'],'Wrong/stale artifact identity')
     require(evidence.get('modules')==identity['modules'],'Wrong native module identity')
     require(evidence.get('save_sha256')==identity['save_sha256'],'Wrong nominated save')
@@ -69,7 +70,18 @@ def audit(scenario, evidence, identity):
         require(metrics.get('fifth_hit') is False and metrics.get('new_restart_first_sequence')==sequences[0],'Chain does not terminate/restart')
     if scenario['id']=='frenzy.griffith':
         require(0<metrics.get('closest_active_xy',999)<160 and metrics.get('native_damage',0)>0,'No active damaging contact in correction scope')
-        require(metrics.get('ground_handle')!=metrics.get('original_player_handle') and metrics.get('original_player_handle') is not None,'Original player used as ground')
+        require(isinstance(metrics.get('ground_handle'),int) and metrics.get('ground_handle')!=metrics.get('original_player_handle') and isinstance(metrics.get('original_player_handle'),int),'Ground handle absent or original player used as ground')
+        for key,protean in [('normal_contact',False),('warform_contact',True)]:
+            state=by[key]['after']
+            require(state.get('protean_active') is protean and state.get('native_damage',0)>0 and 0<state.get('closest_active_xy',999)<160,'Both ordinary/P5 damaging contacts required')
+        for key in ['end','load','map']:
+            before,after=by[key]['before'],by[key]['after']
+            require(before.get('frenzy_active') is True and before.get('owned_shadow_count')==1,'Active context missing before '+key)
+            require(after.get('frenzy_active') is False and after.get('owned_shadow_count')==0,'Stale Frenzy/Shadow after '+key)
+        require(by['scope_forwarding']['after'].get('unrelated_calls_forwarded') is True,'Unrelated scope forwarding unproven')
+        require(by['cleanup']['after'].get('owned_shadow_count')==0,'Final Shadow cleanup unproven')
+        griffith={p:h for p,h in identity['resources'].items() if 'griffith' in p.lower() and p.endswith('.bsp')}
+        require(len(griffith)==1 and by['resolved_resource']['after'].get('resources')==griffith,'Exact selected Griffith BSP unproven')
     if scenario['id']=='frenzy.library':
         require(by['permission']['after'].get('nofrenzyarea')==0,'Library permission not observed')
         native=by['native_frenzy']['after']
@@ -80,7 +92,14 @@ def audit(scenario, evidence, identity):
         require(len(library)==1 and by['resolved_resource']['after'].get('resources')==library,'Exact selected Library BSP unproven')
     if scenario['id']=='history.bounded_resets':
         slots=metrics.get('entity_slots',[])
-        require(2<=len(slots)<=8 and all(isinstance(x,int) and 0<=x<1800 for x in slots),'Bounded safe entity budget not recorded')
+        require(metrics.get('declared_resets')==len(slots)==2 and metrics.get('scanned_handle_table_slots')==8192 and all(isinstance(x,int) and 0<=x<8192 for x in slots),'Two-reset observations of the 8192-entry handle table missing; this is not allocator capacity')
+        state=by['allocation_reset']['after']
+        require(state.get('allocation')==state.get('neutral_allocation') and state.get('allocation'),'Allocation differs from native neutral baseline')
+        state=by['pool_reset']['after']
+        require(state.get('funding',0)>0 and metrics.get('new_purchases')==[3,6,1] and metrics.get('rejected_exhausted_categories')==7,'Complete new spendable pool or rejection of extras unproven')
+        from infra.history_observations import validate_pool,allocation
+        proof=validate_pool(state.get('native_pool_proof',{}))
+        require(allocation(proof['purchases'][0]['before'])==state['allocation'],'Fresh pool starts from a different reset state')
     if scenario['id']=='history.transitions':
         for name in ['non_none_gender','none_gender','reverse_gender']:
             before,after=by[name]['before'],by[name]['after']
@@ -91,6 +110,10 @@ def audit(scenario, evidence, identity):
         require(by['base_sheet']['before'].get('allocation')==by['base_sheet']['after'].get('allocation') and by['base_sheet']['after'].get('allocation'),'Base/Sheet lost new allocation')
         require(by['accept']['before'].get('allocation')==by['accept']['after'].get('allocation') and by['accept']['after'].get('creation_funding')==0,'Accept lost allocation or retained creation funding')
         require(metrics.get('history_bonus_applications')==1,'Repeated History accumulated bonus')
+        from infra.history_observations import validate_pool,allocation
+        for key in ['non_none_gender','none_gender','reverse_gender']:
+            state=by[key]['after'];proof=validate_pool(state.get('native_pool_proof',{}))
+            require(allocation(proof['purchases'][0]['before'])==state['allocation'],'Pool belongs to a different reset transition')
     if scenario['id']=='protean.lifecycle':
         require(metrics.get('native_frenzy_command')=='frenzyplayer' and metrics.get('max_owned_shadows')==1,'Wrong native Frenzy route or duplicate Shadow')
         require(metrics.get('feats_before_repeat')==metrics.get('feats_after_repeat') and metrics.get('feats_before_repeat') is not None,'Repeated bonus growth')
@@ -98,6 +121,10 @@ def audit(scenario, evidence, identity):
             after=by[key]['after']
             require(after.get('protean_active')==(key=='frenzy_ends_first') and after.get('frenzy_active')==(key=='protean_ends_first'),'Wrong lifecycle order')
         require(by['cleanup']['after'].get('shadow_count')==0,'Shadow cleanup incomplete')
+        for key in ['active_load','active_map']:
+            before,after=by[key]['before'],by[key]['after']
+            require(before.get('frenzy_active') is True and before.get('owned_shadow_count')==1,'Active native state missing before '+key)
+            require(after.get('frenzy_active') is False and after.get('owned_shadow_count')==0,'Stale native state after '+key)
     if scenario['id']=='protean.filter':
         require(metrics.get('mat_fullbright_after_reload')==[1,1] and metrics.get('mat_fullbright_off')==0,'Filter ConVar transition wrong')
         require(metrics.get('normal_brightness',0)>0 and all(x>1.5*metrics['normal_brightness'] for x in metrics.get('active_brightness',[])) and len(metrics.get('active_brightness',[]))==3,'Filter brightness missing')
@@ -125,6 +152,12 @@ def execute(name,config,run_id,historical=False,candidate=None):
     command=config.get('gameplay_commands',{}).get(name)
     if not command and name=='console.immediate':
         command=['{python}','-B','-m','infra.console_immediate','{session}']
+    if not command and name=='console.supported':
+        command=['{python}','-B','-m','infra.console_supported','{session}']
+    if not command and name=='history.bounded_resets':
+        command=['{python}','-B','-m','infra.history_bounded','{session}']
+    if not command and name=='history.transitions':
+        command=['{python}','-B','-m','infra.history_transitions','{session}']
     if not isinstance(command,list) or not command:
         raise Blocked('Configure an inspected native collector command for '+name+' in gameplay_commands. Contract: docs/gameplay.md. Retained recipes are inputs, not automatic PASS adapters.')
     save=Path(config.get('saves',{}).get(scenario['save'],'')) if scenario['save'] else None
@@ -132,7 +165,16 @@ def execute(name,config,run_id,historical=False,candidate=None):
         raise Blocked('Nominate archival save for '+str(scenario['save'])+'; original is never substituted')
     from infra.native import exact
     native_result=exact(scenario['mod'],config,candidate)
+    collector_env={'VTMB_GAME_ROOT':str(need(config,'game_root')),'PYTHONPATH':os.pathsep.join(filter(None,[str(ROOT),config.get('dependencies','')]))}
+    if scenario['mod']=='history':
+        try:run([sys.executable,'-B','-c','import unicorn, pefile, capstone, PIL'],env=collector_env)
+        except __import__('infra.core',fromlist=['Failure']).Failure as error:raise Blocked('Collector dependencies unavailable before launch: '+str(error))
     game=Path(need(config,'game_root')).resolve()
+    if name=='console.supported':
+        import re
+        cfg=game/'Unofficial_Patch/cfg/config.cfg'
+        if cfg.exists() and re.search(r'bind "F11"',cfg.read_text(encoding='cp1252'),re.I):
+            raise Blocked('Preparation: Console supported recipe requires an unused F11 binding; preserve personal binding and adapt collector')
     import tempfile
     with tempfile.TemporaryDirectory(prefix='vtmb-preflight-') as preflight:
         windows(config,'Inspect',Path(preflight))
@@ -147,9 +189,16 @@ def execute(name,config,run_id,historical=False,candidate=None):
         require(not settings['Processes'],'User game running; refuse mutation')
         atomic_json(folder/'settings.json',settings)
         transaction.watch_inventory()
-        for directory in ['Bin/loader','Unofficial_Patch/cfg','Vampire/cfg','Unofficial_Patch/save','Vampire/save','Unofficial_Patch/python','Unofficial_Patch/resource']:
+        if name=='console.supported':
+            transaction.write('Unofficial_Patch/cfg/console_task_overlap.cfg',(ROOT/'mods/console/tests/gameplay/console_task_overlap.cfg').read_bytes())
+        for directory in ['Bin/loader','Unofficial_Patch/cfg','Vampire/cfg','Unofficial_Patch/save','Vampire/save','Unofficial_Patch/python','Vampire/python','Unofficial_Patch/resource']:
             for file in (game/directory).rglob('*'):
                 if file.is_file():transaction.preserve(file.relative_to(game).as_posix())
+        for relative in catalog()['native_modules']:transaction.preserve(relative)
+        for directory in ['', 'Unofficial_Patch','Vampire']:
+            for file in (game/directory).glob('*'):
+                if file.is_file() and file.suffix.lower() in ['.cfg','.log','.txt','.exe','.inf']:
+                    transaction.preserve(file.relative_to(game).as_posix())
         artifacts={};resources={}
         for member,data in members(Path(need(config,'releases'))/catalog()['mods'][scenario['mod']]['archive']).items():
             if member=='README.txt':continue
@@ -165,13 +214,20 @@ def execute(name,config,run_id,historical=False,candidate=None):
                 if member!='README.txt':transaction.write(member,data);resources[member]=digest(game/member);artifacts[member]=resources[member]
         # Only predeclared engine outputs can be restored/deleted automatically.
         for relative in config.get('runtime_outputs',[]):transaction.allow_runtime(relative)
+        # Python 2 creates these standard caches itself during engine startup.
+        # Derive and journal each possible destination from a preserved input.
+        for directory in ['Unofficial_Patch/python','Vampire/python']:
+            for source in (game/directory).rglob('*.py'):
+                for extension in ['.pyc','.pyo']:
+                    transaction.allow_runtime(source.with_suffix(extension).relative_to(game).as_posix())
         for file in (game/'Unofficial_Patch/cfg').glob('*.cfg'):transaction.allow_runtime(file.relative_to(game).as_posix())
         stem='rc_'+transaction.data['id'][:12]
         args=['-game','Unofficial_Patch','-dev','-novid','-console']
         if save:
             relative='Unofficial_Patch/save/'+stem+'.sav'
             transaction.write(relative,save.read_bytes());args+=['+load',stem]
-        identity={'session':run_id+'_'+name,'scenario_version':1,'scenario':name,'artifacts':artifacts,'resources':resources,'modules':{n:digest(game/n) for n in catalog()['native_modules']},'save_sha256':digest(save) if save else None}
+        background={p.relative_to(game).as_posix():digest(p) for p in (game/'Bin/loader').glob('*.vtm') if p.relative_to(game).as_posix() not in artifacts}
+        identity={'session':run_id+'_'+name,'scenario_version':scenario.get('version',1),'scenario':name,'artifacts':artifacts,'resources':resources,'modules':{n:digest(game/n) for n in catalog()['native_modules']},'background_mods':background,'save_sha256':digest(save) if save else None}
         atomic_json(folder/'identity.json',identity)
         atomic_json(folder/'launch.json',{'GameRoot':str(game),'Arguments':args,'Candidates':[{'Path':str(game/n),'Hash':h} for n,h in artifacts.items()],'Save':stem,'SaveHash':identity['save_sha256'],'PluginHash':native_result['sha256']})
         transaction.launch_intent(game/'Vampire.exe',args)
@@ -179,31 +235,78 @@ def execute(name,config,run_id,historical=False,candidate=None):
         owned=read_json(folder/'process.json');transaction.owned_process(owned['Id'],owned['Ticks'])
         expanded=[str(x).replace('{session}',str(folder)).replace('{repo}',str(ROOT)).replace('{python}',sys.executable) for x in command]
         try:
-            run(expanded,timeout=scenario['timeout'],env={'VTMB_GAME_ROOT':str(game),'VTMB_SESSION':str(folder),'VTMB_IDENTITY':str(folder/'identity.json'),'PYTHONPATH':str(ROOT)})
+            run(expanded,timeout=scenario['timeout'],env={**collector_env,'VTMB_SESSION':str(folder),'VTMB_IDENTITY':str(folder/'identity.json')},process_tree=True)
         except __import__('infra.core',fromlist=['Failure']).Failure:
-            if name=='console.immediate' and (folder/'collector-result.json').exists():
+            if (folder/'collector-result.json').exists():
                 receipt=read_json(folder/'collector-result.json')
                 if receipt.get('status')=='BLOCKED':raise Blocked(receipt['reason'])
             raise
         require(all(digest(game/n)==h for n,h in artifacts.items()),'Installed resource/binary changed during test')
+        require(all(digest(game/n)==h for n,h in identity['modules'].items()),'Native module changed during test')
+        require(all(digest(game/n)==h for n,h in background.items()),'Background mod changed during test')
         if candidate:require(digest(candidate)==native_result['sha256'],'Candidate changed during gameplay')
         result=audit(scenario,read_json(folder/'observations.json'),identity)
         atomic_json(folder/'fresh-result.json',result)
+        atomic_json(folder/'scenario-result.json',{'status':'PASS','observed':result})
         return result
+    except Exception as error:
+        primary={'status':'BLOCKED' if isinstance(error,Blocked) else 'FAIL','reason':type(error).__name__+': '+str(error)}
+        atomic_json(folder/'scenario-result.json',primary)
+        error.scenario_result=primary
+        raise
     finally:
-        if transaction.data['owned_process']:
-            windows(config,'Stop',folder,folder/'process.json')
-        if transaction.data['launch_intent'] and not transaction.data['owned_process']:
-            raise Blocked('Interrupted launch before PID record: manual ownership resolution required; journal/backups retained')
+        primary_error=sys.exc_info()[1]
+        try:
+            preserve_session(transaction,config,folder)
+            preservation={'status':'PASS','journal':str(transaction.journal)}
+        except Exception as error:
+            preservation={'status':'BLOCKED' if isinstance(error,Blocked) else 'FAIL','reason':type(error).__name__+': '+str(error),'journal':str(transaction.journal)}
+            atomic_json(folder/'preservation-result.json',preservation)
+            if primary_error is not None:
+                primary_error.preservation_result=preservation
+            else:
+                error.scenario_result=read_json(folder/'scenario-result.json')
+                error.preservation_result=preservation
+                raise
+        else:
+            atomic_json(folder/'preservation-result.json',preservation)
+            if primary_error is not None:primary_error.preservation_result=preservation
+            elif 'result' in locals():result['preservation_result']=preservation
+
+
+def preserve_session(transaction,config,folder):
+    if transaction.data['owned_process']:
+        windows(config,'Stop',folder,folder/'process.json')
+    if transaction.data['launch_intent'] and not transaction.data['owned_process']:
+        raise Blocked('Interrupted launch before PID record: manual ownership resolution required; journal/backups retained')
+    windows(config,'Inspect',folder)
+    if read_json(folder/'settings-current.json')['Processes']:
+        raise Blocked('Another game is running; no file restoration until it is closed by its owner')
+    # Only this live controller can attribute the just-stopped runtime output.
+    # A later recover command uses these recorded hashes instead of a stale PID.
+    transaction.seal_runtime()
+    atomic_json(folder/'settings-after-stop.json',read_json(folder/'settings-current.json'))
+    transaction.restore(process_stopped=True,finalize=False)
+    if (folder/'settings.json').exists():
+        import shutil
+        archive=folder/'after-tests/settings-before-restoration.json';archive.parent.mkdir(parents=True,exist_ok=True)
+        shutil.copy2(folder/'settings-current.json',archive)
+        windows(config,'RestoreSettings',folder,folder/'settings.json')
         windows(config,'Inspect',folder)
-        if read_json(folder/'settings-current.json')['Processes']:
-            raise Blocked('Another game is running; no file restoration until it is closed by its owner')
-        transaction.restore(process_stopped=True,runtime_safe=bool(transaction.data['owned_process']),finalize=False)
-        if (folder/'settings.json').exists():
-            windows(config,'RestoreSettings',folder,folder/'settings.json')
-            windows(config,'Inspect',folder)
-            current=read_json(folder/'settings-current.json')
-            original=read_json(folder/'settings.json')
-            require(current['Video']==original['Video'] and current['Shortcuts']==original['Shortcuts'] and not current['Processes'],'Real-user settings/process restoration differs')
-        atomic_json(folder/'preserved.json',{'Result':'PASS','NoGame':True,'Journal':str(transaction.journal)})
-        transaction.finish()
+        current=read_json(folder/'settings-current.json')
+        original=read_json(folder/'settings.json')
+        require(current['Video']==original['Video'] and current['Shortcuts']==original['Shortcuts'] and not current['Processes'],'Real-user settings/process restoration differs')
+    atomic_json(folder/'preserved.json',{'Result':'PASS','NoGame':True,'Journal':str(transaction.journal)})
+    transaction.finish()
+
+
+def loaded_inputs(process,identity):
+    """Resolve actually loaded modules from the owned PID, not planned copies."""
+    observed={}
+    for relative,expected in {**identity['modules'],**identity['artifacts']}.items():
+        if not relative.endswith(('.dll','.vtm')):continue
+        basename=Path(relative).name.lower()
+        actual=process.module_paths.get(basename)
+        require(actual is not None and digest(actual)==expected,'Loaded native input differs or absent: '+basename)
+        observed[relative]={'path':actual,'sha256':digest(actual),'base':process.modules[basename]}
+    return observed

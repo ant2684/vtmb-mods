@@ -8,6 +8,7 @@
   "launch_user": "REAL_WINDOWS_DOMAIN_USER_REQUIRED",
   "saves": {},
   "gameplay_commands": {},
+  "historical": {},
   "audio_helper": "",
   "notes": "Copy to ignored local.json. Nominate save paths explicitly; no video settings are changed."
 }

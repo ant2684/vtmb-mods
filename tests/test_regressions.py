@@ -145,7 +145,7 @@ class GateTests(unittest.TestCase):
             (root/'PRIVATE.DLL').write_bytes(b'not a PE')
             with self.assertRaises(Failure):inspect(root)
     def test_imported_provenance_maps_all_native_sources(self):
-        from infra.core import read_json
+        from infra.core import read_json, digest
         if (ROOT/'docs/provenance.json').exists():records=read_json(ROOT/'docs/provenance.json')['files']
         else:
             from infra.provenance_data import DATA
@@ -154,6 +154,8 @@ class GateTests(unittest.TestCase):
         for source in (ROOT/'mods').glob('*/plugin/*'):
             self.assertIn(source.relative_to(ROOT).as_posix(),published)
         self.assertTrue(all(r.get('original_sha256') for r in records))
+        for r in records:
+            if r['published']:self.assertEqual(digest(ROOT/r['file']),r['public_sha256'],r['file'])
 
 
 class EvidenceTests(unittest.TestCase):

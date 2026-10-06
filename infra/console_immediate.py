@@ -26,15 +26,21 @@ def collect(folder):
             time.sleep(.3)
     if driver is None:raise Blocked('Preparation: owned scene/modules/native player unavailable within 40 seconds')
     d=driver
+    from infra.gameplay import loaded_inputs
+    loaded=loaded_inputs(d.p,identity);atomic_json(folder/'loaded-inputs.json',loaded)
     require('+back' in d.bindings and '+forward' in d.bindings,'Movement bindings unavailable')
     # Close startup console as preparation, then establish a stable loaded scene.
     if d.snap()['console']['visible']:d.click_x()
     before=d.snap();d.delay(1);ready=d.snap()
     if ready['player_handle']!=before['player_handle'] or ready['client_time']<=before['client_time'] or ready['menu']['visible']:
         raise Blocked('Preparation: nominated save must have a stable unpaused world and unobstructed movement')
-    d.toggle(True);opened=d.snap()
+    try:d.toggle(True)
+    except AssertionError as error:raise Failure('Observed console did not open after the test action: '+str(error)) from error
+    opened=d.snap()
     require(opened['console']['visible'] and opened['server_paused']==1,'Console did not establish pause')
-    d.click_x(delay=0);closed=d.snap()
+    try:d.click_x(delay=0)
+    except AssertionError as error:raise Failure('Observed console did not close after the test action: '+str(error)) from error
+    closed=d.snap()
     require(not closed['console']['visible'],'Close not natively observed')
     observed_close=time.perf_counter()
     first_send=[]

@@ -1,19 +1,19 @@
 # Release and regression review
 
-This review covers the six current release families and their imported maintenance sources. Protean includes the shared Core and both accepted model alternatives. The Melee Frenzy prototype is outside the review. No game was launched and no release, game file, configuration or save was changed for this review.
+This review covers the six current release families and their imported maintenance sources. Protean includes the shared Core and both accepted model alternatives. The Melee Frenzy prototype is outside the review. Current archives remain unchanged. Fresh owned History sessions temporarily installed the exact release and were fully restored, including real-user settings and shortcut arguments. No permanent installation was performed. Fresh runs exposed a failed spendable-pool workflow; technical PASS results do not certify it.
 
 The release record identifies twelve gameplay archives and six source capsules. Existing technical and gameplay certificates apply to their recorded artifacts and supported native modules; importing sources or passing CI does not extend that acceptance to new binaries, new module versions or previously untested workflows. Current delivery archives must remain unchanged.
 
 ## Initial implementation findings and disposition
 
-- **P1 вЂ” Candidate propagation.** At review time, `infra/runner.py` accepts `--candidate` but does not pass it to `infra/gameplay.execute`. The latter verifies the frozen release and installs its archive. A gameplay candidate request therefore exercises the release instead. Pass the candidate and its verified identity through preparation, installation, evidence and restoration, or reject this option for gameplay until supported. Never silently substitute artifacts.
-- **P1 вЂ” Fresh collectors are incomplete.** `infra/gameplay.py` declares scenario contracts but requires user-configured external collector commands. Existing historical collectors do not emit this new contract automatically. Supply inspected adapters for the existing workflows and runnable targeted collectors for new workflows. Until then, the relevant tests are `BLOCKED`, not implemented gameplay regressions.
-- **P1 вЂ” Audit predicates do not yet establish every requirement.** Generic `expected=true`, `observed=true` and nonempty before/after dictionaries are insufficient. In particular, `frenzy.library` has no requirement-specific predicate proving permission, native Frenzy, owned Shadow and cleanup. Add predicates derived from native observations for every required transition, including console pause ownership, menu restoration and reload. Add negative tests using plausible but incorrect states; a label asserting success must not replace an observation.
-- **P1 вЂ” Installation locking must identify the installation.** `infra/session.py` places the lock under the configurable state directory. Two state directories permit concurrent transactions against one game directory. Use an installation-keyed process lock or an equivalent shared lock independent of the chosen evidence directory. Test two distinct state roots against one installation.
-- **P1 вЂ” Check all running games before file restoration.** The gameplay `finally` block stops its owned process, then restores files before `RestoreSettings` checks for another running game. A user game started after the owned process exited can therefore receive file changes. Recheck the installation and all live game processes immediately before restoration and retain the journal if restoration is unsafe. This guard must also apply to explicit recovery.
-- **P2 вЂ” Publication audit must inspect the published blobs.** `infra/public_tree.py` uses tracked filenames but reads working-tree content. Sanitized unstaged content can hide unsafe staged content. Inspect the index or final commit blobs selected for publication. Normalize forbidden extensions case-insensitively and reject private configuration, captures and compiled material independently of `.gitignore`. Test staged/worktree divergence and uppercase file extensions.
+- **P1 — Candidate propagation.** At review time, `infra/runner.py` accepts `--candidate` but does not pass it to `infra/gameplay.execute`. The latter verifies the frozen release and installs its archive. A gameplay candidate request therefore exercises the release instead. Pass the candidate and its verified identity through preparation, installation, evidence and restoration, or reject this option for gameplay until supported. Never silently substitute artifacts.
+- **P1 — Fresh collectors are incomplete.** `infra/gameplay.py` declares scenario contracts but requires user-configured external collector commands. Existing historical collectors do not emit this new contract automatically. Supply inspected adapters for the existing workflows and runnable targeted collectors for new workflows. Until then, the relevant tests are `BLOCKED`, not implemented gameplay regressions.
+- **P1 — Audit predicates do not yet establish every requirement.** Generic `expected=true`, `observed=true` and nonempty before/after dictionaries are insufficient. In particular, `frenzy.library` has no requirement-specific predicate proving permission, native Frenzy, owned Shadow and cleanup. Add predicates derived from native observations for every required transition, including console pause ownership, menu restoration and reload. Add negative tests using plausible but incorrect states; a label asserting success must not replace an observation.
+- **P1 — Installation locking must identify the installation.** `infra/session.py` places the lock under the configurable state directory. Two state directories permit concurrent transactions against one game directory. Use an installation-keyed process lock or an equivalent shared lock independent of the chosen evidence directory. Test two distinct state roots against one installation.
+- **P1 — Check all running games before file restoration.** The gameplay `finally` block stops its owned process, then restores files before `RestoreSettings` checks for another running game. A user game started after the owned process exited can therefore receive file changes. Recheck the installation and all live game processes immediately before restoration and retain the journal if restoration is unsafe. This guard must also apply to explicit recovery.
+- **P2 — Publication audit must inspect the published blobs.** `infra/public_tree.py` uses tracked filenames but reads working-tree content. Sanitized unstaged content can hide unsafe staged content. Inspect the index or final commit blobs selected for publication. Normalize forbidden extensions case-insensitively and reject private configuration, captures and compiled material independently of `.gitignore`. Test staged/worktree divergence and uppercase file extensions.
 
-The initial findings above are retained. Candidate propagation, installation-wide persistent/process locking, pre-restoration running-game checks and staged-blob publication scanning were subsequently corrected and received rejection/recovery regressions. A built-in fresh Console immediate collector now exists but has not run in the game. Library predicates now require native permission, a distinct owned Shadow, cleanup and exact selected BSP. Other fresh collector adapters and further transition predicates remain unfinished; those scenarios stay BLOCKED. This review does not claim complete fresh gameplay coverage.
+The initial findings above are retained. Candidate propagation, installation-wide persistent/process locking, pre-restoration running-game checks and staged-blob publication scanning were subsequently corrected and received rejection/recovery regressions. Built-in fresh Console supported/immediate and History bounded/transition collectors now exist. Console still needs a nominated save. Fresh History bounded v2 FAILed after two gender changes: allocation reset, but the first fresh physical purchase did not change native stats. An independent delayed diagnostic click also failed and the UI displayed zero physical points. The code cause remains unresolved; this is not dismissed as automation loss. Library predicates now require native permission, a distinct owned Shadow, cleanup and exact selected BSP. Fresh Protean, Frenzy, Subtitle and Background collector adapters remain unfinished and need nominated saves; those scenarios stay BLOCKED. Audit rejection checks now require both Griffith contacts, actual ground observation, each end/load/map state, exact resource selection and actual Protean active-load/map cleanup. Generic success labels are insufficient. This review does not claim complete fresh gameplay coverage.
 
 ## Review by release family
 
@@ -52,3 +52,53 @@ Future acceptance gates should distinguish:
 4. **Export:** test each source capsule from an isolated extraction with no access to the original workspace. Require one `README.md`, required shared dependencies, no compiled tests/private evidence, and usable explicit local-input instructions. Gameplay archives contain necessary game-layout fixes plus one English manual `README.txt`; no installer, alternate README, checksum manifest or gameplay checklist.
 
 Before cleanup, verify recoverable archives of unique internal material and run the relocated source tests. Delete only enumerated task-owned duplicates/temporary files after those checks. User backups, preserved original saves, existing evidence and excluded prototype material remain protected. A passing infrastructure test cannot substitute for this preservation check or for a missing gameplay scenario.
+
+## Additional infrastructure findings and corrected behavior
+
+Later recovery no longer treats any runtime output as owned merely because an
+old PID was recorded. The live controller seals file hashes/timestamps and
+settings immediately after stopping its own process; later recovery requires
+those observations or unchanged originals. Newer user configuration/settings
+are preserved and cause BLOCKED. Unknown runtime output still requires explicit
+reconciliation. Scenario outcome and preservation outcome are recorded
+separately, so restoration failure cannot erase a first behavioral FAIL.
+
+Collectors and their descendants are confined to an owned Windows Job Object
+with finite timeout and kill-on-close. The separately owned game outlives its
+launcher and is stopped only by its recorded PID/creation time. Hanging
+child/grandchild fixtures verify termination without stopping a separate
+control process. Tests also exercise typed registry restoration in an isolated
+new fixture key, never by overwriting game video preferences.
+
+The History reader scans 8192 handle-table entries; this is not the allocator
+capacity. Historical native exhaustion near 2001 occupied entries remains a
+separate limitation. Bounded tests record observed growth, without declaring
+every count below 8192 safe or promising unlimited reset endurance.
+
+The first fresh History preparation failed because collector dependencies were
+not propagated, and engine startup produced previously unregistered Python 2
+caches. Recovery correctly stopped on unknown files. Those exact caches were
+independently reconciled against source/header/time observations, archived and
+removed before verified restoration. Dependencies are now preflighted and
+each derived cache destination is declared before launch. A subsequent test
+incorrectly equated a complete spendable pool with stock XP=9000; that failed
+test is preserved and its assumption removed in scenario version 2. The actual
+new-purchase failure remains FAIL. Rejection/purchase audits derive counts and
+native costs from raw states rather than accepting a collector summary.
+
+## Fresh gameplay status and reproduction
+
+| Scenario | Collector | Fresh result / limitation | Command |
+| --- | --- | --- | --- |
+| Console supported | Built-in | BLOCKED: nominated console save absent; retained five-second evidence remains historical | `./RunTests.ps1 -Suite gameplay -Scenario console.supported` |
+| Console immediate | Built-in | BLOCKED: nominated console save absent; no immediate acceptance | `./RunTests.ps1 -Suite gameplay -Scenario console.immediate` |
+| History bounded resets v2 | Built-in | FAIL: new physical purchase after two resets; exact release, observed slot growth and verified restoration | `./RunTests.ps1 -Suite gameplay -Scenario history.bounded_resets` |
+| History transitions | Built-in | FAIL: first fresh purchase after actual bonus History/repeated selection and gender reset; preservation PASS. Later None/Accept portions were not reached | `./RunTests.ps1 -Suite gameplay -Scenario history.transitions` |
+| Protean lifecycle/filter/fourhit | External contract; adapter incomplete | BLOCKED: fresh collector and nominated warehouse/claws saves absent | `./RunTests.ps1 -Suite gameplay -Mod protean` |
+| Frenzy Library/Griffith | External contract; adapter incomplete | BLOCKED: fresh collectors and nominated distinct saves absent; Griffith cannot certify Library | `./RunTests.ps1 -Suite gameplay -Mod frenzy` |
+| Subtitle radio | External contract; adapter incomplete | BLOCKED: fresh native/PCM collector and nominated radio save absent | `./RunTests.ps1 -Suite gameplay -Scenario subtitle.radio` |
+| Background cinematics | External contract; adapter incomplete | BLOCKED: fresh cinematic/text observations and nominated save absent | `./RunTests.ps1 -Suite gameplay -Scenario background.cinematics` |
+
+The repository and hosted CI are published. CI checks technical/source and
+infrastructure coverage only. The new faults suite remains visibly failing on
+the unchanged releases. No release version or acceptance has been advanced.

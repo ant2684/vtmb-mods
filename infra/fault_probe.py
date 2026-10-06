@@ -23,6 +23,7 @@ def probe(mod,config):
         candidate=work/info['filename']
         candidate.write_bytes(members(Path(need(config,'releases'))/info['archive'])['Bin/loader/'+info['filename']])
         before=digest(candidate)
+        require(before==info['plugin_sha256'],'Fault probe input is not the frozen current release')
         existing=(code/'tests/exact_harness.c').read_text(encoding='utf-8').split('int main(')[0]
         if mod=='console':
             setup='engine=VirtualAlloc(NULL,0x1400000,MEM_COMMIT|MEM_RESERVE,PAGE_EXECUTE_READWRITE);ui=VirtualAlloc(NULL,0x80000,MEM_COMMIT|MEM_RESERVE,PAGE_EXECUTE_READWRITE);check(engine&&ui,"fixture allocation");fixtures(); fail_at=0; h=(HMODULE)0; open_plugin(argv[1]); h=plugin; sitep=engine+0x10dc10;'
@@ -45,6 +46,8 @@ puts("PASS cache-flush failure refuses/rolls back hook");return 0;}}
         exe=work/'probe.exe';env=environment(config,work)
         compile_c(need(config,'zig'),source,exe,env,['-Wno-unused-function','-Wno-unused-variable'])
         game=Path(need(config,'game_root'))
+        for relative,pin in catalog()['native_modules'].items():
+            require((game/relative).is_file() and digest(game/relative)==pin,'Fault probe requires supported native fixture: '+relative)
         args=[str(exe),str(candidate),str(game/'Vampire/dlls/vampire.dll'),str(game/('Vampire/cl_dlls/client.dll' if mod=='protean' else 'Bin/engine.dll'))]
         p=subprocess.run(args,capture_output=True,text=True,timeout=90)
         require(digest(candidate)==before,'Fault probe changed candidate file')

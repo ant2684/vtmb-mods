@@ -131,6 +131,18 @@ class Transaction:
         self.data['owned_process']={'Id':int(pid),'Ticks':int(ticks)}
         self.data['launch_intent']['state']='RECORDED';self.data['state']='RUNNING';self.save()
 
+    def seal_runtime(self):
+        """Called only by the live controller after stopping its PID and
+        observing no game. Recovery must not infer this snapshot retroactively.
+        """
+        frozen={}
+        for row in self.data['operations']:
+            if row['kind']!='runtime_intent':continue
+            target=self.path(row['path'])
+            frozen[row['path']]={'sha256':digest(target) if target.exists() else None,
+                                 'mtime_ns':target.stat().st_mtime_ns if target.exists() else None}
+        self.data['runtime_after_stop']=frozen;self.save()
+
     def restore(self, process_stopped=False, runtime_safe=False, finalize=True):
         require(self.data is not None,'Journal missing; lock alone needs manual inspection')
         require(self.data['game_root']==str(self.game),'Journal belongs to different installation')
@@ -158,7 +170,12 @@ class Transaction:
                 require(backup.is_file() and digest(backup)==row['before'],'Backup damaged; preserved current file: '+row['path'])
             current=digest(target) if target.exists() else None
             known=current in [row['before'],row['after']]
-            if row['kind']=='runtime_intent' and runtime_safe:known=True
+            if row['kind']=='runtime_intent':
+                stamp=target.stat().st_mtime_ns if target.exists() else None
+                original={'sha256':row['before'],'mtime_ns':row.get('mtime_ns')}
+                observed={'sha256':current,'mtime_ns':stamp}
+                frozen=self.data.get('runtime_after_stop',{}).get(row['path'])
+                known=observed==original or observed==frozen
             if not known:
                 raise Blocked('Unknown changed file; kept intact: '+row['path'])
             if current!=row['before'] and target.exists():

@@ -4,9 +4,11 @@ Fresh gameplay contracts are listed by `./RunTests.ps1 -Suite gameplay -List`.
 Each requires the exact supported modules, temporarily installed artifact and
 actually selected resources. Nominate a save in local.json; do not substitute
 the user's current quicksave or manufacture a PASS from a historical log.
-`console.immediate` has a built-in first-event collector. Other fresh contracts
-currently require a configured native collector; retained individual session
-scripts have not been converted automatically.
+`console.immediate`, `console.supported`, `history.bounded_resets` and
+`history.transitions` have built-in collectors. Other fresh contracts require
+a configured native collector; retained individual session scripts do not
+automatically implement the new contracts. A named contract alone is not a
+completed gameplay regression.
 An absent collector or save produces BLOCKED before any game change.
 
 Set `gameplay_commands.<scenario>` to an argument array for a reviewed
@@ -30,8 +32,11 @@ general proof of speech timing correctness. Keep raw observations separately.
 Library requires the exact shipped Library BSP and its own nominated save.
 Four-hit needs a suitable living target and four independently observed hit
 windows, plus interruption/restart/block. History tests use a bounded number
-of resets because native entity allocation can grow. These missing gameplay
-certificates remain BLOCKED until a real fresh collector run establishes them.
+of resets because native entity allocation can grow. Missing gameplay certificates remain BLOCKED. History bounded v2 was actually
+run and FAILed: after two gender changes the first fresh physical purchase did
+not change native stats. A separate delayed diagnostic click also failed; the
+UI showed zero physical points while raw stats had reset. Its first failure
+is retained. This is a user workflow failure with unresolved code cause.
 
 Before mutation, the executor refuses a user-owned running game and captures
 real launch-user HKCU Settings/ResPatch, shortcut arguments, file bytes and
@@ -55,3 +60,19 @@ intent without a captured PID require explicit inspection and reconciliation;
 the executor never guesses process ownership. Keep all evidence and originals
 until resolved. Infrastructure tests exercise failures on isolated fixtures;
 they do not certify a real gameplay session or permission to change resolution.
+
+
+The live controller seals runtime hash/timestamp and settings observations
+after stopping the owned PID. Delayed recovery uses that snapshot; a historical
+PID alone cannot authorize overwriting newer user changes. Without a snapshot,
+changed mutable files/settings remain BLOCKED for explicit reconciliation.
+Scenario and preservation results have separate receipts. A behavioral FAIL
+remains FAIL even when restoration is BLOCKED. Collectors/helper descendants
+run in an owned kill-on-close Job Object, separately from the owned game.
+
+Historical re-audit uses `-Suite historical -Mod <mod>` with
+`historical.<mod>.evidence` configured to the original dated evidence tree.
+Subtitle additionally requires `assets`; Background requires `game_snapshot`
+from that historical run. The runner copies evidence before running the
+retained auditor. Original first failures remain unchanged. Partial/PENDING
+certificates are not PASS, and a dated audit never establishes fresh acceptance.

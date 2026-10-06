@@ -37,6 +37,10 @@ def export(mod,output,reference=None):
         import copy
         provenance=copy.deepcopy(DATA)
     provenance['files']=[r for r in provenance['files'] if r['file'].startswith('mods/'+mod+'/')]
+    for record in provenance['files']:
+        if record['published'] and record['file'] not in files:
+            record['published']=False
+            record['export_omission']='Original per-mod README retained in Git; isolated capsule has exactly one new top-level README'
     files['infra/provenance_data.py']=('"""Source origin records for isolated export verification."""\nDATA = '+repr(provenance)+'\n').encode()
     if reference:
         reference=Path(reference)

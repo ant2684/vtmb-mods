@@ -87,7 +87,7 @@ def exact(mod, config, candidate=None):
         path = game/relative
         if not path.is_file():
             raise Blocked('Missing native fixture: ' + relative)
-        require(digest(path) == pin, 'Unsupported native module: ' + relative)
+        if digest(path)!=pin:raise Blocked('Unsupported native module: '+relative+'; select the pinned supported installation')
     with tempfile.TemporaryDirectory(prefix='vtmb-exact-') as td:
         work = Path(td)
         source = scratch(work)
@@ -95,14 +95,16 @@ def exact(mod, config, candidate=None):
         (code/'build').mkdir(exist_ok=True)
         if candidate:
             external = Path(candidate).resolve()
-            require(external.is_file(), 'Candidate absent')
+            if not external.is_file():raise Blocked('Candidate file absent: '+str(external))
             frozen = digest(external)
             rebuilt, _, env = build(mod, config, source, work)
             require(digest(rebuilt) == frozen, 'Candidate does not match this checkout and pinned finalized build. Use its matching source checkout; never bypass this gate.')
             plugin = external
             provenance = {'source':source_identity(mod),'rebuilt_sha256':digest(rebuilt),'compiler':'Zig 0.15.2','mode':'candidate'}
         else:
-            files = members(Path(need(config,'releases'))/info['archive'])
+            archive=Path(need(config,'releases'))/info['archive']
+            if not archive.is_file():raise Blocked('Frozen archive absent: '+info['archive'])
+            files = members(archive)
             plugin = code/'build'/info['filename']
             plugin.write_bytes(files['Bin/loader/'+info['filename']])
             frozen = digest(plugin)
@@ -125,9 +127,11 @@ def exact(mod, config, candidate=None):
                 compile_c(zig,code/'tests/native_harness.c',exe,env)
                 logs.append(run([exe],env=env))
                 logs.append(run([sys.executable,'-B',code/'tests/verify.py','--client',game/'Vampire/cl_dlls/client.dll','--plugin',plugin,'--dependency-dir',config.get('dependencies') or work],env=env))
-            else:
+            elif mod=='subtitle':
                 exe = code/'tests/native_harness.exe'
                 compile_c(zig,code/'tests/native_harness.c',exe,env)
                 logs.append(run([sys.executable,'-B',code/'tests/verify.py','--game',game,'--plugin',plugin],env=env,timeout=600))
+            else:
+                raise Blocked('Implement the future family exact-binary verifier before certifying '+mod)
         require(digest(plugin) == frozen, 'Candidate changed during exact verification')
         return {'sha256':frozen,'provenance':provenance,'checks':logs,'scope':'Exact finalized binary; local pinned native fixtures, ABI, functional guards and rollback; no game launch'}

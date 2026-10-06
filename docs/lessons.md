@@ -34,3 +34,14 @@ refusal/rollback tests, clean payload checks and a script entry point. Prefer a
 shared implementation for common helpers and verify exported source capsules
 without the original workspace. Do not turn a discovered defect into a passing
 expectation merely to obtain a green dashboard.
+
+
+The complete History creation pool means actual spendable category points,
+not a guessed XP constant. A native allocation reset and positive XP can coexist
+with exhausted UI category points. Observe purchases and rejection after
+exhaustion. Preserve the incorrectly specified test and correct its version;
+do not turn the subsequently observed workflow failure into PASS.
+An observer table size is not an allocator budget. A stale recorded PID is not
+ownership of later user changes. A cleanup failure must not replace the first
+scenario result. Capture runtime output hashes after the owned process stops,
+and require them when delayed recovery restores personal configuration.

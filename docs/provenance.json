@@ -1334,7 +1334,7 @@
       "classification": "original workspace source/patch recipe",
       "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
       "published": true,
-      "public_sha256": "24692D00292930E016F419B39CDE1E1EC02F3BD8546FF66AE1CE1B85502EF52B",
+      "public_sha256": "9D8F945FD774B51901EAF69170F260D3839240C4A944C645233063401B55C5C5",
       "transforms": [
         "UTF-8/LF",
         "private-path placeholders",
