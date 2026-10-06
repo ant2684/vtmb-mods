@@ -1107,11 +1107,12 @@
       "classification": "original workspace source/patch recipe",
       "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
       "published": true,
-      "public_sha256": "EF3CC90383DE9F7BC97FD12142205399C414233A46CCCD3A8D3A3CDCD97D0955",
+      "public_sha256": "6ACEEB9C0AE96C329189944B80F1DA2496666E8681E017E69EF6869E2DC78F85",
       "transforms": [
         "UTF-8/LF",
         "private-path placeholders",
-        "historical-script notice when applicable"
+        "historical-script notice when applicable",
+        "History 1.5.2 maintenance: native creation-pool reset, compatible verification and accepted release documentation; original origin hash retained"
       ]
     },
     {
@@ -1137,12 +1138,13 @@
       "classification": "original workspace source/patch recipe",
       "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
       "published": true,
-      "public_sha256": "DB1FE9E6279C3365C15ACD249C69BB8A6849517E72DEA9563152215A89DFB9A7",
+      "public_sha256": "7E8C59CEE698F05CF45869A297FBF13A8F2FA87283646E948B6668E7D8F2E7D3",
       "transforms": [
         "UTF-8/LF",
         "private-path placeholders",
         "historical-script notice when applicable",
-        "maintenance documentation update"
+        "maintenance documentation update",
+        "History 1.5.2 maintenance: native creation-pool reset, compatible verification and accepted release documentation; original origin hash retained"
       ]
     },
     {
@@ -1379,11 +1381,12 @@
       "classification": "original workspace source/patch recipe",
       "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
       "published": true,
-      "public_sha256": "068D10DCCC1D04CDEC7F219DF9F4C86546041E8F078FFBF77D70BAB68C46EEE2",
+      "public_sha256": "0D9DA36E172A7EF24FA457857F5A359F744200323CD7B49FBE86C0CA4FB14901",
       "transforms": [
         "UTF-8/LF",
         "private-path placeholders",
-        "historical-script notice when applicable"
+        "historical-script notice when applicable",
+        "History 1.5.2 maintenance: native creation-pool reset, compatible verification and accepted release documentation; original origin hash retained"
       ]
     },
     {

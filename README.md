@@ -2,8 +2,10 @@
 
 Source and tests for Console Pause, Protean Improved Core and its two model
 alternatives, Frenzy Fixes, Subtitle Pause, Cutscene Subtitle Background and
-History Stat Reset. Current release archives remain frozen; this repository
-does not change their versions or gameplay behavior.
+History Stat Reset. Current release archives remain frozen. History 1.5.2
+restores the native creation category pool after gender/History resets,
+including Auto-Spend Points; its exact clean binary and distinct workflows
+were verified and the user accepted the correction.
 
 On Windows, install Python 3.12.10 and run `./Setup.ps1`. It creates the
 ignored local environment and creates local.json only when absent. Configure

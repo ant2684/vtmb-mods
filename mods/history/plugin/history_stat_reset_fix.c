@@ -47,12 +47,27 @@ static const uint8_t kNoneSignature[] = {
 static void *volatile allow_same_clan_once;
 static uint8_t *helper_page;
 static uint8_t *server_module;
+static uint8_t *client_module;
 static int attempted;
 
 typedef int (__thiscall *GetClanFn)(void *);
 typedef void (__thiscall *SetClanFn)(void *, int, void *);
 typedef int (__thiscall *GetRawFn)(void *, int);
 typedef void (__thiscall *SetRawFn)(void *, int, int);
+typedef void (__thiscall *InitCreationPoolFn)(void *, int);
+
+/* Stock Reset Stats uses this initializer to read all seven category budgets
+   from ClanDoc. The server reset does not reset the separate Sheet counters.
+   Its creation flag is the same explicit flag used by the stock UI guard. */
+static void reset_creation_pool(int clan)
+{
+    uint8_t *character, *sheet;
+    if (!client_module) return;
+    character = *(uint8_t **)(client_module + 0x5fb14c);
+    if (!character || !*(int *)(character + 0x274)) return;
+    sheet = *(uint8_t **)(character + 0xedc);
+    if (sheet) ((InitCreationPoolFn)(client_module + 0x17d930))(sheet, clan);
+}
 
 static void *attribute_group(void *player)
 {
@@ -68,20 +83,23 @@ static void *attribute_group(void *player)
 
 /* The creation UI funds purchases with Experience. SetClan clears that stat
    along with the old allocation, even for None. Preserve the existing value
-   through native accessors; never synthesize XP or touch the UI point pools. */
+   through native accessors; never synthesize XP. Reinitialize creation-only
+   category counters through the stock initializer, independently of XP. */
 static void reset_same_clan(void *player)
 {
     void *group = attribute_group(player);
-    int experience;
+    int experience, clan;
     if (!group || allow_same_clan_once) return;
     experience = ((GetRawFn)(server_module + GET_RAW_RVA))(group, 34);
+    clan = ((GetClanFn)(server_module + GET_CLAN_RVA))(player);
     allow_same_clan_once = player;
     ((SetClanFn)(server_module + SET_CLAN_RVA))(
         server_module + CLAN_MANAGER_RVA,
-        ((GetClanFn)(server_module + GET_CLAN_RVA))(player), player);
+        clan, player);
     allow_same_clan_once = NULL;
     group = attribute_group(player);
     if (group) ((SetRawFn)(server_module + SET_RAW_RVA))(group, 34, experience);
+    reset_creation_pool(clan);
 }
 
 static IMAGE_NT_HEADERS32 *pe_headers(uint8_t *module)
@@ -222,8 +240,23 @@ __declspec(dllexport) void loaded_vampire(void)
     for (i = 0; i < 3; ++i) if (!install_hook(&hooks[i])) { rollback_all(); return; }
 }
 
-/* Kept for loader compatibility; the fix intentionally has no client.dll hooks. */
-__declspec(dllexport) void loaded_client(void) { }
+/* No client hooks: validate the stock initializer and its creation-state global.
+   Absolute operands are relocated to the actual module base before validation. */
+__declspec(dllexport) void loaded_client(void)
+{
+    uint8_t *module = (uint8_t *)GetModuleHandleA("client.dll");
+    IMAGE_NT_HEADERS32 *nt = pe_headers(module);
+    uint8_t guard[] = {0xa1,0,0,0,0,0x85,0xc0,0x74,0x0c,0x8b,0x88,
+        0x74,0x02,0,0,0x85,0xc9,0x0f,0x95,0xc0,0xc3,0x32,0xc0,0xc3};
+    uint8_t init[] = {0x51,0x55,0x8b,0x2d,0,0,0,0,0x56,0x8b,0xf1,
+        0x85,0xed,0x0f,0x84,0x51,0x02,0,0,0x53,0x57,0x8b,0x7c,0x24,0x18};
+    if (client_module || !nt || nt->OptionalHeader.SizeOfImage < 0x5fb150) return;
+    put_u32(guard + 1, (uint32_t)(uintptr_t)(module + 0x5fb14c));
+    put_u32(init + 4, (uint32_t)(uintptr_t)(module + 0x4a0d50));
+    if (!unique_bytes(module, nt, 0x1713e0, guard, sizeof(guard)) ||
+        !unique_bytes(module, nt, 0x17d930, init, sizeof(init))) return;
+    client_module = module;
+}
 
 BOOL WINAPI DllMain(HINSTANCE instance, DWORD reason, LPVOID reserved)
 {

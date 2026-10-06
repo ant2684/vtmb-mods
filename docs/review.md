@@ -1,5 +1,16 @@
 # Release and regression review
 
+Later disposition (2026-10-06): History 1.5.2 fixes the pool failure recorded
+below. Its existing server reset now calls the stock ClanDoc category
+initializer under the explicit creation flag, with validated client signatures,
+no client hook and no synthesized XP. The clean exact binary passed the37
+server cases and13 additional client/pool/ABI cases. Distinct Auto-Spend and
+manual History/gender transitions, new purchases, repeated Auto-Spend, stock
+Reset Stats, Base/Sheet and Accept were verified; the user accepted the result
+and selected1.5.2. Unlimited reset endurance remains outside the claim.
+The old configuration was restored following the user's choice. The following
+initial review and first FAIL observations remain historical.
+
 This review covers the six current release families and their imported maintenance sources. Protean includes the shared Core and both accepted model alternatives. The Melee Frenzy prototype is outside the review. Current archives remain unchanged. Fresh owned History sessions temporarily installed the exact release and were fully restored, including real-user settings and shortcut arguments. No permanent installation was performed. Fresh runs exposed a failed spendable-pool workflow; technical PASS results do not certify it.
 
 The release record identifies twelve gameplay archives and six source capsules. Existing technical and gameplay certificates apply to their recorded artifacts and supported native modules; importing sources or passing CI does not extend that acceptance to new binaries, new module versions or previously untested workflows. Current delivery archives must remain unchanged.

@@ -146,7 +146,10 @@ def main():
  h.install();assert len(h.allocs)==1
  before_calls=h.calls[:]
  h.run(PBASE+next(e.address for e in p.DIRECTORY_ENTRY_EXPORT.symbols if e.name==b'loaded_client'))
- assert h.calls==before_calls;cases+=1
+ # Old releases have an empty client callback; candidates may validate stock
+ # client entry points. This server-only fixture must not install more hooks.
+ assert h.allocs==[HEAP] and h.native==[]
+ assert all(name=='GetModuleHandleA' for name,count in h.calls[len(before_calls):]);cases+=1
  # Distinct arguments cover empty History, a selected History, and automatic
  # automatic None with an unrelated EDI. No Cartesian repetition is needed.
  for key,selected,xp in [('HISTORY',0,9000),('HISTORY',4,8996),('HISTORY',1,0),('NONE',999,8996),('NONE',-2,0)]:

@@ -122,6 +122,8 @@ def exact(mod, config, candidate=None):
             logs += [run([load,plugin,export],env=env) for export in info['exports']]
             if mod == 'history':
                 logs.append(run([sys.executable,'-B',code/'tests/verify.py',plugin,game/'Vampire/dlls/vampire.dll'],env=env,timeout=600))
+                if candidate:
+                    logs.append(run([sys.executable,'-B',code/'tests/verify_pool.py',plugin,game/'Vampire/cl_dlls/client.dll'],env=env,timeout=120))
             elif mod == 'background':
                 exe = code/'build/native-harness.exe'
                 compile_c(zig,code/'tests/native_harness.c',exe,env)
