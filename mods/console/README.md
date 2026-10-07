@@ -1,8 +1,8 @@
-# Console Pause Fix 1.0.1 maintenance source
+# Console Pause Fix 1.1.0 source
 
 Balances console-owned pause and completes native GameUI deactivation while retaining menu, ordinary and script pause ownership.
 
-Based on the accepted 1.0.1 source capsule. The current maintenance candidate also hides the console Minimize button on each opening and disables Minimize in an existing title menu, using guarded stock methods. It adds no detours. Frozen release archives remain unchanged; this behavior change has no new public version yet.
+Version 1.1.0 also hides the console Minimize button on each opening and disables Minimize in an existing title menu, using guarded stock methods. It adds no detours. The release preserves the exact clean bytes used in the recorded gameplay checks and installed maintenance build.
 
 From the repository root:
 

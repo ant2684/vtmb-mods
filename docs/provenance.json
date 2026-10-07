@@ -40,13 +40,14 @@
       "classification": "original workspace source/patch recipe",
       "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
       "published": true,
-      "public_sha256": "9BDFD0D3AB714B20C3B502185516A2A0077AA8627CA6F238C45FDACE2005FBE9",
+      "public_sha256": "34073E4AE7A03B134FAB4A98F69C1777C0CA39F76B1B8859F31405C866663B58",
       "transforms": [
         "UTF-8/LF",
         "private-path placeholders",
         "historical-script notice when applicable",
         "maintenance documentation update",
-        "console minimize maintenance: guarded native button/menu control and matching regression checks"
+        "console minimize maintenance: guarded native button/menu control and matching regression checks",
+        "Console 1.1.0 release documentation; native gameplay bytes unchanged"
       ]
     },
     {

@@ -91,10 +91,21 @@ def frozen_console_tests(config, work):
     if not archive.is_file():raise Blocked('Frozen Console source capsule absent: '+name)
     pin = catalog()['archives'][name]
     require(digest(archive)==pin['sha256'], 'Frozen Console source capsule changed')
-    files = members(archive); code = work/'frozen-console'
+    files = members(archive); base = work/'frozen-console'
+    repository_layout = 'mods/console/plugin/console_pause.c' in files
+    code = base/'mods/console' if repository_layout else base
     for name in CONSOLE_FROZEN_TEST_FILES:
-        require(name in files and sha(files[name])==pin['members'][name], 'Frozen Console test/source changed: '+name)
-        target=code/name;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(files[name])
+        matches = [key for key in (name, 'mods/console/'+name) if key in files]
+        require(len(matches)==1, 'Frozen Console source layout missing/ambiguous: '+name)
+        key = matches[0]
+        require(key==('mods/console/'+name if repository_layout else name), 'Mixed Frozen Console source layouts')
+        require(sha(files[key])==pin['members'][key], 'Frozen Console test/source changed: '+key)
+        target=code/name;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(files[key])
+    # Repository-layout capsules use the same exported clean-PE adapter.
+    if repository_layout:
+        for key in ('infra/common/clean_pe.py','infra/common/load_clean.c'):
+            require(key in files and sha(files[key])==pin['members'][key], 'Frozen Console shared helper changed: '+key)
+            target=base/key;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(files[key])
     return code
 
 

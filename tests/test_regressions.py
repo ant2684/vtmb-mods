@@ -127,7 +127,7 @@ class GateTests(unittest.TestCase):
             self.assertEqual(json.loads(p.read_text(encoding='utf-8'))['reason'],'Нет сохранения')
     def test_public_tree_and_python_sources(self):
         from infra.public_tree import inspect
-        inspect()
+        inspect(source_reference=not (ROOT/'docs/release_catalog.json').exists() and (ROOT/'infra/release_data.py').is_file())
         for path in ROOT.rglob('*.py'):
             if not any(x in {'.git','.local','__pycache__'} for x in path.relative_to(ROOT).parts):compile(path.read_bytes(),str(path),'exec')
 
@@ -144,6 +144,24 @@ class GateTests(unittest.TestCase):
             self.assertEqual(inspect(root,tracked=True)['result'],'PASS')
             (root/'PRIVATE.DLL').write_bytes(b'not a PE')
             with self.assertRaises(Failure):inspect(root)
+
+    def test_source_reference_is_explicit_pinned_and_capsule_only(self):
+        from unittest.mock import patch
+        from infra.core import sha
+        from infra.public_tree import inspect
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d);(root/'infra').mkdir();(root/'infra/release_data.py').write_text('DATA = {}')
+            (root/'reference').mkdir();reference=root/'reference/fix.vtm';reference.write_bytes(b'pinned')
+            pins={'mods':{'console':{'filename':'fix.vtm','plugin_sha256':sha(b'pinned'),'exports':['loaded_gameui']}}}
+            with patch('infra.public_tree.ROOT',root),patch('infra.public_tree.catalog',return_value=pins),patch('infra.release.clean_pe') as clean:
+                with self.assertRaises(Failure):inspect(root)
+                self.assertEqual(inspect(root,source_reference=True)['result'],'PASS');clean.assert_called_once()
+                reference.write_bytes(b'changed')
+                with self.assertRaises(Failure):inspect(root,source_reference=True)
+                reference.write_bytes(b'pinned');other=root/'reference/extra.vtm';other.write_bytes(b'extra')
+                with self.assertRaises(Failure):inspect(root,source_reference=True)
+                other.unlink();(root/'docs').mkdir();(root/'docs/release_catalog.json').write_text('{}')
+                with self.assertRaises(Failure):inspect(root,source_reference=True)
     def test_imported_provenance_maps_all_native_sources(self):
         from infra.core import read_json, digest
         if (ROOT/'docs/provenance.json').exists():records=read_json(ROOT/'docs/provenance.json')['files']

@@ -3,13 +3,17 @@ import re
 import subprocess
 import zipfile
 from pathlib import Path
-from infra.core import ROOT, require
+from infra.core import ROOT, require, catalog, sha
 
 FORBIDDEN={'.exe','.dll','.vtm','.bsp','.mdl','.sav','.log','.pdb','.wav','.pcm','.hl1','.hl2','.hl3'}
 
 
-def inspect(root=ROOT, tracked=False):
+def inspect(root=ROOT, tracked=False, source_reference=False):
     root=Path(root)
+    references={}
+    if source_reference:
+        require(not tracked and root==ROOT and not (root/'docs/release_catalog.json').exists() and (root/'infra/release_data.py').is_file(), 'Reference exception is only for isolated source capsules')
+        references={root/'reference'/info['filename']:info for info in catalog()['mods'].values()}
     if tracked:
         p=subprocess.run(['git','ls-files','--stage','-z'],cwd=root,capture_output=True,check=True)
         paths=[];blobs={}
@@ -24,6 +28,13 @@ def inspect(root=ROOT, tracked=False):
     for path in paths:
         require(path.name.lower() not in {'local.json','settings.json','process.json','launch.json','observations.json','cleanup-ledger.json'} and not any(x.lower() in {'.local','build','__pycache__'} for x in path.relative_to(root).parts),'Private runtime/config file staged for publication')
         suffix=path.suffix.lower()
+        if path in references:
+            from infra.release import clean_pe
+            raw=path.read_bytes();info=references[path]
+            require(sha(raw)==info['plugin_sha256'],'Source reference identity changed')
+            mod=next(k for k,v in catalog()['mods'].items() if v==info)
+            clean_pe(raw,info['exports'],mod)
+            continue
         require(suffix not in FORBIDDEN and suffix not in {'.zip','.7z','.rar','.tar','.gz'},'Nonpublic/game/compiled/archive file: '+str(path))
         raw=blobs[path] if tracked else path.read_bytes()
         require(b'MZ' != raw[:2], 'PE file disguised as source')

@@ -2,7 +2,8 @@
 
 Source and tests for Console Pause, Protean Improved Core and its two model
 alternatives, Frenzy Fixes, Subtitle Pause, Cutscene Subtitle Background and
-History Stat Reset. Current release archives remain frozen. History 1.5.2
+History Stat Reset. Current release archives are pinned. Console 1.1.0 hides
+the Minimize button and disables its cached title-menu action. History 1.5.2
 restores the native creation category pool after gender/History resets,
 including Auto-Spend Points; its exact clean binary and distinct workflows
 were verified and the user accepted the correction.
