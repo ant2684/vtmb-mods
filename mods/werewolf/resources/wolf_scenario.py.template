@@ -1,0 +1,32 @@
+# Native Griffith combat completion; global guards are serialized by the game.
+def nativeWolfReward():
+    if getattr(G, 'GP_Wolf_Rewarded', 0) or G.Werewolf_Dead:
+        return 0
+    events = Find('player_stuff')
+    if not events:
+        return 0
+    G.GP_Wolf_Rewarded = 1
+    G.Werewolf_Dead = 1
+    events.AwardExp('Alliance04')
+    return 1
+
+
+def nativeWolfCrushStart():
+    G.GP_Wolf_CrushStarted = 1
+
+
+def nativeWolfDeath():
+    # Crush owns its animation, tram-at-start and doors-at-finish outputs.
+    if getattr(G, 'GP_Wolf_CrushStarted', 0):
+        return
+    if not nativeWolfReward():
+        return
+    # UP has two ambient_generic entities with this same targetname.
+    for sound in __main__.FindEntitiesByName('werewolf_death'):
+        sound.PlaySound()
+    timer = Find('tram_timer')
+    if timer:
+        timer.Hide()
+    tram = Find('tram_to_station')
+    if tram:
+        tram.Trigger()

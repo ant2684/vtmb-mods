@@ -2684,6 +2684,17 @@
         "private-path placeholders",
         "historical-script notice when applicable"
       ]
+    },
+    {
+      "file": "mods/werewolf/plugin/wolf_damage_mode.c",
+      "capsule": "Griffith Wolf original workspace task source, 2026-10-10",
+      "member": "source/wolf_damage_mode.c",
+      "original_sha256": "F3EDE32DCA348B82290D7727EDB3C50917C9AA5A6866BB0E8E47A6FD9A0170CE",
+      "classification": "original workspace native implementation, experimental candidate",
+      "license": "MIT: original mod source; game signature constants excluded from ownership claim",
+      "published": true,
+      "public_sha256": "F3EDE32DCA348B82290D7727EDB3C50917C9AA5A6866BB0E8E47A6FD9A0170CE",
+      "transforms": ["none: native implementation imported byte-for-byte; no behavior change"]
     }
   ]
 }

@@ -8,6 +8,13 @@ restores the native creation category pool after gender/History resets,
 including Auto-Spend Points; its exact clean binary and distinct workflows
 were verified and the user accepted the correction.
 
+Experimental Griffith Park Werewolf source and explicit technical tools are in
+[mods/werewolf](mods/werewolf/README.md). Its
+[enemy/discipline reference](mods/werewolf/docs/ENEMY_REFERENCE.md) includes
+Sheriff and Ming Xiao comparisons. This test family is not a finalized release
+or a registered common-runner gameplay adapter; further manual testing/tuning
+is expected. Game-layout test ZIPs remain local, not tracked game assets.
+
 On Windows, install Python 3.12.10 and run `./Setup.ps1`. It creates the
 ignored local environment and creates local.json only when absent. Configure
 its local paths; RunTests.ps1 uses that environment and configuration by default:
