@@ -1,0 +1,23 @@
+# The native input wrapper performs HP access and keeps queued ticks disarmed.
+def nativeWolfRegenStop():
+    timer = Find('gp_wolf_regen_timer')
+    if timer:
+        timer.FireUser2()
+        timer.Disable()
+
+
+def nativeWolfRegenSetup():
+    timers = __main__.FindEntitiesByName('gp_wolf_regen_timer')
+    if len(timers) != 1:
+        # Old serialized maps are not migrated; duplicates fail closed.
+        for timer in timers:
+            timer.FireUser2()
+            timer.Disable()
+        return
+    timer = timers[0]
+    timer.Disable()
+    if G.Werewolf_Dead or getattr(G, 'GP_Wolf_CrushStarted', 0):
+        timer.FireUser2()
+        return
+    timer.FireUser1()
+    timer.Enable()

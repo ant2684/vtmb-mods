@@ -184,6 +184,8 @@ static int exchange_slot(unsigned int offset, void *expected, void *replacement)
     return previous == expected;
 }
 
+#include "wolf_regeneration.h"
+
 __declspec(dllexport) void loaded_vampire(void)
 {
     static const uint8_t expected_thunk[] = {0xe9,0x4a,0x1a,0x3c,0x00};
@@ -223,13 +225,15 @@ __declspec(dllexport) void loaded_vampire(void)
         return;
     }
     installed = 1;
+    regen_install();
 }
 
 BOOL WINAPI DllMain(HINSTANCE instance, DWORD reason, LPVOID reserved)
 {
-    (void)instance;
+    if (reason == DLL_PROCESS_ATTACH) wolf_instance = instance;
     if (reason == DLL_PROCESS_DETACH && !reserved && installed &&
         (uint8_t *)GetModuleHandleA("vampire.dll") == server_module) {
+        regen_unload();
         exchange_slot(TRACE_SLOT, (void *)wolf_trace, (void *)original_trace);
         exchange_slot(DAMAGE_SLOT, (void *)wolf_damage, (void *)original_damage);
     }

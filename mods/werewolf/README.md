@@ -1,5 +1,38 @@
 # Griffith Park Werewolf — experimental maintenance source
 
+## Current regeneration candidate (October 2026)
+
+Current source adds continuous native `HealthHeal` regeneration to the existing
+damage fix. It uses CURRENT stats, not base values or raw cache writes. Defaults
+are 5 absolute HP per 1 game second, clamped to missing health, for all wound
+types. `docs/griffith-wolf-native-damage.ini` is the editable example placed next
+to the installed VTM; changes require a game restart. Zero HPPerTick disables
+healing; malformed existing settings disable regeneration, not damage.
+
+The Werewolf-only AcceptInput vtable wrapper recognizes WolfRegenStart/Stop/Tick
+without allocating/rewriting datamaps. All other inputs forward unchanged. One
+stock logic_timer uses a 0.1-second heartbeat; game-time deadlines determine
+the configured healing interval. Activity 0x11e blocks and disarms before the
+crush-begin output; map/Python stop signals additionally disable queued healing.
+Native owner/serial/scope checks protect death, visibility and changed actors.
+
+Run `VerifyRegen.ps1` with explicit Zig/Python/Dependencies/GameRoot/Plugin paths
+for the stock native HealthHeal flow and actual final-VTM ABI/lifetime/INI tests.
+`tests/test_regeneration_resources.py --game-root <pinned-damage-only-input>`
+checks the map/scenario generator, duplicates, reload and crush markers.
+`tools/install_regeneration.py` stages/installs only the VTM, INI, map and scenario,
+with pinned preconditions and a complete guarded rollback. It never replaces the
+NPC template. `docs/manual_regeneration_README.txt` covers manual installation.
+
+Gameplay timing, pause/reload and crush/death acceptance remain manual and
+unqualified until the owner tests the exact installed clean bytes. No archived
+ZIP is updated in this task. The October10 section below, old payload hashes,
+manual_README.txt and ENEMY_REFERENCE.md describe that retained archive baseline,
+not current manually tuned installation stats. Its old packaging/Verify entry
+points are deliberately pinned to the preceding damage-only candidate.
+
+## Retained October10 archive baseline
+
 UP 11.5 Plus test candidate for Wesp5; no public release version is assigned.
 The owner reported positive first gameplay impressions and requested external
 testing, with further balance tuning expected. This is not complete acceptance.
