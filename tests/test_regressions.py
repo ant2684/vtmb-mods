@@ -168,9 +168,17 @@ class GateTests(unittest.TestCase):
         else:
             from infra.provenance_data import DATA
             records=DATA['files']
-        published={r['file'] for r in records if r['published']}
+        by_path={r['file']:r for r in records}
         for source in (ROOT/'mods').glob('*/plugin/*'):
-            self.assertIn(source.relative_to(ROOT).as_posix(),published)
+            name=source.relative_to(ROOT).as_posix()
+            self.assertIn(name,by_path)
+            # Newly authored candidates need origin/hash coverage before any
+            # external publication; do not falsely mark them published to pass.
+            record=by_path[name]
+            if not record['published']:
+                self.assertTrue(record.get('classification'))
+                self.assertTrue(record.get('license'))
+                self.assertEqual(digest(source),record['original_sha256'],name)
         self.assertTrue(all(r.get('original_sha256') for r in records))
         for r in records:
             if r['published']:self.assertEqual(digest(ROOT/r['file']),r['public_sha256'],r['file'])

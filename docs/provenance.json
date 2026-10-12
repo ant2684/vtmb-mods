@@ -2694,7 +2694,73 @@
       "license": "MIT: original mod source; game signature constants excluded from ownership claim",
       "published": true,
       "public_sha256": "F3EDE32DCA348B82290D7727EDB3C50917C9AA5A6866BB0E8E47A6FD9A0170CE",
-      "transforms": ["none: native implementation imported byte-for-byte; no behavior change"]
+      "transforms": [
+        "none: native implementation imported byte-for-byte; no behavior change"
+      ]
+    },
+    {
+      "file": "mods/flamethrower/README.md",
+      "classification": "original workspace flamethrower floater fix/source regression, 2026-10-12",
+      "license": "MIT for original source; native interoperability constants excluded from game ownership claim",
+      "published": false,
+      "original_sha256": "E2401019A45F1D4E5C781F919707630C650C5331F8F66985F1986AD4F8D34066",
+      "transforms": []
+    },
+    {
+      "file": "mods/flamethrower/Build.ps1",
+      "classification": "original workspace flamethrower floater fix/source regression, 2026-10-12",
+      "license": "MIT for original source; native interoperability constants excluded from game ownership claim",
+      "published": false,
+      "original_sha256": "215CD2EA48909A2655C0D21FF2B2016CC7413505EC39EEA293CF50392CF3E2F9",
+      "transforms": []
+    },
+    {
+      "file": "mods/flamethrower/Verify.ps1",
+      "classification": "original workspace flamethrower floater fix/source regression, 2026-10-12",
+      "license": "MIT for original source; native interoperability constants excluded from game ownership claim",
+      "published": false,
+      "original_sha256": "C00DB58ACDBFEBC07E0769C6E382D591B2B7CACEC00BB9CA74B7C6CE04C8450B",
+      "transforms": []
+    },
+    {
+      "file": "mods/flamethrower/plugin/flamethrower_numbers.c",
+      "classification": "original workspace flamethrower floater fix/source regression, 2026-10-12",
+      "license": "MIT for original source; native interoperability constants excluded from game ownership claim",
+      "published": false,
+      "original_sha256": "B471095C8AC4263222DA54E5EEC2B31CB11219767020741F7C13FCFA6D4BB2D9",
+      "transforms": []
+    },
+    {
+      "file": "mods/flamethrower/tests/exact.c",
+      "classification": "original workspace flamethrower floater fix/source regression, 2026-10-12",
+      "license": "MIT for original source; native interoperability constants excluded from game ownership claim",
+      "published": false,
+      "original_sha256": "FEDC21AEE753FE4EFDDC50F06854EB421187181C124A3E4E04E082B5C88D426C",
+      "transforms": []
+    },
+    {
+      "file": "mods/flamethrower/tests/verify_flow.py",
+      "classification": "original workspace flamethrower floater fix/source regression, 2026-10-12",
+      "license": "MIT for original source; native interoperability constants excluded from game ownership claim",
+      "published": false,
+      "original_sha256": "A4C0268C5F15A6C1ACE98D1BBD9847C8E32CDC1241A56CC7994EC981B9B25702",
+      "transforms": []
+    },
+    {
+      "file": "mods/flamethrower/tools/package.py",
+      "classification": "original workspace flamethrower floater fix/source regression, 2026-10-12",
+      "license": "MIT for original source; native interoperability constants excluded from game ownership claim",
+      "published": false,
+      "original_sha256": "7F4CA5F4E888BB687B4E55B5D9FDB39D6584576AD49585A7BB4FCA4EDD23BE03",
+      "transforms": []
+    },
+    {
+      "file": "mods/flamethrower/tools/install_local.py",
+      "classification": "original workspace flamethrower floater fix/source regression, 2026-10-12",
+      "license": "MIT for original source; native interoperability constants excluded from game ownership claim",
+      "published": false,
+      "original_sha256": "3C1E0DAD89E390A17CA35CFB9AAF4F6A200E3655469A576141175A54CC2A5A30",
+      "transforms": []
     }
   ]
 }

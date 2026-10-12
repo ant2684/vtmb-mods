@@ -15,6 +15,11 @@ Sheriff and Ming Xiao comparisons. This test family is not a finalized release
 or a registered common-runner gameplay adapter; further manual testing/tuning
 is expected. Game-layout test ZIPs remain local, not tracked game assets.
 
+Experimental [Flamethrower Damage Numbers](mods/flamethrower/README.md) enables
+stock hit floaters with a guarded one-byte runtime patch. Its standalone verifier
+checks the exact clean VTM and native packet/queue behavior; manual visual
+acceptance is pending. It is not a registered common-runner release family.
+
 On Windows, install Python 3.12.10 and run `./Setup.ps1`. It creates the
 ignored local environment and creates local.json only when absent. Configure
 its local paths; RunTests.ps1 uses that environment and configuration by default:
