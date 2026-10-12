@@ -12,7 +12,10 @@ healing; malformed existing settings disable regeneration, not damage.
 The Werewolf-only AcceptInput vtable wrapper recognizes WolfRegenStart/Stop/Tick
 without allocating/rewriting datamaps. All other inputs forward unchanged. One
 stock logic_timer uses a 0.1-second heartbeat; game-time deadlines determine
-the configured healing interval. Activity 0x11e blocks and disarms before the
+the configured healing interval. Two stock logic_relay entities route their
+OnTrigger outputs to WolfRegenStart/Stop; Python uses verified Trigger and
+Enable/Disable inputs, not unavailable Source FireUser/OnUser APIs. Activity
+0x11e blocks and disarms before the
 crush-begin output; map/Python stop signals additionally disable queued healing.
 Native owner/serial/scope checks protect death, visibility and changed actors.
 
@@ -20,9 +23,16 @@ Run `VerifyRegen.ps1` with explicit Zig/Python/Dependencies/GameRoot/Plugin path
 for the stock native HealthHeal flow and actual final-VTM ABI/lifetime/INI tests.
 `tests/test_regeneration_resources.py --game-root <pinned-damage-only-input>`
 checks the map/scenario generator, duplicates, reload and crush markers.
+It additionally checks ordinary death/reload reward idempotence and safe
+completion on older serialized maps without the new relays. These actors are
+mocks, not real gameplay. `tests/verify_timer_api.py` separately pins and reads
+actual server datamap entries, so a mock-only API assumption cannot pass again.
 `tools/install_regeneration.py` stages/installs only the VTM, INI, map and scenario,
 with pinned preconditions and a complete guarded rollback. It never replaces the
 NPC template. `docs/manual_regeneration_README.txt` covers manual installation.
+The installer accepts either the pinned damage-only set or preceding regeneration
+set, rejects mixed/changed resources, and preserves an existing INI byte-for-byte.
+Ordinary completion still needs the owner's in-game confirmation after repair.
 
 Gameplay timing, pause/reload and crush/death acceptance remain manual and
 unqualified until the owner tests the exact installed clean bytes. No archived

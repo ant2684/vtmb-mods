@@ -30,6 +30,7 @@ class Installation(unittest.TestCase):
             before={n:impl.snapshot(game/n) for n in names}
             with patch.object(impl,'idle'), contextlib.redirect_stdout(io.StringIO()):
                 impl.install(game,PLUGIN,root/'stage')
+                self.assertEqual((game/impl.INI).read_bytes(), b'[Regeneration]\nHPPerTick=3\n')
                 self.assertFalse((game/impl.CACHE).exists())
                 self.assertEqual((game/'Unofficial_Patch/vdata/system/npctemplate001.txt').read_bytes(),b'custom-user-balance')
                 backup=next((game/'Mod_Backups').iterdir())

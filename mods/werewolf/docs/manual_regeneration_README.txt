@@ -22,8 +22,10 @@ game root. Preserve any existing INI and the original file timestamps. Also
 back up griffith.pyc if present and maps/graphs/sp_observatory_2.ain. Remove
 the backed-up griffith.pyc so the new source imports. Keep the graph bytes,
 making its timestamp newer than the updated BSP to avoid a graph rebuild.
-Use a save BEFORE the first observatory visit; old serialized maps without
-the new timer are not automatically repaired. Keep other plug-ins, saves
+If you already have an INI, keep your existing values instead of copying the
+example settings over them. Use a save BEFORE the first observatory visit;
+old serialized maps without the new timer and start/stop relays are not
+automatically repaired. Keep other plug-ins, saves
 and video settings unchanged.
 
 Rollback, game closed:

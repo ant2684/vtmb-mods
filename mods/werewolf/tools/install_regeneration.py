@@ -9,10 +9,12 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'resources'))
-from build_regeneration import build_map, build_script, MAP_PIN, SCRIPT_PIN
+from build_regeneration import (build_map, build_script, MAP_PIN, SCRIPT_PIN,
+                               PREVIOUS_MAP_PIN, PREVIOUS_SCRIPT_PIN)
 from verify_regeneration import verify, VTM, INI, MAP, SCRIPT
 
 OLD_VTM = '4f1dc7b0244049593adeb19cada3e7367d4a80ed9d9450d0f544ee9ac241b64c'
+REGEN_VTM = '785380fe615b7ab0641bf9f2b210fa35f1a9d8e6fc91869f39cc23f35960b6aa'
 CACHE = 'Unofficial_Patch/python/griffith/griffith.pyc'
 GRAPH = 'Unofficial_Patch/maps/graphs/sp_observatory_2.ain'
 
@@ -57,8 +59,12 @@ def install(game, plugin, output):
     idle()
     game, output = game.resolve(), output.resolve()
     if output.exists(): raise FileExistsError('Occupied stage')
-    for name, expected in [(VTM, OLD_VTM), (MAP, MAP_PIN), (SCRIPT, SCRIPT_PIN)]:
-        if sha(safe(game, name)) != expected: raise RuntimeError('Unexpected existing resource: ' + name)
+    identity = tuple(sha(safe(game, name)) for name in (VTM, MAP, SCRIPT))
+    if identity not in ((OLD_VTM, MAP_PIN, SCRIPT_PIN),
+                        (REGEN_VTM, PREVIOUS_MAP_PIN, PREVIOUS_SCRIPT_PIN)):
+        raise RuntimeError('Unexpected existing Wolf resource set; no replacement')
+    if sha(plugin) != REGEN_VTM:
+        raise RuntimeError('Unqualified native candidate')
     protected = {}
     for folder in ['Unofficial_Patch/SAVE', 'Unofficial_Patch/cfg', 'Bin/loader', 'Vampire/dlls']:
         for path in (game / folder).rglob('*'):
@@ -82,7 +88,8 @@ def install(game, plugin, output):
         path = output / name; path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(builder((backup / 'originals' / name).read_bytes()))
     mod = Path(__file__).resolve().parents[1]
-    for source, name in [(plugin, VTM), (mod / 'docs/griffith-wolf-native-damage.ini', INI),
+    ini_source = backup / 'originals' / INI if originals[INI]['exists'] else mod / 'docs/griffith-wolf-native-damage.ini'
+    for source, name in [(plugin, VTM), (ini_source, INI),
                          (mod / 'docs/manual_regeneration_README.txt', 'README.txt')]:
         path = output / name; path.parent.mkdir(parents=True, exist_ok=True); shutil.copy2(source, path)
     identities = verify(output, backup / 'originals')

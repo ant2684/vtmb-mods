@@ -2,22 +2,28 @@
 def nativeWolfRegenStop():
     timer = Find('gp_wolf_regen_timer')
     if timer:
-        timer.FireUser2()
         timer.Disable()
+    stop = Find('gp_wolf_regen_stop')
+    if stop:
+        stop.Trigger()
 
 
 def nativeWolfRegenSetup():
     timers = __main__.FindEntitiesByName('gp_wolf_regen_timer')
-    if len(timers) != 1:
+    starts = __main__.FindEntitiesByName('gp_wolf_regen_start')
+    stops = __main__.FindEntitiesByName('gp_wolf_regen_stop')
+    # Disable all heartbeats before dispatching any event. Old serialized maps
+    # without the relays fail closed, but ordinary completion must still work.
+    for timer in timers:
+        timer.Disable()
+    if len(timers) != 1 or len(starts) != 1 or len(stops) != 1:
         # Old serialized maps are not migrated; duplicates fail closed.
-        for timer in timers:
-            timer.FireUser2()
-            timer.Disable()
+        for stop in stops:
+            stop.Trigger()
         return
     timer = timers[0]
-    timer.Disable()
     if G.Werewolf_Dead or getattr(G, 'GP_Wolf_CrushStarted', 0):
-        timer.FireUser2()
+        stops[0].Trigger()
         return
-    timer.FireUser1()
+    starts[0].Trigger()
     timer.Enable()

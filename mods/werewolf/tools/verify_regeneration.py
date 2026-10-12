@@ -23,7 +23,10 @@ def verify(stage, original):
     if (stage / SCRIPT).read_bytes() != build_script((original / SCRIPT).read_bytes()):
         raise ValueError('Scenario is not exact scoped regeneration resource')
     mod = Path(__file__).resolve().parents[1]
-    for name, source in [(INI, 'docs/griffith-wolf-native-damage.ini'), ('README.txt', 'docs/manual_regeneration_README.txt')]:
+    ini_source = original / INI if (original / INI).exists() else mod / 'docs/griffith-wolf-native-damage.ini'
+    if (stage / INI).read_bytes() != ini_source.read_bytes():
+        raise ValueError('Existing settings were not preserved')
+    for name, source in [('README.txt', 'docs/manual_regeneration_README.txt')]:
         if (stage / name).read_bytes() != (mod / source).read_bytes():
             raise ValueError('Settings/manual identity mismatch')
     raw = (stage / VTM).read_bytes()
