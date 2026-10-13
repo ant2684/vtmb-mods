@@ -30,6 +30,8 @@ class Installation(unittest.TestCase):
             before={n:impl.snapshot(game/n) for n in names}
             with patch.object(impl,'idle'), contextlib.redirect_stdout(io.StringIO()):
                 impl.install(game,PLUGIN,root/'stage')
+                self.assertTrue(impl.matches(game/impl.MAP,before[impl.MAP]),'unchanged map and timestamp')
+                self.assertTrue(impl.matches(game/impl.GRAPH,before[impl.GRAPH]),'unchanged graph and timestamp')
                 self.assertEqual((game/impl.INI).read_bytes(), b'[Regeneration]\nHPPerTick=3\n')
                 self.assertFalse((game/impl.CACHE).exists())
                 self.assertEqual((game/'Unofficial_Patch/vdata/system/npctemplate001.txt').read_bytes(),b'custom-user-balance')

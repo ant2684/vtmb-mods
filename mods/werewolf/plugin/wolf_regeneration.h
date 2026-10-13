@@ -20,6 +20,10 @@ static void *regen_owner;
 static uint32_t regen_serial;
 static int regen_active, regen_stopped, regen_visible;
 static double regen_next, regen_last;
+static int regen_state_read(void);
+static int regen_tick_allowed(void *caller);
+static int lifecycle_install(void);
+static void lifecycle_unload(void);
 
 static char *regen_trim(char *s)
 {
@@ -115,34 +119,30 @@ static int FC wolf_regen_input(void *self, void *unused, const char *name,
     int start = name && !_stricmp(name, "WolfRegenStart");
     int stop = name && !_stricmp(name, "WolfRegenStop");
     int tick = name && !_stricmp(name, "WolfRegenTick");
+    int reset = name && !_stricmp(name, "WolfRegenReset");
     uint8_t *clock, *p = self;
     double now;
     void *group;
     int damage, maximum, amount;
     (void)unused;
-    if (!(start || stop || tick) || !regen_identity(self, &serial))
+    if (!(start || stop || tick || reset) || !regen_identity(self, &serial))
         return stock_input(self, name, activator, caller, value, output_id);
-    if (!regen_hp) return 1;
+    /* Legacy queued commands carry no load identity. They are compatibility
+       sinks, not state transitions; only the synchronous lifecycle owns start. */
+    if (!tick || !regen_hp || !regen_active || regen_stopped ||
+        regen_owner != self || regen_serial != serial || !regen_tick_allowed(caller)) return 1;
     clock = *(uint8_t **)(server_module + 0x70b228);
     if (!clock) return 1;
     now = *(float *)(clock + 0xc);
     if (!isfinite(now) || now < 0) return 1;
-    if (regen_owner != self || regen_serial != serial || now < regen_last) {
-        regen_owner = self; regen_serial = serial;
-        regen_active = regen_stopped = regen_visible = 0;
-        regen_next = now + regen_interval;
-    }
+    /* curtime can be temporarily rewound during player simulation. A real
+       load is reset explicitly; a tiny rewind must not silently stop healing. */
+    if (now < regen_last) now = regen_last;
     regen_last = now;
     /* This activity is installed before OnBeginCrushAnimation is fired.
        It closes the window before queued map/Python stop outputs arrive. */
-    if (*(int *)(p + 0xff0) == 0x11e) stop = 1;
+    if (*(uint32_t *)(p + 0x200) || *(int *)(p + 0xff0) == 0x11e || regen_state_read() != 2) stop = 1;
     if (stop) { regen_active = regen_visible = 0; regen_stopped = 1; return 1; }
-    if (start) {
-        if (regen_stopped) return 1;
-        regen_active = 1; regen_visible = wolf_scope(self);
-        regen_next = now + regen_interval;
-        return 1;
-    }
     if (!regen_active || regen_stopped) return 1;
     if (!wolf_scope(self)) { regen_visible = 0; return 1; }
     if (!regen_visible) { regen_visible = 1; regen_next = now + regen_interval; }
@@ -188,11 +188,16 @@ static void regen_install(void)
         return;
     }
     regen_registered = previous == (void *)stock_input;
+    if (regen_registered && !lifecycle_install()) {
+        exchange_slot(INPUT_SLOT, (void *)wolf_regen_input, (void *)stock_input);
+        regen_registered = 0;
+    }
 }
 
 static void regen_unload(void)
 {
     regen_active = 0;
+    lifecycle_unload();
     if (regen_registered) exchange_slot(INPUT_SLOT, (void *)wolf_regen_input, (void *)stock_input);
     if (regen_protection_pending) {
         DWORD ignored;

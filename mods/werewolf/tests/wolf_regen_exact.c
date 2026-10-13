@@ -3,7 +3,7 @@
 #include <stdlib.h>
 typedef struct { uint32_t words[5]; } Variant;
 typedef int (__attribute__((thiscall)) *Input)(void *, const char *, void *, void *, Variant, int);
-static uint8_t *server, *engine, *entity, *table, *clock_data, *group, *groups;
+static uint8_t *server, *engine, *entity, *table, *clock_data, *group, *groups, *reset_sender;
 static int stats[35], heal_calls, last_heal, forwarded, protect_calls, fail_at, deny_restore;
 static const char *map = "sp_observatory_2";
 static uint8_t saved_current[8], saved_heal[8], saved_input[8], saved_level[7];
@@ -45,6 +45,11 @@ static int input(const char *name)
 {
     Variant v = {{0xabc,2,3,4,4}};
     return ((Input)*(void **)(server + 0x4cf4d4 + 0x1d8))(entity, name, (void *)0x1234, (void *)0x5678, v, 71);
+}
+static void reset_input(void)
+{
+    Variant v = {{0,0,0,0,0}};
+    ((Input)*(void **)(server + 0x4cf4d4 + 0x1d8))(entity, "WolfRegenReset", NULL, reset_sender, v, 0);
 }
 static void now(float t) { memcpy(clock_data + 0xc, &t, 4); }
 static void configure(const char *text)
@@ -110,9 +115,13 @@ int main(int argc, char **argv)
     server = map_image(argv[2]); engine = map_image(argv[3]);
     entity = calloc(1, 0x6800); table = calloc(8192, 12); clock_data = calloc(1, 64);
     group = calloc(1, 64); groups = calloc(1, 4);
+    reset_sender = calloc(1, 0x400);
     check(entity && table && clock_data && group && groups, "fixture objects");
     put(server + 0x566458, (uint32_t)(uintptr_t)table);
     put(table + 4, (uint32_t)(uintptr_t)entity); put(table + 8, 1);
+    put(table + 16, (uint32_t)(uintptr_t)reset_sender); put(table + 20, 3);
+    put(reset_sender + 0x11c, (uint32_t)(uintptr_t)"logic_relay");
+    put(reset_sender + 0x26c, (uint32_t)(uintptr_t)"gp_wolf_regen_reset");
     put(entity, (uint32_t)(uintptr_t)(server + 0x4cf4d4));
     put(entity + 0x26c, (uint32_t)(uintptr_t)"werewolf"); put(entity + 0x1fc, 1);
     put(entity + 0x13bc, 1); put(entity + 0x13c0, (uint32_t)(uintptr_t)groups);
@@ -133,12 +142,26 @@ int main(int argc, char **argv)
     stats[15] = 50; stats[17] = 1200; now(25); input("WolfRegenTick"); check(heal_calls == 3, "long stall pays one only/current max");
     put(entity + 0xff0, 0x11e); now(26); input("WolfRegenTick"); check(heal_calls == 3, "crush blocks BEFORE queued stop");
     put(entity + 0xff0, 0); input("WolfRegenStart"); now(27); input("WolfRegenTick"); check(heal_calls == 3, "crush disarm is sticky");
-    now(10); input("WolfRegenStart"); now(11); input("WolfRegenTick"); check(heal_calls == 4, "clock rollback reload/reset/full interval");
+    now(30); reset_input(); input("WolfRegenStart"); now(30.99f); input("WolfRegenTick");
+    check(heal_calls == 3, "same handle later-time load waits a full interval");
+    now(31); input("WolfRegenTick"); check(heal_calls == 4, "explicit live load reset/same handle/later clock");
     input("WolfRegenStop"); now(12); input("WolfRegenTick"); check(heal_calls == 4, "queued tick after stop ignored");
     put(table + 8, 2); input("WolfRegenStart"); now(13); input("WolfRegenTick"); check(heal_calls == 5, "new serial fresh state");
     put(entity + 0x200, 1); now(14); input("WolfRegenTick"); check(heal_calls == 5, "dead cannot heal");
     put(entity + 0x200, 0); stats[15] = stats[17]; now(15); input("WolfRegenTick"); now(16); input("WolfRegenTick"); check(heal_calls == 5, "zeroHP cannot resurrect");
     stats[15] = 50; map = "other_map"; now(17); input("Use"); check(forwarded == 2 && heal_calls == 5, "other map forwarded");
+    close_plugin(plugin);
+    plugin = open_plugin(NULL); input("WolfRegenStart");
+    now(10.5f); input("WolfRegenStart"); now(11); input("WolfRegenTick");
+    check(heal_calls == 1, "repeated Start does not postpone deadline");
+    now(10.99f); input("WolfRegenTick"); now(12); input("WolfRegenTick");
+    check(heal_calls == 2, "simulation clock rewind does not disarm live healing");
+    input("WolfRegenStop"); input("WolfRegenStart"); now(13); input("WolfRegenTick");
+    check(heal_calls == 2, "late queued Start and Tick cannot remove stop");
+    put(entity + 0xff0, 0x11e); reset_input(); input("WolfRegenStart"); now(14); input("WolfRegenTick");
+    check(heal_calls == 2, "load reset cannot remove active crush stop");
+    put(entity + 0xff0, 0); put(entity + 0x200, 1); reset_input(); input("WolfRegenStart"); now(15); input("WolfRegenTick");
+    check(heal_calls == 2, "load reset cannot revive dead actor");
     close_plugin(plugin);
     {
         const unsigned fps[] = {20, 30, 60, 144, 240};

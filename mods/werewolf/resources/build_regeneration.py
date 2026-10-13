@@ -8,6 +8,10 @@ MAP_PIN = '3e5fdfa9cb054ba1c17380ff5128aac8ddd8b72dc5f2d5059e14121cf67d2fad'
 SCRIPT_PIN = 'd3b9df97d63f8fe8558e584ab9e5a058728317845366b81c85423e6d5a41b15f'
 PREVIOUS_MAP_PIN = '34b23dd725c9ae23d013b6cdbe21d917f42546f43d40ae6387650f5b54e70801'
 PREVIOUS_SCRIPT_PIN = 'ec85633c1bb9dbb3be4b4cda5d38c1fcf60e5a20d9dafc591debd589d3214dd2'
+CURRENT_MAP_PIN = 'c0c10a6e796d2581f5b679edbe7b50466de4cdd91070352577dba6566280753a'
+CURRENT_SCRIPT_PIN = 'f49092402132cd4b890369f2fec2054215cba2656b99afbb85f7e7369bc48dd1'
+LIFE_MAP_PIN = '1d7fc983b163e19f554bd741e11cbee65abaff8b0c315acbed9c98db68b31983'
+LIFE_SCRIPT_PIN = 'd2f6fcac14819627a882823b60f545d67d1e9a3ecd38afde4383a4929bf20e63'
 
 RELAYS = b'''
 {
@@ -31,11 +35,15 @@ RELAYS = b'''
 
 def build_map(raw):
     digest = hashlib.sha256(raw).hexdigest()
-    if digest not in (MAP_PIN, PREVIOUS_MAP_PIN):
+    if digest == LIFE_MAP_PIN:
+        return raw
+    if digest not in (MAP_PIN, PREVIOUS_MAP_PIN, CURRENT_MAP_PIN):
         raise ValueError('Unrecognized current map: preserve user changes, no generic replacement')
     offset, length = struct.unpack_from('<II', raw, 8)
     active = raw[offset:offset + length]
-    if digest == PREVIOUS_MAP_PIN:
+    if digest == CURRENT_MAP_PIN:
+        pass
+    elif digest == PREVIOUS_MAP_PIN:
         # Repair only the exact preceding candidate; never touch geometry or
         # unrelated entities. These Source-generic events do not exist in VTMB.
         for line in (b'"OnUser1" "werewolf,WolfRegenStart,,0,-1,,"\n',
@@ -67,6 +75,33 @@ def build_map(raw):
 "origin" "0 0 0"
 }
 ''' + RELAYS + b'\0'
+    # These callbacks run after the real battle reveal / after world readiness.
+    active = active.replace(b'"OnMapSpawn" ",,,0,-1,nativeWolfRegenSetup(),"\n', b'')
+    active = active.replace(b'"OnMapLoad" ",,,0,-1,nativeWolfRegenSetup(),"',
+                            b'"OnMapLoad" ",,,0,-1,nativeWolfRegenLoad(),"')
+    from probe_map import ENTITY, TARGET
+    text = active.rstrip(b'\0').decode('latin1')
+    seen = False
+    def battle(match):
+        nonlocal seen
+        block = match.group(); target = TARGET.search(block)
+        if target and target.group(1) == 'cutscene_end':
+            if seen: raise ValueError('Duplicate battle reveal')
+            seen = True
+            block = block.replace('}', '"OnTrigger" ",,,0.1,-1,nativeWolfBattleStart(),"\n}', 1)
+        return block
+    text = ENTITY.sub(battle, text)
+    if not seen: raise ValueError('Battle reveal missing')
+    active = text.encode('latin1') + b'''
+{
+"classname" "logic_relay"
+"targetname" "gp_wolf_regen_reset"
+"StartDisabled" "0"
+"spawnflags" "0"
+"OnTrigger" "werewolf,WolfRegenReset,,0,-1,,"
+"origin" "0 0 0"
+}
+\0'''
     result = bytearray(raw)
     new_offset = (len(result) + 3) & ~3
     result.extend(bytes(new_offset - len(result)))
@@ -77,11 +112,11 @@ def build_map(raw):
 
 def build_script(raw):
     digest = hashlib.sha256(raw).hexdigest()
-    if digest not in (SCRIPT_PIN, PREVIOUS_SCRIPT_PIN):
+    if digest not in (SCRIPT_PIN, PREVIOUS_SCRIPT_PIN, CURRENT_SCRIPT_PIN, LIFE_SCRIPT_PIN):
         raise ValueError('Unrecognized current scenario script; no user changes overwritten')
     extension = Path(__file__).with_name('wolf_regeneration.py.template').read_bytes()
     extension = extension.replace(b'\r\n', b'\n').replace(b'\n', b'\r\n')
-    if digest == PREVIOUS_SCRIPT_PIN:
+    if digest in (PREVIOUS_SCRIPT_PIN, CURRENT_SCRIPT_PIN, LIFE_SCRIPT_PIN):
         marker = b'# The native input wrapper performs HP access and keeps queued ticks disarmed.'
         if raw.count(marker) != 1:
             raise ValueError('Unexpected previous regeneration functions')

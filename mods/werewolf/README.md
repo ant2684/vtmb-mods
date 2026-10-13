@@ -9,20 +9,44 @@ types. `docs/griffith-wolf-native-damage.ini` is the editable example placed nex
 to the installed VTM; changes require a game restart. Zero HPPerTick disables
 healing; malformed existing settings disable regeneration, not damage.
 
-The Werewolf-only AcceptInput vtable wrapper recognizes WolfRegenStart/Stop/Tick
-without allocating/rewriting datamaps. All other inputs forward unchanged. One
-stock logic_timer uses a 0.1-second heartbeat; game-time deadlines determine
-the configured healing interval. Two stock logic_relay entities route their
-OnTrigger outputs to WolfRegenStart/Stop; Python uses verified Trigger and
-Enable/Disable inputs, not unavailable Source FireUser/OnUser APIs. Activity
-0x11e blocks and disarms before the
-crush-begin output; map/Python stop signals additionally disable queued healing.
-Native owner/serial/scope checks protect death, visibility and changed actors.
+The Werewolf AcceptInput wrapper consumes old WolfRegenStart/Stop/Reset events
+without letting them change lifecycle state. WolfRegenTick is accepted only from
+the current named timer. All other inputs forward unchanged. One stock timer
+has a0.1-second heartbeat; game-time deadlines determine the healing interval.
+Activity0x11e and native death block treatment before queued script outputs.
+Current saved completion flags are also checked synchronously, not acknowledged
+through an uncorrelated relay event. No health/cache field is written directly.
+
+Only the named gp_wolf_regen_init logic_auto receives the new lifecycle behavior.
+Saved-map Activate forwards once with the original argument, invalidates the old
+context and schedules Think independently of the saved heartbeat. Fresh-map
+Spawn reaches Think without Activate, so its first Think starts the fresh
+context. Map identity is checked in Think: it is unavailable during saved-map
+Activate. Other logic_auto instances forward their original outputs unchanged.
+The reserved initializer never replays its serialized output chain. Its Think
+uses the pinned Python2.1 C API to call a read-only nativeWolfRegenState query.
+No native callable is registered in Python, and no delayed reset is scheduled.
+The live context commits once, enables the stock timer, and waits a full configured
+first interval. Missing/duplicate actors, a five-game-second readiness timeout,
+errors, death and crush fail closed without disabling native damage. Pause and
+duplicate/late events do not pay extra ticks or postpone the committed deadline.
+The map's5000-force shardboom_1/2/3 blasts retain their original event/physics
+path without opening health damage; ordinary weapons and other blasts stay normal.
+
+Clean candidate627C9096/Python866B57F0 now qualifies real P5 claws900→876→900
+and automatic CURRENT healing700→750→800→850→900 after fresh-process and
+same-process load. Disabled saved heartbeat and repeated loads also recover;
+stock console/menu pause freezes HP/game time without catch-up. Direct wound and
+completed-flag controls are explicitly diagnostic, not real combat completion.
+The preceding diagnostic natural shardboom_1 roof survival is retained evidence,
+not a new clean entrance/roof acceptance. Full manual scenario/discipline/Frenzy
+acceptance remains outside this focused save/load repair.
 
 Run `VerifyRegen.ps1` with explicit Zig/Python/Dependencies/GameRoot/Plugin paths
 for the stock native HealthHeal flow and actual final-VTM ABI/lifetime/INI tests.
-`tests/test_regeneration_resources.py --game-root <pinned-damage-only-input>`
-checks the map/scenario generator, duplicates, reload and crush markers.
+`tests/test_regeneration_resources.py --game-root <pinned-input>` checks the
+map/scenario generator. The installed life candidate BSP is passed through
+byte-for-byte, without appending another actor or battle-start output.
 It additionally checks ordinary death/reload reward idempotence and safe
 completion on older serialized maps without the new relays. These actors are
 mocks, not real gameplay. `tests/verify_timer_api.py` separately pins and reads
@@ -30,13 +54,27 @@ actual server datamap entries, so a mock-only API assumption cannot pass again.
 `tools/install_regeneration.py` stages/installs only the VTM, INI, map and scenario,
 with pinned preconditions and a complete guarded rollback. It never replaces the
 NPC template. `docs/manual_regeneration_README.txt` covers manual installation.
-The installer accepts either the pinned damage-only set or preceding regeneration
-set, rejects mixed/changed resources, and preserves an existing INI byte-for-byte.
-Ordinary completion still needs the owner's in-game confirmation after repair.
+The installer accepts the exact preceding1A2B/1D7F/D2F6 set, rejects mixed/changed
+resources, and preserves an existing INI byte-for-byte. This upgrade replaces
+only VTM/Python and backs up the compiled Python cache; identical BSP/INI and
+graph bytes/timestamps are not rewritten. Complete rollback is tested separately.
+`tests/wolf_lifecycle_exact.c` is the current clean-VTM fixture, including Python
+result ownership, lifecycle ABI, same-handle reload and adversarial legacy inputs.
+`tests/wolf_regen_exact.c` is retained for the preceding relay-reset implementation,
+not used to certify this different lifecycle. The bounded local launcher and
+native read-only observer remain in the original source capsule. The portable
+`tests/audit_reload_session.py` checks their retained clean evidence and, before
+installation, independently verifies original tree membership/hash/timestamps.
 
-Gameplay timing, pause/reload and crush/death acceptance remain manual and
-unqualified until the owner tests the exact installed clean bytes. No archived
-ZIP is updated in this task. The October10 section below, old payload hashes,
+The focused save/load repair is installed after exact clean gameplay and technical
+checks, with the owner's50HP/1second INI unchanged. Real claws also completed a
+battle at temporary zero regeneration, increasing experience by4 and recording
+Alliance04 once. That real completed save was loaded at50HP without revival.
+Native crush guards are covered by exact-binary checks, not a new full animation
+playthrough. Broader manual acceptance/publication remains pending. The earlier
+12 source changes are the same unfinished life/roof repair dependency, included
+in this maintenance task rather than silently treated as unrelated or accepted.
+No archived ZIP is updated in this task. The October10 section below, old payload hashes,
 manual_README.txt and ENEMY_REFERENCE.md describe that retained archive baseline,
 not current manually tuned installation stats. Its old packaging/Verify entry
 points are deliberately pinned to the preceding damage-only candidate.

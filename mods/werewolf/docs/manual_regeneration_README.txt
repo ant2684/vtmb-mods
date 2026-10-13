@@ -15,17 +15,22 @@ INI uses 5/1 defaults; an invalid or unreadable INI disables regeneration.
 Use ASCII or UTF-8 text, with a dot for the decimal separator.
 Healing cannot exceed the actor's current maximum or revive a dead actor.
 It uses game time, not frame count; pause/load do not grant missed ticks.
+Healing starts when the introductory scene reveals the combat Werewolf.
+Load restoration reads the current saved battle state through the game-thread
+lifecycle. Old queued start/stop/reset events cannot reset the healing deadline.
+The Werewolf keeps stock protection from its own high-force roof shard blasts;
+other damage and the scripted observatory crush remain separate paths.
 
 Manual installation, game closed:
 Back up each supplied file before copying Bin and Unofficial_Patch into the
 game root. Preserve any existing INI and the original file timestamps. Also
-back up griffith.pyc if present and maps/graphs/sp_observatory_2.ain. Remove
-the backed-up griffith.pyc so the new source imports. Keep the graph bytes,
-making its timestamp newer than the updated BSP to avoid a graph rebuild.
+back up griffith.pyc if present. Remove the backed-up griffith.pyc so the new
+source imports. For an update with an identical BSP, leave that map and its
+graph bytes and timestamps untouched.
 If you already have an INI, keep your existing values instead of copying the
-example settings over them. Use a save BEFORE the first observatory visit;
-old serialized maps without the new timer and start/stop relays are not
-automatically repaired. Keep other plug-ins, saves
+example settings over them. Saves already containing this mod's regeneration
+actors are supported. For older saves without them, use a save BEFORE the first
+observatory visit; those serialized maps are not migrated. Keep other plug-ins, saves
 and video settings unchanged.
 
 Rollback, game closed:

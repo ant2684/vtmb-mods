@@ -7,7 +7,7 @@ import unittest
 from pathlib import Path
 from types import SimpleNamespace
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'resources'))
-from build_regeneration import build_map, build_script, PREVIOUS_MAP_PIN
+from build_regeneration import build_map, build_script, PREVIOUS_MAP_PIN, CURRENT_MAP_PIN, LIFE_MAP_PIN
 from probe_map import ENTITY, TARGET
 GAME = None
 CANDIDATE = None
@@ -22,6 +22,10 @@ class RegenResources(unittest.TestCase):
 
     def test_map_changes_only_scoped_timer_outputs_and_adds_relays(self):
         raw, new = self.candidate('Unofficial_Patch/maps/sp_observatory_2.bsp', build_map)
+        if hashlib.sha256(raw).hexdigest() == LIFE_MAP_PIN:
+            self.assertEqual(new,raw,'Save/load repair must preserve the map byte-for-byte')
+            self.assertEqual(build_map(new),new,'Map passthrough must not duplicate actors')
+            return
         self.assertEqual(new[:8], raw[:8])
         self.assertEqual(new[16:len(raw)], raw[16:])
         def lump(data):
@@ -34,11 +38,21 @@ class RegenResources(unittest.TestCase):
             old_entities = [e.replace('"OnUser1" "werewolf,WolfRegenStart,,0,-1,,"\n', '')
                              .replace('"OnUser2" "werewolf,WolfRegenStop,,0,-1,,"\n', '')
                             for e in old_entities]
+        old_entities = [e.replace('"OnMapSpawn" ",,,0,-1,nativeWolfRegenSetup(),"\n','')
+                         .replace('"OnMapLoad" ",,,0,-1,nativeWolfRegenSetup(),"',
+                                  '"OnMapLoad" ",,,0,-1,nativeWolfRegenLoad(),"') for e in old_entities]
+        for i,e in enumerate(old_entities):
+            if '"targetname" "cutscene_end"' in e:
+                old_entities[i]=e.replace('}', '"OnTrigger" ",,,0.1,-1,nativeWolfBattleStart(),"\n}',1)
         self.assertEqual(new_entities[:len(old_entities)], old_entities)
-        self.assertEqual(len(new_entities), len(old_entities) + (2 if previous else 4))
+        added=5
+        if previous:added=3
+        if hashlib.sha256(raw).hexdigest()==CURRENT_MAP_PIN:added=1
+        self.assertEqual(len(new_entities), len(old_entities) + added)
         self.assertEqual(lump(new).count(b'"targetname" "gp_wolf_regen_timer"'), 1)
         self.assertIn(b'"RefireTime" "0.1"', lump(new))
-        self.assertIn(b'"OnMapLoad" ",,,0,-1,nativeWolfRegenSetup(),"', lump(new))
+        self.assertIn(b'"OnMapLoad" ",,,0,-1,nativeWolfRegenLoad(),"', lump(new))
+        self.assertNotIn(b'OnMapSpawn',lump(new))
         self.assertNotIn(b'OnUser', lump(new))
         for name, action in [('start', 'Start'), ('stop', 'Stop')]:
             self.assertEqual(lump(new).count(('"targetname" "gp_wolf_regen_%s"' % name).encode()), 1)
@@ -60,24 +74,40 @@ class RegenResources(unittest.TestCase):
         timer = Timer()
         actors = {'gp_wolf_regen_timer': [timer], 'gp_wolf_regen_start': [Relay('start')],
                   'gp_wolf_regen_stop': [Relay('stop')]}
-        namespace['__main__'] = SimpleNamespace(FindEntitiesByName=lambda name: actors.get(name, []))
+        actors['gp_wolf_regen_reset']=[Relay('reset')]
+        actors['gp_wolf_regen_init']=[object()]
+        actors['werewolf']=[object()]
+        namespace['__main__'] = SimpleNamespace(FindEntitiesByName=lambda name: actors.get(name, []),
+                                               ScheduleTask=lambda delay,cmd:events.append((delay,cmd)))
         namespace['Find'] = lambda name: actors.get(name, [None])[0] if actors.get(name) else None
         # Only execute our Python2-compatible appended functions.
         exec(new[new.index('# Native Griffith combat completion;'):], namespace)
         namespace['nativeWolfRegenSetup']()
-        self.assertEqual(events, ['disable', 'start', 'enable'])
+        self.assertEqual(events,[])
+        self.assertEqual(namespace['nativeWolfRegenState'](),1)
+        events.clear();namespace['nativeWolfBattleStart']()
+        self.assertEqual(events, [])
+        self.assertEqual(namespace['nativeWolfRegenState'](),2)
+        events.clear();namespace['nativeWolfRegenLoad']()
+        self.assertEqual(events,[])
+        events.clear();namespace['nativeWolfRegenRestore']()
+        self.assertEqual(events,[])
         events.clear(); namespace['nativeWolfCrushStart']()
-        self.assertEqual(events, ['disable', 'stop'])
+        self.assertEqual(events, [])
+        self.assertEqual(namespace['nativeWolfRegenState'](),3)
         events.clear(); namespace['nativeWolfRegenSetup']()
-        self.assertEqual(events, ['disable', 'stop'])
+        self.assertEqual(events, [])
         namespace['G'].GP_Wolf_CrushStarted = 0; namespace['G'].Werewolf_Dead = 1
         events.clear(); namespace['nativeWolfRegenSetup']()
-        self.assertEqual(events, ['disable', 'stop'])
+        self.assertEqual(events, [])
+        namespace['G'].Werewolf_Dead = 0
         actors['gp_wolf_regen_timer'] = [timer, timer]
         events.clear(); namespace['nativeWolfRegenSetup']()
-        self.assertEqual(events, ['disable', 'disable', 'stop'])
+        self.assertEqual(events, [])
+        self.assertEqual(namespace['nativeWolfRegenState'](),4)
         actors.clear()
         events.clear(); namespace['nativeWolfRegenSetup'](); self.assertEqual(events, [])
+        self.assertEqual(namespace['nativeWolfRegenState'](),4)
         with self.assertRaises(ValueError): build_script(new.encode('latin1'))
 
     def test_combat_reward_still_runs_without_relays_in_serialized_map(self):
@@ -130,7 +160,7 @@ class RegenResources(unittest.TestCase):
         if not relays:
             namespace['G'] = SimpleNamespace(Werewolf_Dead=0)
             events.clear(); namespace['nativeWolfRegenSetup']()
-            self.assertEqual(events, ['disable'])
+            self.assertEqual(events, [])
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

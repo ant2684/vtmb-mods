@@ -74,6 +74,25 @@ static int wolf_scope(void *self)
     return name && strcmp(name, "werewolf") == 0;
 }
 
+/* The map's own roof-shattering physics blasts were harmless in stock mode1.
+   Keep forwarding/physics, but do not open health damage for those sources. */
+static int wolf_roof_blast(void *self, void *packet)
+{
+    uint8_t *source;
+    uint32_t serial;
+    const char *name, *class_name;
+    if (!packet || !wolf_scope(self) || *(uint32_t *)((uint8_t *)packet + 0x38) != 0x40) return 0;
+    source = *(uint8_t **)((uint8_t *)packet + 0x28); /* qualified DamageInfo inflictor */
+    if (!source || !find_handle(source, &serial)) return 0;
+    class_name = *(const char **)(source + 0x11c);
+    name = *(const char **)(source + 0x26c);
+    if (!class_name || strcmp(class_name, "env_physexplosion") || !name) return 0;
+    /* Only the demonstrated 5000-force shards. Do not extend to200 skylights
+       until the same native packet/source behavior is qualified separately. */
+    return (!strcmp(name, "shardboom_1") || !strcmp(name, "shardboom_2") ||
+            !strcmp(name, "shardboom_3")) && same_entity(source, serial);
+}
+
 static void FC wolf_trace(void *self, void *unused, void *packet,
                           const void *direction, void *trace)
 {
@@ -128,7 +147,7 @@ static int FC wolf_damage(void *self, void *unused, void *packet)
         target_map(level_name()) &&
         *(uint32_t *)(entity + 0x200) == 0 &&
         !(*(uint32_t *)(entity + 0x19c) & 0x20) &&
-        *(uint32_t *)(entity + 0x1fc) == 1) {
+        *(uint32_t *)(entity + 0x1fc) == 1 && !wolf_roof_blast(self, packet)) {
         name = *(const char **)(entity + 0x26c);
         if (name && strcmp(name, "werewolf") == 0 && find_handle(self, &handle)) {
             *(uint32_t *)(entity + 0x1fc) = 2;
@@ -185,6 +204,7 @@ static int exchange_slot(unsigned int offset, void *expected, void *replacement)
 }
 
 #include "wolf_regeneration.h"
+#include "wolf_lifecycle.h"
 
 __declspec(dllexport) void loaded_vampire(void)
 {

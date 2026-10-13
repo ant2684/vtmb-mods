@@ -117,6 +117,25 @@ int main(int argc, char **argv)
     check(((DamageFn)*slot)(entity, packet) == 321 && hits == 2 && seen_mode == 1, "other map unchanged");
     current_map = "sp_observatory_2"; put(entity + 0x19c, 0x20);
     check(((DamageFn)*slot)(entity, packet) == 321 && hits == 3 && seen_mode == 1, "hidden phase unchanged");
+    {
+        uint8_t *source=calloc(1,0x400);
+        put(entity+0x19c,0);put(entity+0x1fc,1);
+        put(table+16,(uint32_t)(uintptr_t)source);put(table+20,9);
+        put(source+0x11c,(uint32_t)(uintptr_t)"env_physexplosion");
+        put(source+0x26c,(uint32_t)(uintptr_t)"shardboom_1");
+        put(packet+0x28,(uint32_t)(uintptr_t)source);put(packet+0x38,0x40);
+        ((DamageFn)*slot)(entity,packet);check(seen_mode==1,"own roof blast retains original event/physics path");
+        put(source+0x26c,(uint32_t)(uintptr_t)"shardboom_1_fake");
+        ((DamageFn)*slot)(entity,packet);check(seen_mode==2,"similar name is not exempt");
+        put(source+0x26c,(uint32_t)(uintptr_t)"shardboom_1");
+        put(source+0x11c,(uint32_t)(uintptr_t)"item_w_claws");
+        ((DamageFn)*slot)(entity,packet);check(seen_mode==2,"wrong class is not exempt");
+        put(source+0x11c,(uint32_t)(uintptr_t)"env_physexplosion");put(table+16,0);
+        ((DamageFn)*slot)(entity,packet);check(seen_mode==2,"stale source is not dereferenced/exempt");
+        put(table+16,(uint32_t)(uintptr_t)source);put(packet+0x38,0x08000000);
+        ((DamageFn)*slot)(entity,packet);check(seen_mode==2,"ordinary claw damage unaffected");
+        free(source);put(table+16,0);
+    }
     check(FreeLibrary(plugin), "actual candidate unloads");
     check(*slot == original, "original vtable restored on unload");
     check(*trace_slot == original_trace, "original TraceAttack restored on unload");

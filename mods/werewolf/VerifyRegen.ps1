@@ -12,11 +12,15 @@ try {
  if($LASTEXITCODE -ne 0){throw 'Stock timer/relay API qualification failed'}
  & $Python (Join-Path $taskRoot 'tests/verify_heal_flow.py') (Join-Path $GameRoot 'Vampire/dlls/vampire.dll')
  if($LASTEXITCODE -ne 0){throw 'Stock HealthHeal flow failed'}
- foreach($test in @('wolf_damage_exact','wolf_regen_exact')) {
+ foreach($test in @('wolf_damage_exact','wolf_lifecycle_exact')) {
   $output=Join-Path $taskRoot "build/$test.exe"
   & $Zig cc -target x86-windows-gnu -O2 -g0 -s -Wall -Wextra -Werror -o $output (Join-Path $taskRoot "tests/$test.c")
   if($LASTEXITCODE -ne 0){throw "Compilation failed: $test"}
-  & $output $Plugin (Join-Path $GameRoot 'Vampire/dlls/vampire.dll') (Join-Path $GameRoot 'Bin/engine.dll')
+  if($test -eq 'wolf_lifecycle_exact') {
+   & $output $Plugin (Join-Path $GameRoot 'Vampire/dlls/vampire.dll') (Join-Path $GameRoot 'Bin/engine.dll') (Join-Path $GameRoot 'Bin/vampire_python21.dll')
+  } else {
+   & $output $Plugin (Join-Path $GameRoot 'Vampire/dlls/vampire.dll') (Join-Path $GameRoot 'Bin/engine.dll')
+  }
   if($LASTEXITCODE -ne 0){throw "Exact VTM failed: $test"}
  }
 } finally {$env:PYTHONPATH=$oldPythonPath;$env:ZIG_GLOBAL_CACHE_DIR=$oldZigCache}

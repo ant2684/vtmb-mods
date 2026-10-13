@@ -48,7 +48,7 @@ def verify(stage, original):
     for marker in [b'.pdb', b'.log', b'gp_wolf_diagnostics', b'gp_wolf_damage_log']:
         if marker in raw.lower():
             raise ValueError('Diagnostic debris')
-    header = (mod / 'plugin/wolf_regeneration.h').read_text()
+    header = (mod / 'plugin/wolf_regeneration.h').read_text() + (mod / 'plugin/wolf_lifecycle.h').read_text()
     if 'GENERIC_WRITE' in header or 'FILE_APPEND_DATA' in header:
         raise ValueError('Configuration reader may write files')
     if re.search(r'\b(?:printf|fprintf|fwrite|fopen|WriteFile|OutputDebugStringA)\s*\(', header):

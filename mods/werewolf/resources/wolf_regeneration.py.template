@@ -1,29 +1,38 @@
 # The native input wrapper performs HP access and keeps queued ticks disarmed.
 def nativeWolfRegenStop():
-    timer = Find('gp_wolf_regen_timer')
-    if timer:
-        timer.Disable()
-    stop = Find('gp_wolf_regen_stop')
-    if stop:
-        stop.Trigger()
+    pass
 
 
 def nativeWolfRegenSetup():
-    timers = __main__.FindEntitiesByName('gp_wolf_regen_timer')
-    starts = __main__.FindEntitiesByName('gp_wolf_regen_start')
-    stops = __main__.FindEntitiesByName('gp_wolf_regen_stop')
-    # Disable all heartbeats before dispatching any event. Old serialized maps
-    # without the relays fail closed, but ordinary completion must still work.
-    for timer in timers:
-        timer.Disable()
-    if len(timers) != 1 or len(starts) != 1 or len(stops) != 1:
-        # Old serialized maps are not migrated; duplicates fail closed.
-        for stop in stops:
-            stop.Trigger()
-        return
-    timer = timers[0]
-    if G.Werewolf_Dead or getattr(G, 'GP_Wolf_CrushStarted', 0):
-        stops[0].Trigger()
-        return
-    starts[0].Trigger()
-    timer.Enable()
+    pass
+
+
+def nativeWolfBattleStart():
+    G.GP_Wolf_CombatStarted = 1
+
+
+def nativeWolfRegenLoad():
+    pass
+
+
+def nativeWolfRegenRestore():
+    pass
+
+
+def nativeWolfRegenState():
+    # Pure query: 0 not ready, 1 awaiting battle, 2 live, 3 completed, 4 invalid.
+    # Legacy serialized callbacks above cannot schedule or reset native state.
+    try:
+        if not hasattr(G, 'Werewolf_Dead'):
+            return 0
+        if G.Werewolf_Dead or getattr(G, 'GP_Wolf_CrushStarted', 0):
+            return 3
+        for name in ('werewolf', 'gp_wolf_regen_init', 'gp_wolf_regen_timer',
+                     'gp_wolf_regen_start', 'gp_wolf_regen_stop', 'gp_wolf_regen_reset'):
+            if len(__main__.FindEntitiesByName(name)) != 1:
+                return 4
+        if not getattr(G, 'GP_Wolf_CombatStarted', 0):
+            return 1
+        return 2
+    except:
+        return 0

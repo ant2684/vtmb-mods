@@ -10,11 +10,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'resources'))
 from build_regeneration import (build_map, build_script, MAP_PIN, SCRIPT_PIN,
-                               PREVIOUS_MAP_PIN, PREVIOUS_SCRIPT_PIN)
+                               PREVIOUS_MAP_PIN, PREVIOUS_SCRIPT_PIN, CURRENT_MAP_PIN, CURRENT_SCRIPT_PIN,
+                               LIFE_MAP_PIN, LIFE_SCRIPT_PIN)
 from verify_regeneration import verify, VTM, INI, MAP, SCRIPT
 
 OLD_VTM = '4f1dc7b0244049593adeb19cada3e7367d4a80ed9d9450d0f544ee9ac241b64c'
-REGEN_VTM = '785380fe615b7ab0641bf9f2b210fa35f1a9d8e6fc91869f39cc23f35960b6aa'
+OLD_REGEN_VTM = '785380fe615b7ab0641bf9f2b210fa35f1a9d8e6fc91869f39cc23f35960b6aa'
+LIFE_VTM = '1a2b67cdcb7ca12d92b6c09cf81efb6b4c48518111216de4853636c39e336cc6'
+REGEN_VTM = '627c90962aaa49ee229f1e05c397a7dc2718f2dfd11418292309900041433f01'
 CACHE = 'Unofficial_Patch/python/griffith/griffith.pyc'
 GRAPH = 'Unofficial_Patch/maps/graphs/sp_observatory_2.ain'
 
@@ -61,7 +64,9 @@ def install(game, plugin, output):
     if output.exists(): raise FileExistsError('Occupied stage')
     identity = tuple(sha(safe(game, name)) for name in (VTM, MAP, SCRIPT))
     if identity not in ((OLD_VTM, MAP_PIN, SCRIPT_PIN),
-                        (REGEN_VTM, PREVIOUS_MAP_PIN, PREVIOUS_SCRIPT_PIN)):
+                        (OLD_REGEN_VTM, PREVIOUS_MAP_PIN, PREVIOUS_SCRIPT_PIN),
+                        (OLD_REGEN_VTM, CURRENT_MAP_PIN, CURRENT_SCRIPT_PIN),
+                        (LIFE_VTM, LIFE_MAP_PIN, LIFE_SCRIPT_PIN)):
         raise RuntimeError('Unexpected existing Wolf resource set; no replacement')
     if sha(plugin) != REGEN_VTM:
         raise RuntimeError('Unqualified native candidate')
@@ -93,6 +98,8 @@ def install(game, plugin, output):
                          (mod / 'docs/manual_regeneration_README.txt', 'README.txt')]:
         path = output / name; path.parent.mkdir(parents=True, exist_ok=True); shutil.copy2(source, path)
     identities = verify(output, backup / 'originals')
+    changes = [name for name in [VTM, INI, MAP, SCRIPT]
+               if not originals[name]['exists'] or originals[name]['sha256'] != identities[name]]
     receipt = {'game': str(game), 'stage': str(output), 'status': 'backed-up',
                'originals': originals, 'after': identities, 'protected': protected}
     receipt_path = backup / 'receipt.json'; record(receipt_path, receipt)
@@ -104,7 +111,7 @@ def install(game, plugin, output):
         idle()
         for name, state in originals.items():
             if not matches(safe(game, name), state): raise RuntimeError('Concurrent modification: ' + name)
-        for name in [VTM, INI, MAP, SCRIPT]:
+        for name in changes:
             path = safe(game, name); temporary = path.with_name(path.name + '.wolf_regen_new')
             shutil.copy2(output / name, temporary)
             if sha(temporary) != identities[name]: raise RuntimeError('Copy mismatch')
@@ -112,7 +119,7 @@ def install(game, plugin, output):
             if sha(path) != identities[name]: raise RuntimeError('Installed mismatch')
         if originals[CACHE]['exists']:
             safe(game, CACHE).unlink(); cache_changed = True
-        if originals[GRAPH]['exists']:
+        if MAP in changes and originals[GRAPH]['exists']:
             graph = safe(game, GRAPH)
             os.utime(graph, ns=(originals[GRAPH]['atime_ns'], max(originals[GRAPH]['mtime_ns'], safe(game, MAP).stat().st_mtime_ns + 1000000000)))
             graph_changed = True
