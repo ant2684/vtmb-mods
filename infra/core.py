@@ -29,6 +29,11 @@ def digest(path):
     return sha(Path(path).read_bytes())
 
 
+def source_digest_lf(path):
+    """Text-source identity across Git LF and Windows CRLF checkouts only."""
+    return sha(Path(path).read_bytes().replace(b'\r\n', b'\n'))
+
+
 def read_json(path):
     return json.loads(Path(path).read_text(encoding='utf-8-sig'))
 

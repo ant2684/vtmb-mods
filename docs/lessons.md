@@ -81,3 +81,11 @@ price formula. Install payment before visibility. If restoring the visibility
 site cannot be confirmed by an instruction-cache flush, retain the standalone
 payment helper as well. Test quantities and money together: row visibility
 and a successful transfer alone would miss this regression.
+
+
+Record an explicit source_sha256_lf identity for newly authored text candidates
+that can be checked out with LF or CRLF. Compute it with source_digest_lf;
+normalization changes only CRLF to LF. Preserve original_sha256 as the original
+byte identity. Published public_sha256 pins, binary hashes and delivered archive
+identities remain byte-exact. Exercise provenance checks on a Git LF snapshot,
+not only on the local working copy or an exported CRLF source capsule.

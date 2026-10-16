@@ -163,7 +163,7 @@ class GateTests(unittest.TestCase):
                 other.unlink();(root/'docs').mkdir();(root/'docs/release_catalog.json').write_text('{}')
                 with self.assertRaises(Failure):inspect(root,source_reference=True)
     def test_imported_provenance_maps_all_native_sources(self):
-        from infra.core import read_json, digest
+        from infra.core import read_json, digest, source_digest_lf
         if (ROOT/'docs/provenance.json').exists():records=read_json(ROOT/'docs/provenance.json')['files']
         else:
             from infra.provenance_data import DATA
@@ -178,7 +178,10 @@ class GateTests(unittest.TestCase):
             if not record['published']:
                 self.assertTrue(record.get('classification'))
                 self.assertTrue(record.get('license'))
-                self.assertEqual(digest(source),record['original_sha256'],name)
+                if 'source_sha256_lf' in record:
+                    self.assertEqual(source_digest_lf(source),record['source_sha256_lf'],name)
+                else:
+                    self.assertEqual(digest(source),record['original_sha256'],name)
         self.assertTrue(all(r.get('original_sha256') for r in records))
         for r in records:
             if r['published']:self.assertEqual(digest(ROOT/r['file']),r['public_sha256'],r['file'])
