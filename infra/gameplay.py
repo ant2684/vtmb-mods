@@ -9,11 +9,14 @@ import os
 import sys
 import time
 from pathlib import Path
-from infra.core import ROOT, Blocked, atomic_json, catalog, digest, need, read_json, require, run
+from infra.core import ROOT, Blocked, atomic_json, catalog, mod_info, digest, need, read_json, require, run
 from infra.release import members
 from infra.session import Transaction
 
 SCENARIOS = [
+    {'id':'container.transfer','version':2,'mod':'container','timeout':240,'save':'container','expected':'Narrow candidate confirmation: two individual knife takes, returns, reopen, cap rejection and capacity recovery','checks':['transfer','reopen','cap']},
+    {'id':'container.baseline','version':1,'mod':'container','timeout':180,'save':'container','expected':'Original duplicate filter hides the remaining stack while native ownership/count is conserved','checks':['reproduction','trade_reference']},
+    {'id':'container.stacks','version':2,'mod':'container','timeout':900,'save':'container','expected':'Native transfer/reopen/reload, cap and capacity recovery, stackable/nonstack/ammo and trade preserve items and wallet','checks':['transfer','reopen','reload','cap','other_stack','nonstack','ammo','trade']},
     {'id':'console.minimize_remaining','mod':'console','timeout':180,'save':'console','expected':'Targeted first console opening after measured five-second menu exit wait, script pause and reload; hidden minimize controls and resumed input','checks':['menu_first_delayed_open','script_pause','first_input','reload','minimize_controls']},
     {'id':'console.minimize','mod':'console','timeout':240,'save':'console','expected':'Console minimize button hidden, cached Minimize disabled; X/tilde, pause/menu/script/reload and signed input after external five-second wait remain usable','checks':['console_x','console_tilde','ordinary_pause','prior_menu','script_pause','first_input','reload','minimize_controls']},
     {'id':'console.supported','version':2,'mod':'console','timeout':240,'save':'console','expected':'X/tilde preserve owned ordinary/menu/script pauses; after measured five-second external wait first signed movement/camera succeeds; reload remains usable','checks':['console_x','console_tilde','ordinary_pause','prior_menu','script_pause','first_input','reload']},
@@ -51,6 +54,9 @@ def audit(scenario, evidence, identity):
         require(row.get('source') in ['native-process-read','native-console-readback','offline-native-getter','process-wasapi-plus-native'],'Unproven observation source: '+name)
     # Requirement-specific metrics prevent a generic passed=True replacing proof.
     metrics=evidence.get('metrics',{})
+    if scenario['mod']=='container':
+        from mods.container.tests.audit import audit as container_audit
+        container_audit(evidence)
     if scenario['id'] in ['console.minimize','console.minimize_remaining']:
         from infra.console_minimize import audit_controls
         audit_controls(evidence)
@@ -167,6 +173,8 @@ def execute(name,config,run_id,historical=False,candidate=None):
         command=['{python}','-B','-m','infra.history_bounded','{session}']
     if not command and name=='history.transitions':
         command=['{python}','-B','-m','infra.history_transitions','{session}']
+    if not command and name.startswith('container.'):
+        command=['{python}','-B','-m','infra.container_gameplay','{session}']
     if not isinstance(command,list) or not command:
         raise Blocked('Configure an inspected native collector command for '+name+' in gameplay_commands. Contract: docs/gameplay.md. Retained recipes are inputs, not automatic PASS adapters.')
     save=Path(config.get('saves',{}).get(scenario['save'],'')) if scenario['save'] else None
@@ -178,6 +186,10 @@ def execute(name,config,run_id,historical=False,candidate=None):
     if scenario['mod']=='history':
         try:run([sys.executable,'-B','-c','import unicorn, pefile, capstone, PIL'],env=collector_env)
         except __import__('infra.core',fromlist=['Failure']).Failure as error:raise Blocked('Collector dependencies unavailable before launch: '+str(error))
+    if name=='container.stacks':
+        proof=Path(need(config,'container_baseline'))
+        if not proof.is_file():raise Blocked('Run container.baseline first and configure container_baseline observations')
+        collector_env['VTMB_CONTAINER_BASELINE']=str(proof)
     game=Path(need(config,'game_root')).resolve()
     if name in ['console.supported','console.minimize','console.minimize_remaining']:
         import re
@@ -209,9 +221,29 @@ def execute(name,config,run_id,historical=False,candidate=None):
                 if file.is_file() and file.suffix.lower() in ['.cfg','.log','.txt','.exe','.inf']:
                     transaction.preserve(file.relative_to(game).as_posix())
         artifacts={};resources={}
-        for member,data in members(Path(need(config,'releases'))/catalog()['mods'][scenario['mod']]['archive']).items():
+        if scenario['mod']=='container':
+            require(candidate is not None,'Container requires the exact candidate')
+            payload={} if name=='container.baseline' else {'Bin/loader/'+mod_info('container')['filename']:Path(candidate).read_bytes()}
+            require(not (game/'Bin/loader/container-stack-fix.vtm').exists(),'Refuse to replace a pre-existing container candidate')
+            from mods.container.tests.save_members import members as save_members
+            for cache_name in save_members(save):
+                transaction.allow_runtime('Unofficial_Patch/save/'+cache_name)
+            transaction.write('Unofficial_Patch/cfg/container_probe.cfg',b'// registered task command file\n')
+            transaction.allow_runtime('Unofficial_Patch/cfg/container_probe.cfg')
+            # Fixed destinations of this retained workflow are declared before
+            # launch, even in a fresh installation without any previous cache.
+            outputs=['Unofficial_Patch/save/rc_container_state.sav']
+            outputs += ['Unofficial_Patch/save/'+name+'.HL'+str(i) for name in ['sm_hub_1','sm_pawnshop_2'] for i in range(1,4)]
+            outputs += ['Unofficial_Patch/save/autosave'+suffix+'.sav' for suffix in ['',*['%02d'%i for i in range(1,10)]]]
+            outputs += [mod+'/maps/graphs/'+name for mod in ['Unofficial_Patch','Vampire'] for name in ['.loc','sm_pawnshop_1.loc','sm_pawnshop_2.loc','sm_hub_1.loc']]
+            for relative in outputs:transaction.allow_runtime(relative)
+            for relative in ['Unofficial_Patch/maps/graphs','Vampire/maps/graphs']:
+                for file in (game/relative).rglob('*'):
+                    if file.is_file():transaction.preserve(file.relative_to(game).as_posix())
+        else:payload=members(Path(need(config,'releases'))/catalog()['mods'][scenario['mod']]['archive'])
+        for member,data in payload.items():
             if member=='README.txt':continue
-            if candidate and member=='Bin/loader/'+catalog()['mods'][scenario['mod']]['filename']:
+            if candidate and member=='Bin/loader/'+mod_info(scenario['mod'])['filename']:
                 data=Path(candidate).read_bytes()
                 require(__import__('infra.core',fromlist=['sha']).sha(data)==native_result['sha256'],'Candidate changed after exact tests')
             transaction.write(member,data);artifacts[member]=digest(game/member)
@@ -230,9 +262,11 @@ def execute(name,config,run_id,historical=False,candidate=None):
                 for extension in ['.pyc','.pyo']:
                     transaction.allow_runtime(source.with_suffix(extension).relative_to(game).as_posix())
         for file in (game/'Unofficial_Patch/cfg').glob('*.cfg'):transaction.allow_runtime(file.relative_to(game).as_posix())
+        for relative in ['Unofficial_Patch/cfg/config.cfg','Vampire/cfg/config.cfg']:
+            transaction.allow_runtime(relative)
         stem='rc_'+transaction.data['id'][:12]
         args=['-game','Unofficial_Patch','-dev','-novid','-console']
-        if name in ['console.minimize','console.minimize_remaining']:args+=['+developer','0']
+        if name in ['console.minimize','console.minimize_remaining'] or scenario['mod']=='container':args+=['+developer','0']
         if save:
             relative='Unofficial_Patch/save/'+stem+'.sav'
             transaction.write(relative,save.read_bytes());args+=['+load',stem]

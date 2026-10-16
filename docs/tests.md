@@ -47,3 +47,22 @@ python -m infra.fault_probe --mod console --config local.json --output .local/co
 A proven hook remaining installed after injected OS refusal is FAIL. A broken
 probe or an unexercised fault is BLOCKED. This is distinct from passing the
 retained historical coverage; findings require separate behavior fixes.
+
+
+Container Stack Fix is selected explicitly with `-Mod container`; the default
+all-mod suite continues to use the frozen catalog. `container.build` checks the
+clean source build, forced relocation, missing/unsupported/occupied modules,
+repeated callbacks, protection/flush faults, races, rollback and helper lifetime.
+`container.exact` binds these checks and 96 emitted-helper ABI comparisons to
+the supplied candidate and supported client image. `container.baseline` records
+the original disappearance without installing the plugin. `container.stacks`
+checks two individual takes, returns, reopen, an independently confirmed reload,
+full-stack rejection/capacity recovery, bloodpacks, a nonstackable weapon, the
+native firearm-ammunition exception, and ordered vendor buy/sell operations.
+The independent auditor rejects missing/replayed actions, mismatched rows,
+quotes, inventory continuity, stock policy, wallet deltas and load receipts.
+
+The container exact verifier also covers the server price helper in18 native
+branch/local-state contexts, either module load order and coupled rollback.
+Visibility is never published before the matching payment hook. Persistent UI
+cache failure must retain payment, including during DLL unload.

@@ -20,6 +20,12 @@ stock hit floaters with a guarded one-byte runtime patch. Its standalone verifie
 checks the exact clean VTM and native packet/queue behavior; manual visual
 acceptance is pending. It is not a registered common-runner release family.
 
+[Container Stack Fix](mods/container/README.md) is a separate unreleased loader
+candidate. Its explicit common-runner scenarios cover the original duplicate
+filter and stack transfer, capacity, save/load and vendor workflows. Select
+`-Mod container -Candidate <finalized.vtm>`; the frozen release catalog remains
+unchanged. See the source README for required local save and baseline inputs.
+
 On Windows, install Python 3.12.10 and run `./Setup.ps1`. It creates the
 ignored local environment and creates local.json only when absent. Configure
 its local paths; RunTests.ps1 uses that environment and configuration by default:

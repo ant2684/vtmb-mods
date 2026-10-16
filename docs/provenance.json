@@ -2779,6 +2779,76 @@
       "published": false,
       "original_sha256": "3C1E0DAD89E390A17CA35CFB9AAF4F6A200E3655469A576141175A54CC2A5A30",
       "transforms": []
+    },
+    {
+      "file": "mods/container/Build.ps1",
+      "original_sha256": "B791089451F93E99E319A8AA0D8A884CBF8D3E37CAF2D0BADF19DFE305343DE6",
+      "classification": "Original container stack visibility fix and regression source",
+      "license": "MIT; native signatures are interoperability constants",
+      "published": false
+    },
+    {
+      "file": "mods/container/plugin/container_stack.c",
+      "original_sha256": "9ECF9901699BF993CD5B85CFAF1342DF0DE92F3B9DF97F89DFD916A26B55C7E9",
+      "classification": "Original container stack visibility fix and regression source",
+      "license": "MIT; native signatures are interoperability constants",
+      "published": false
+    },
+    {
+      "file": "mods/container/README.md",
+      "original_sha256": "41C772B62DD65DB7EEDC12EBEF246BA49D47EB94AA6BA88B276BB49DA420AEAD",
+      "classification": "Original container stack visibility fix and regression source",
+      "license": "MIT; native signatures are interoperability constants",
+      "published": false
+    },
+    {
+      "file": "mods/container/tests/audit.py",
+      "original_sha256": "379D283DC0F8C4C018DC9AD1B3105E27D5D3F59E745B15DBF51D873F6F850B11",
+      "classification": "Original container stack visibility fix and regression source",
+      "license": "MIT; native signatures are interoperability constants",
+      "published": false
+    },
+    {
+      "file": "mods/container/tests/exact.c",
+      "original_sha256": "460CFF3F127F66148549918F4A8933741AE139E53D8F30F25486234A785C3B25",
+      "classification": "Original container stack visibility fix and regression source",
+      "license": "MIT; native signatures are interoperability constants",
+      "published": false
+    },
+    {
+      "file": "mods/container/tests/load_clean.c",
+      "original_sha256": "059E5D1A2125875CAC4CFF193BA41DEB5A43677DAFED1FBD385287452D86976B",
+      "classification": "Original container stack visibility fix and regression source",
+      "license": "MIT; native signatures are interoperability constants",
+      "published": false
+    },
+    {
+      "file": "mods/container/tests/save_members.py",
+      "original_sha256": "E1606AE3E8C2F1169B860F3BD95368E50A4DEE93E393934EA8A4459354C8B9F2",
+      "classification": "Original container stack visibility fix and regression source",
+      "license": "MIT; native signatures are interoperability constants",
+      "published": false
+    },
+    {
+      "file": "mods/container/tests/verify.py",
+      "original_sha256": "062237C88108A6FF6D6B052BB421EAE332E043C56AB16BBA9DF3FFF169BA6A62",
+      "classification": "Original container stack visibility fix and regression source",
+      "license": "MIT; native signatures are interoperability constants",
+      "published": false
+    },
+    {
+      "file": "mods/container/tools/finalize_pe.py",
+      "original_sha256": "6F5DAA683D27ABAA825530D40C44774F554B24D36D41AF01AA42AC66AF1AC25A",
+      "classification": "Original container stack visibility fix and regression source",
+      "license": "MIT; native signatures are interoperability constants",
+      "published": false
+    },
+    {
+      "file": "mods/container/tools/package.py",
+      "classification": "Original container stack visibility fix and regression source",
+      "license": "MIT; native signatures are interoperability constants",
+      "published": false,
+      "original_sha256": "BB54D0C81BAB5BA46D2A9ED82AD11DEB807AB863028D20228119D1C7B1EEBD1D"
     }
   ]
 }

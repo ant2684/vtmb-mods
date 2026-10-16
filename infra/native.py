@@ -5,7 +5,7 @@ import shutil
 import sys
 import tempfile
 from pathlib import Path
-from infra.core import ROOT, Blocked, catalog, digest, need, require, run, sha
+from infra.core import ROOT, Blocked, catalog, mod_info, digest, need, require, run, sha
 from infra.release import clean_pe, members
 
 
@@ -27,7 +27,7 @@ def compile_c(zig, source, output, env, extra=()):
 
 def build(mod, config, source, work):
     if os.name!='nt':raise Blocked('Native build/load verification requires Windows')
-    info = catalog()['mods'][mod]
+    info = mod_info(mod)
     zig = need(config, 'zig')
     version = run([zig,'version'], timeout=15).strip()
     require(version == '0.15.2', 'Pinned Zig 0.15.2 required; found ' + version)
@@ -44,7 +44,7 @@ def build(mod, config, source, work):
     output.parent.mkdir(parents=True, exist_ok=True)
     native = next(code.glob('plugin/*.c'))
     extra = ['-shared']
-    if mod == 'history':
+    if mod in ['history','container']:
         headers = Path(zig).resolve().parent/'lib/libc/include/any-windows-any'
         extra += ['-nostdlib','-isystem',str(headers),'-Wl,--entry,DllMain@12','-lkernel32']
     compile_c(zig, native, output, env, extra)
@@ -63,7 +63,9 @@ def synthetic(mod, config):
         frozen = digest(candidate)
         loader = code/'build/load_clean.exe'
         compile_c(need(config,'zig'), code/'tests/load_clean.c', loader, env)
-        logs = [run([loader,candidate,export],env=env) for export in catalog()['mods'][mod]['exports']]
+        logs = [run([loader,candidate,export],env=env) for export in mod_info(mod)['exports']]
+        if mod == 'container':
+            logs += container_verify(config,code,env,candidate,'--synthetic')
         harness = code/'tests/native_harness.c'
         if harness.exists():
             exe = code/'build/native_harness.exe'
@@ -110,7 +112,7 @@ def frozen_console_tests(config, work):
 
 
 def exact(mod, config, candidate=None):
-    info = catalog()['mods'][mod]
+    info = mod_info(mod)
     game = Path(need(config,'game_root'))
     for relative, pin in catalog()['native_modules'].items():
         path = game/relative
@@ -131,6 +133,7 @@ def exact(mod, config, candidate=None):
             plugin = external
             provenance = {'source':source_identity(mod),'rebuilt_sha256':digest(rebuilt),'compiler':'Zig 0.15.2','mode':'candidate'}
         else:
+            if info.get('candidate_only'):raise Blocked('Select an exact --candidate for '+mod)
             archive=Path(need(config,'releases'))/info['archive']
             if not archive.is_file():raise Blocked('Frozen archive absent: '+info['archive'])
             files = members(archive)
@@ -147,7 +150,9 @@ def exact(mod, config, candidate=None):
         clean_pe(plugin.read_bytes(),info['exports'],mod)
         zig = need(config,'zig')
         logs=[]
-        if mod in ('console','protean','frenzy'):
+        if mod == 'container':
+            logs += container_verify(config,code,env,plugin,game/'Vampire/cl_dlls/client.dll')
+        elif mod in ('console','protean','frenzy'):
             logs.append(run([sys.executable,'-B',code/'tests/verify_exact.py','--plugin',plugin,'--zig',zig,'--game',game],env=env,timeout=600))
         else:
             load = code/('tests/load_clean.exe' if mod == 'subtitle' else 'build/load_clean.exe' if mod=='history' else 'build/load-clean.exe')
@@ -170,3 +175,14 @@ def exact(mod, config, candidate=None):
                 raise Blocked('Implement the future family exact-binary verifier before certifying '+mod)
         require(digest(plugin) == frozen, 'Candidate changed during exact verification')
         return {'sha256':frozen,'provenance':provenance,'checks':logs,'scope':'Exact finalized binary; local pinned native fixtures, ABI, functional guards and rollback; no game launch'}
+
+
+def container_verify(config,code,env,plugin,client):
+    exe=code/'build/exact.exe';receipt=code/'build/exact-helper.json'
+    compile_c(need(config,'zig'),code/'tests/exact.c',exe,env)
+    server='--synthetic' if str(client)=='--synthetic' else Path(client).parent.parent/'dlls/vampire.dll'
+    logs=[run([exe,plugin,client,server,receipt],env=env)]
+    args=[sys.executable,'-B',code/'tests/verify.py','--certificate',receipt]
+    if str(client)!='--synthetic':args+=['--client',client,'--server',server]
+    logs.append(run(args,env=env))
+    return logs

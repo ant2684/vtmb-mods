@@ -45,3 +45,39 @@ An observer table size is not an allocator budget. A stale recorded PID is not
 ownership of later user changes. A cleanup failure must not replace the first
 scenario result. Capture runtime output hashes after the owned process stops,
 and require them when delayed recovery restores personal configuration.
+
+
+Container candidates must stay separate from frozen public release identities.
+Exercise the actual finalized VTM with forced relocation and a synthetic/real
+client image, then run emitted helper bytes against original registers, flags
+and stack state. A published standalone helper must remain callable after a
+failed cache flush or unload restoration; freeing published code can leave
+cached or in-flight jumps pointing into released memory.
+
+For container gameplay, a click or unchanged before/after count is insufficient.
+Observe server owners/counts and the live client row/action separately. Save,
+change ownership deliberately, then confirm a new player and restored saved
+inventory. Bind trade quotes to the selected native entity and action before
+the click; verify money and the native authored stock policy afterward.
+
+Bloodlines evaluates Python when submitting console text; an engine cfg command
+buffer is not equivalent. Trading additionally requires the server command-client
+context. SyncVendorInventory reads that context even when StartBarter already
+received a player. Drive the original dialogue response through the native HUD
+instead of scheduling a Python StartBarter call outside a client command.
+
+For a full-stack fixture, GiveItem creates the item but repeated calls do not
+add copies. The native GiveAmmo API also increases counts for stackable items;
+UP uses it for bloodpacks and other stackable goods. Confirm the native count
+before testing capacity. Avoid clicking an already selected row again: a
+second row click can trigger the native double-click transfer.
+
+
+Making duplicate stackable vendor rows visible exposes an original server
+price bug: the Buy handler passes an already-owned flag as the ammunition-price
+flag, so an owned knife costs zero. Correct that local flag only after the
+native IsStackable branch; retain the original nonstack ammunition path and
+price formula. Install payment before visibility. If restoring the visibility
+site cannot be confirmed by an instruction-cache flush, retain the standalone
+payment helper as well. Test quantities and money together: row visibility
+and a successful transfer alone would miss this regression.

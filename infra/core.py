@@ -42,7 +42,15 @@ def atomic_json(path, data):
         f.write('\n')
         f.flush()
         os.fsync(f.fileno())
-    os.replace(tmp, path)
+    # Windows readers/antivirus may briefly hold the destination without
+    # FILE_SHARE_DELETE. Keep the durable pending file and retry boundedly.
+    for attempt in range(6):
+        try:
+            os.replace(tmp, path)
+            break
+        except PermissionError:
+            if attempt==5:raise
+            __import__('time').sleep(.025*(2**attempt))
 
 
 def catalog():
@@ -50,6 +58,20 @@ def catalog():
     if path.exists():return read_json(path)
     from infra.release_data import DATA
     return DATA
+
+
+def candidate_mods():
+    # Source candidates are deliberately separate from frozen release pins.
+    return {'container': {'title':'Container Stack Fix','version':'unreleased',
+        'filename':'container-stack-fix.vtm','exports':['loaded_client','loaded_server'], 'candidate_only':True}}
+
+
+def families():
+    return {**candidate_mods(), **catalog()['mods']}
+
+
+def mod_info(mod):
+    return families()[mod]
 
 
 def need(config, key):

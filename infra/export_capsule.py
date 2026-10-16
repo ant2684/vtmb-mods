@@ -9,12 +9,12 @@ import sys
 import zipfile
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from infra.core import ROOT, catalog, digest, read_json, require, sha
+from infra.core import ROOT, catalog, families, mod_info, digest, read_json, require, sha
 from infra.release import clean_pe, members
 
 
 def export(mod,output,reference=None):
-    require(mod in catalog()['mods'],'Unknown mod')
+    require(mod in families(),'Unknown mod')
     output=Path(output)
     require(not output.exists(),'Refuse capsule overwrite')
     files={}
@@ -28,7 +28,7 @@ def export(mod,output,reference=None):
     for path in (ROOT/'tests').glob('*.py'):files[path.relative_to(ROOT).as_posix()]=path.read_bytes()
     for name in ['gameplay.md','lessons.md']:
         files['docs/'+name]=(ROOT/'docs'/name).read_bytes()
-    data=catalog();data['mods']={mod:data['mods'][mod]}
+    data=catalog();data['mods']={mod:mod_info(mod)}
     files['infra/release_data.py']=('"""Frozen source verification inputs, not a distribution checksum manifest."""\nDATA = '+repr(data)+'\n').encode()
     if (ROOT/'docs/provenance.json').exists():
         provenance=read_json(ROOT/'docs/provenance.json')
@@ -46,7 +46,10 @@ def export(mod,output,reference=None):
         reference=Path(reference)
         clean_pe(reference.read_bytes(),data['mods'][mod]['exports'],mod)
         files['reference/'+data['mods'][mod]['filename']]=reference.read_bytes()
+        if mod=='container':data['mods'][mod]['plugin_sha256']=digest(reference)
+        files['infra/release_data.py']=('DATA = '+repr(data)+'\n').encode()
     maintenance = ('Console Pause Fix '+data['mods'][mod]['version']+' hides the Minimize button and disables its cached title-menu item using guarded native methods. For the included exact reference, use `./RunTests.ps1 -Suite offline -Mod console -Scenario console.exact -Candidate ./reference/console-pause-fix.vtm -Config ./local.json`. The embedded catalog is a dated verification input; this explicit selection avoids requiring older packages or a self-referential capsule hash. Use console.minimize with that reference for fresh gameplay observations. Recorded control coverage has an external five-second wait; an earlier menu-to-console opening failed despite engine key receipt, and its downstream cause remains unresolved. The plugin adds no wait. Sources retain cache-flush refusal probes; their known failure is not certified by passing ordinary checks.\n' if mod=='console' else 'Native code is unchanged from the current source capsule. Shared adapters and tests are maintenance updates, with no public mod version change.\n')
+    if mod=='container':maintenance='Unreleased candidate. The included reference is verified with `./RunTests.ps1 -Suite offline -Mod container -Scenario container.exact -Candidate ./reference/container-stack-fix.vtm -Config ./local.json`. Run container.stacks for fresh gameplay and container.baseline to reproduce the original filter without installing the candidate. Supply saves.container and local supported game modules. No public release version is assigned.\n'
     files['README.md']=('# '+data['mods'][mod]['title']+' source capsule\n\nSelf-contained sources and regression infrastructure. This capsule is not installed into the game.\n\nUse `./RunTests.ps1 -Suite ci -Mod '+mod+' -Config ./local.json` or `-Suite offline`. Copy local.example.json to local.json and provide pinned Zig 0.15.2 and local inputs. See docs/gameplay.md for opt-in gameplay and recovery. Reference certificates are historical evidence only.\n\n'+maintenance).encode()
     output.parent.mkdir(parents=True,exist_ok=True)
     with zipfile.ZipFile(output,'w',zipfile.ZIP_DEFLATED,compresslevel=9) as z:

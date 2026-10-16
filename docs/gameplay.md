@@ -114,3 +114,46 @@ Partial restoration retains the installation lock and an explicit remaining
 path list. Each restoration records its intent before replacing/removing bytes.
 An incomplete partial restoration never reports a completed session or allows
 another gameplay run.
+
+
+Container Stack Fix is an unreleased source candidate, selected explicitly with
+`-Mod container -Candidate <finalized.vtm>`. Configure `saves.container` with the
+archival Item Issue save. Use `container.transfer` for a focused confirmation
+of knife transfers and stack capacity. Run `container.baseline` without the candidate;
+set `container_baseline` to that session's observations.json before running
+`container.stacks`. Both use the same native modules, background plugins and
+save identity. They never replace a pre-existing container candidate.
+
+The collector observes server inventory owners/counts and client row visibility,
+selection and action availability independently. Save/load is exercised after a
+deliberate ownership change, with a created-save hash and fresh player readiness.
+Trade receipts contain the selected native entity, the displayed RichText quote,
+wallet deltas and the authored vendor stock policy. The auditor enforces the
+ordered operation sequence and continuity between operations. Passing OS input
+alone does not establish a transfer, rejected action or load.
+
+The container adapter declares its fixed task save, map cache and autosave
+destinations before launch, including the nominated save's extracted HL
+members. Use `runtime_outputs` for any additional inspected engine outputs.
+The runner also journals the task cfg, existing graph files, standard Python
+caches and configuration files. A newly generated unregistered
+file blocks restoration and remains intact for inspection.
+
+
+The container trade fixture uses the real Trip in his original pawnshop map.
+It sets an explicit stage-1 stock context in both controls, starts his original
+dialogue, records the native player/NPC handles and available response strings,
+and chooses the visible buy response through the physical number key. The
+native HUD sends dialogpick with a zero-based response index; its server
+callback supplies the command-client context needed by SyncVendorInventory.
+A direct or scheduled Python StartBarter call lacks that context and is not a
+valid substitute. The trade fixture is separate from the nominated haven
+transfer; it does not certify inter-map inventory preservation. All fixture
+changes exist only in the owned test session, outside original user saves.
+
+
+Container gameplay version2 also records the live server price branch. Candidate
+observations require both the visibility and payment hooks; a version1 unpatched
+baseline remains a valid original-price control. The payment correction was added
+after the original stacked-purchase price flag was proven to charge ammunition
+worth. Native UI affordability and capacity rules remain in effect.

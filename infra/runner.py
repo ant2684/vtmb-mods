@@ -7,13 +7,13 @@ import time
 import uuid
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from infra.core import ROOT, Blocked, Failure, atomic_json, catalog, read_json, run
+from infra.core import ROOT, Blocked, Failure, atomic_json, catalog, families, mod_info, read_json, run
 
 
 def main(argv=None):
     p=argparse.ArgumentParser()
     p.add_argument('--suite',choices=['ci','offline','gameplay','historical','faults'],default='offline')
-    p.add_argument('--mod',default='all',choices=['all',*catalog()['mods']])
+    p.add_argument('--mod',default='all',choices=['all',*families()])
     p.add_argument('--config',type=Path)
     p.add_argument('--candidate',type=Path)
     p.add_argument('--output',type=Path)
@@ -31,7 +31,8 @@ def main(argv=None):
         definitions.append(('infrastructure',120,'Portable synthetic regression tests; public tree, provenance and audit rejection'))
         definitions += [(m+'.build',600,'Pinned own-source build, clean PE, relocated Windows load, synthetic harness') for m in selected]
     if a.suite=='offline':
-        definitions.append(('packages',120,'Frozen archive identity, exact membership, CRC, manuals, PE and BSP permission'))
+        if a.mod=='all' or not mod_info(a.mod).get('candidate_only'):
+            definitions.append(('packages',120,'Frozen archive identity, exact membership, CRC, manuals, PE and BSP permission'))
         definitions += [(m+'.exact',900,'Final release/candidate machine code on local pinned native fixtures') for m in selected]
         if 'protean' in selected:definitions.append(('protean.models',180,'Different edition/sex MDL bytes, signed links, metadata, corruption and reconstruction'))
     if a.suite=='gameplay':

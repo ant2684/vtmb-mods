@@ -5,13 +5,14 @@ import sys
 import tempfile
 import zipfile
 from pathlib import Path
-from infra.core import ROOT, atomic_json, catalog, read_json, require, run
+from infra.core import ROOT, atomic_json, catalog, families, read_json, require, run
 from infra.export_capsule import export
 
 
-def validate(config,output):
+def validate(config,output,mod=None):
     rows=[]
-    for mod in catalog()['mods']:
+    for mod in ([mod] if mod else catalog()['mods']):
+        require(mod in families(),'Unknown mod for isolated capsule validation')
         with tempfile.TemporaryDirectory(prefix='vtmb-capsule-') as td:
             folder=Path(td);archive=folder/'source.zip'
             identity=export(mod,archive)
@@ -35,5 +36,5 @@ def validate(config,output):
 
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('--config',required=True);parser.add_argument('--output',required=True);args=parser.parse_args()
-    validate(read_json(args.config),Path(args.output))
+    parser=argparse.ArgumentParser();parser.add_argument('--config',required=True);parser.add_argument('--output',required=True);parser.add_argument('--mod');args=parser.parse_args()
+    validate(read_json(args.config),Path(args.output),args.mod)
