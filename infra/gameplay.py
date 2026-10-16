@@ -16,7 +16,7 @@ from infra.session import Transaction
 SCENARIOS = [
     {'id':'container.transfer','version':2,'mod':'container','timeout':240,'save':'container','expected':'Narrow candidate confirmation: two individual knife takes, returns, reopen, cap rejection and capacity recovery','checks':['transfer','reopen','cap']},
     {'id':'container.baseline','version':1,'mod':'container','timeout':180,'save':'container','expected':'Original duplicate filter hides the remaining stack while native ownership/count is conserved','checks':['reproduction','trade_reference']},
-    {'id':'container.stacks','version':2,'mod':'container','timeout':900,'save':'container','expected':'Native transfer/reopen/reload, cap and capacity recovery, stackable/nonstack/ammo and trade preserve items and wallet','checks':['transfer','reopen','reload','cap','other_stack','nonstack','ammo','trade']},
+    {'id':'container.stacks','version':3,'mod':'container','timeout':900,'save':'container','expected':'Native transfer/reopen/reload, cap and capacity recovery, stackable/nonstack/ammo and trade preserve items and wallet','checks':['transfer','reopen','reload','cap','other_stack','nonstack','ammo','trade','receiver_cap']},
     {'id':'console.minimize_remaining','mod':'console','timeout':180,'save':'console','expected':'Targeted first console opening after measured five-second menu exit wait, script pause and reload; hidden minimize controls and resumed input','checks':['menu_first_delayed_open','script_pause','first_input','reload','minimize_controls']},
     {'id':'console.minimize','mod':'console','timeout':240,'save':'console','expected':'Console minimize button hidden, cached Minimize disabled; X/tilde, pause/menu/script/reload and signed input after external five-second wait remain usable','checks':['console_x','console_tilde','ordinary_pause','prior_menu','script_pause','first_input','reload','minimize_controls']},
     {'id':'console.supported','version':2,'mod':'console','timeout':240,'save':'console','expected':'X/tilde preserve owned ordinary/menu/script pauses; after measured five-second external wait first signed movement/camera succeeds; reload remains usable','checks':['console_x','console_tilde','ordinary_pause','prior_menu','script_pause','first_input','reload']},
@@ -224,7 +224,10 @@ def execute(name,config,run_id,historical=False,candidate=None):
         if scenario['mod']=='container':
             require(candidate is not None,'Container requires the exact candidate')
             payload={} if name=='container.baseline' else {'Bin/loader/'+mod_info('container')['filename']:Path(candidate).read_bytes()}
-            require(not (game/'Bin/loader/container-stack-fix.vtm').exists(),'Refuse to replace a pre-existing container candidate')
+            installed=game/'Bin/loader/container-stack-fix.vtm'
+            if installed.exists():
+                require(name!='container.baseline' and digest(installed)==config.get('container_installed_sha256'),
+                        'Pre-existing container plugin requires its explicit preservation pin')
             from mods.container.tests.save_members import members as save_members
             for cache_name in save_members(save):
                 transaction.allow_runtime('Unofficial_Patch/save/'+cache_name)

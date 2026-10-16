@@ -13,6 +13,12 @@ static int state; /* 0 uninstalled, 1 installed, 2 failed/published or pending *
 static DWORD original_protection;
 static int protection_pending;
 static int ui_cache_safe=1;
+#define CAP_SITE 0x16fe4au
+static uint8_t *cap_helper;
+static int cap_state,cap_pending;
+static DWORD cap_protection;
+static const uint8_t cap_original[]={0x8a,0x44,0x24,0x13,0x84,0xc0,0x0f,0x85,0xaa,0,0,0};
+static const uint8_t donor_anchor[]={0xa1,0x84,0xd9,0x49,0x10,0x53,0x55,0x33,0xed,0x33,0xdb,0x85,0xc0,0x7e,0x64};
 #define PRICE_SITE 0xda3cbu
 static uint8_t *server, *price_helper;
 static int price_state, price_pending;
@@ -49,7 +55,10 @@ static int supported(uint8_t *base) {
     return identity(base,0x41afaf63,0x6e9000) &&
         equal(base+SITE,original,sizeof(original)) &&
         equal(base+0x16df25,owner_anchor,sizeof(owner_anchor)) &&
-        equal(base+0x16f9ef,stack_anchor,sizeof(stack_anchor));
+        equal(base+0x16f9ef,stack_anchor,sizeof(stack_anchor)) &&
+        equal(base+CAP_SITE,cap_original,12) &&
+        base[0x16ebe0]==0xa1 && *(uint32_t *)(base+0x16ebe1)==(uint32_t)(uintptr_t)(base+0x49d984) &&
+        equal(base+0x16ebe5,donor_anchor+5,sizeof(donor_anchor)-5);
 }
 static int price_supported(uint8_t *base) {
     return identity(base,0x41afafae,0xab9000) &&
@@ -77,6 +86,59 @@ static int restore_page(void) {
 }
 static int flush(void *p,unsigned n) {
     int i;for(i=0;i<2;i++)if(FlushInstructionCache(GetCurrentProcess(),p,n))return 1;return 0;
+}
+static void cap_patch(uint8_t *patch) {
+    unsigned i;for(i=0;i<12;i++)patch[i]=0x90;
+    branch(patch,cap_helper);
+    value(patch+1,(uint32_t)(uintptr_t)cap_helper-(uint32_t)(uintptr_t)(client+CAP_SITE+5));
+}
+static int cap_restore_page(void) {
+    DWORD ignored;int i;
+    for(i=0;i<2;i++)if(VirtualProtect(client+CAP_SITE,12,cap_protection,&ignored)) {cap_pending=0;return 1;}
+    cap_pending=1;return 0;
+}
+static void remove_cap(void) {
+    DWORD old;uint8_t patch[12];
+    if(!client || (void *)GetModuleHandleA("client.dll")!=client)return;
+    if(cap_state==1) {
+        cap_patch(patch);
+        if(equal(client+CAP_SITE,patch,12) && VirtualProtect(client+CAP_SITE,12,PAGE_EXECUTE_READWRITE,&old)) {
+            cap_protection=old;copy(client+CAP_SITE,cap_original,12);flush(client+CAP_SITE,12);cap_restore_page();cap_state=2;
+        }
+    } else if(cap_pending)cap_restore_page();
+}
+static int install_cap(void) {
+    /* Only Give/Sell in barter mode. Use the native donor cache and validated
+       EHANDLEs; item-data index identifies the same stack type. Native stack
+       limit comes from GetItemData (7B160), not an item-specific constant.
+       PUSHFD/PUSHAD preserve all state; only the original full-stack local
+       [ESP+13] may become 1. Then replay the original button-disable branch.
+       This independent helper has no plugin pointers and remains RX for life. */
+    static const uint8_t code[]={0x9c,0x60,0x80,0xbe,0x81,0x01,0x00,0x00,0x00,0x0f,0x85,0xd3,0x00,0x00,0x00,0x8b,0x86,0xd4,0x04,0x00,0x00,0x83,0xf8,0x02,0x0f,0x84,0x09,0x00,0x00,0x00,0x83,0xf8,0x04,0x0f,0x85,0xbb,0x00,0x00,0x00,0x85,0xdb,0x0f,0x84,0xb3,0x00,0x00,0x00,0x8b,0xcb,0x8b,0x01,0xff,0x90,0xe8,0x03,0x00,0x00,0x84,0xc0,0x0f,0x84,0xa1,0x00,0x00,0x00,0x8b,0xcb,0xe8,0x00,0x00,0x00,0x00,0x85,0xc0,0x0f,0x84,0x92,0x00,0x00,0x00,0x8b,0xb8,0xa8,0xfe,0x04,0x00,0x0f,0xb7,0xab,0x5e,0x09,0x00,0x00,0x81,0xfd,0xff,0xff,0x00,0x00,0x0f,0x84,0x79,0x00,0x00,0x00,0xb8,0x00,0x00,0x00,0x00,0x8b,0x08,0x85,0xc9,0x0f,0x8e,0x6a,0x00,0x00,0x00,0xb8,0x00,0x00,0x00,0x00,0x8b,0x30,0xb8,0x00,0x00,0x00,0x00,0x8b,0x18,0x8b,0x06,0x83,0xf8,0xff,0x0f,0x84,0x47,0x00,0x00,0x00,0x89,0xc2,0x25,0xff,0x1f,0x00,0x00,0xc1,0xea,0x0d,0x8d,0x04,0x40,0x8d,0x04,0x83,0x39,0x50,0x08,0x0f,0x85,0x2e,0x00,0x00,0x00,0x8b,0x40,0x04,0x85,0xc0,0x0f,0x84,0x23,0x00,0x00,0x00,0x66,0x39,0xa8,0x5e,0x09,0x00,0x00,0x0f,0x85,0x16,0x00,0x00,0x00,0x39,0xb8,0x54,0x09,0x00,0x00,0x0f,0x8c,0x0a,0x00,0x00,0x00,0xc6,0x44,0x24,0x37,0x01,0xe9,0x0a,0x00,0x00,0x00,0x83,0xc6,0x04,0x49,0x0f,0x85,0xa4,0xff,0xff,0xff,0x61,0x9d,0x8a,0x44,0x24,0x13,0x84,0xc0,0x0f,0x85,0x00,0x00,0x00,0x00,0xe9,0x00,0x00,0x00,0x00};
+    DWORD old,ignored;uint8_t patch[12];
+    cap_helper=VirtualAlloc(NULL,sizeof(code),MEM_COMMIT|MEM_RESERVE,PAGE_READWRITE);
+    if(!cap_helper)return 0;
+    copy(cap_helper,code,sizeof(code));
+    value(cap_helper+68,(uint32_t)(uintptr_t)(client+0x7b160)-(uint32_t)(uintptr_t)(cap_helper+72));
+    value(cap_helper+236,(uint32_t)(uintptr_t)(client+0x16ff00)-(uint32_t)(uintptr_t)(cap_helper+240));
+    branch(cap_helper+240,client+0x16fe56);
+    value(cap_helper+106,(uint32_t)(uintptr_t)(client+0x49d984));
+    value(cap_helper+121,(uint32_t)(uintptr_t)(client+0x49d978));
+    value(cap_helper+128,(uint32_t)(uintptr_t)(client+0x2b8e98));
+    if(!FlushInstructionCache(GetCurrentProcess(),cap_helper,sizeof(code)) || !VirtualProtect(cap_helper,sizeof(code),PAGE_EXECUTE_READ,&old)) {
+        VirtualFree(cap_helper,0,MEM_RELEASE);cap_helper=NULL;return 0;
+    }
+    cap_patch(patch);
+    if(!VirtualProtect(client+CAP_SITE,12,PAGE_EXECUTE_READWRITE,&old)) {
+        VirtualFree(cap_helper,0,MEM_RELEASE);cap_helper=NULL;return 0;
+    }
+    cap_protection=old;
+    if(!equal(client+CAP_SITE,cap_original,12)) {
+        cap_restore_page();VirtualFree(cap_helper,0,MEM_RELEASE);cap_helper=NULL;return 0;
+    }
+    cap_state=2;copy(client+CAP_SITE,patch,12);
+    if(FlushInstructionCache(GetCurrentProcess(),client+CAP_SITE,12) && VirtualProtect(client+CAP_SITE,12,cap_protection,&ignored)) {cap_state=1;return 1;}
+    copy(client+CAP_SITE,cap_original,12);flush(client+CAP_SITE,12);cap_restore_page();return 0;
 }
 static int install_price(void) {
     /* Original JZ keeps the nonstack/ammunition path. Only the stackable
@@ -141,7 +203,8 @@ static void install_client(void) {
     DWORD old,ignored;uint8_t patch[sizeof(original)];unsigned i;
     if(state || protection_pending)return;
     client=(void *)GetModuleHandleA("client.dll");
-    if(!supported(client) || !make_helper())return;
+    /* Both client sites/anchors were checked before publishing cap. */
+    if(!make_helper())return;
     for(i=0;i<sizeof(patch);i++)patch[i]=0x90;
     branch(patch,helper);
     /* branch() used the local array address; encode for the actual site. */
@@ -166,8 +229,9 @@ static void install(void) {
        Either module load order is accepted; no site changes until both match. */
     if(!supported(client) || !price_supported(server))return;
     if(!install_price())return;
+    if(!install_cap()) {remove_price();state=2;return;}
     install_client();
-    if(state!=1) {if(ui_cache_safe)remove_price();state=2;}
+    if(state!=1) {remove_cap();if(ui_cache_safe)remove_price();state=2;}
 }
 __declspec(dllexport) void loaded_client(void) {install();}
 __declspec(dllexport) void loaded_server(void) {install();}
@@ -175,6 +239,7 @@ BOOL WINAPI DllMain(HINSTANCE instance,DWORD reason,LPVOID reserved) {
     DWORD old;uint8_t patch[sizeof(original)];unsigned i;
     (void)instance;
     if(reason!=DLL_PROCESS_DETACH || reserved)return TRUE;
+    remove_cap();
     if(!client || (void *)GetModuleHandleA("client.dll")!=client) {remove_price();return TRUE;}
     if(state==1) {
         for(i=0;i<sizeof(patch);i++)patch[i]=0x90;

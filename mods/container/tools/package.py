@@ -15,7 +15,8 @@ MANUAL = """Container Stack Fix
 
 Keeps stackable items visible in containers and vendor inventories when the
 player already owns the same item. Native stack limits, transfers and prices
-remain in effect. Stacked purchases use the item price. Supports the original
+remain in effect. Give/Sell is disabled when the receiving stack is full and
+becomes available after space is freed. Stacked purchases use the item price. Supports the original
 Bloodlines client and server used by the
 Unofficial Patch. An incompatible or already modified hook site is left alone.
 
@@ -44,7 +45,7 @@ def package(plugin, certificate, observations, output):
             'Exact clean candidate certificate differs')
     observations = Path(observations)
     evidence = read_json(observations)
-    require(evidence['scenario'] == 'container.stacks' and
+    require(evidence['scenario'] == 'container.stacks' and evidence['scenario_version'] >= 3 and
             evidence['artifacts'] == {'Bin/loader/container-stack-fix.vtm': pin},
             'Fresh gameplay used another candidate')
     audit(evidence)

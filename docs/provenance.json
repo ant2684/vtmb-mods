@@ -2789,28 +2789,28 @@
     },
     {
       "file": "mods/container/plugin/container_stack.c",
-      "original_sha256": "9ECF9901699BF993CD5B85CFAF1342DF0DE92F3B9DF97F89DFD916A26B55C7E9",
+      "original_sha256": "7B4B3AAFAF90A1821DE952BC2E1EB323462F28D3587902874459D665AE916BE3",
       "classification": "Original container stack visibility fix and regression source",
       "license": "MIT; native signatures are interoperability constants",
       "published": false
     },
     {
       "file": "mods/container/README.md",
-      "original_sha256": "41C772B62DD65DB7EEDC12EBEF246BA49D47EB94AA6BA88B276BB49DA420AEAD",
+      "original_sha256": "A22EAE96E7940DD7E7BEF40EDEDDE6288FDA2B694AB876E52296624F6300D0A3",
       "classification": "Original container stack visibility fix and regression source",
       "license": "MIT; native signatures are interoperability constants",
       "published": false
     },
     {
       "file": "mods/container/tests/audit.py",
-      "original_sha256": "379D283DC0F8C4C018DC9AD1B3105E27D5D3F59E745B15DBF51D873F6F850B11",
+      "original_sha256": "5F6C921395E45CA1F39573D1FA0A6489151D06BFC2E99FFF7C25580D261C988A",
       "classification": "Original container stack visibility fix and regression source",
       "license": "MIT; native signatures are interoperability constants",
       "published": false
     },
     {
       "file": "mods/container/tests/exact.c",
-      "original_sha256": "460CFF3F127F66148549918F4A8933741AE139E53D8F30F25486234A785C3B25",
+      "original_sha256": "6306446CF158787F94E5C1B2FFEF7DA9CBB3F494632155111416E980CA679570",
       "classification": "Original container stack visibility fix and regression source",
       "license": "MIT; native signatures are interoperability constants",
       "published": false
@@ -2831,7 +2831,7 @@
     },
     {
       "file": "mods/container/tests/verify.py",
-      "original_sha256": "062237C88108A6FF6D6B052BB421EAE332E043C56AB16BBA9DF3FFF169BA6A62",
+      "original_sha256": "38418DDAA4428C31FC32539B8B372A740439B182D6D5A761DBD31F046589A84E",
       "classification": "Original container stack visibility fix and regression source",
       "license": "MIT; native signatures are interoperability constants",
       "published": false
@@ -2848,7 +2848,7 @@
       "classification": "Original container stack visibility fix and regression source",
       "license": "MIT; native signatures are interoperability constants",
       "published": false,
-      "original_sha256": "BB54D0C81BAB5BA46D2A9ED82AD11DEB807AB863028D20228119D1C7B1EEBD1D"
+      "original_sha256": "F55B0512065FF6C9239E075BE378671292CE1C7D98F8E6CB1255CB10A55E5542"
     }
   ]
 }

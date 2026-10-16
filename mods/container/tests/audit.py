@@ -172,7 +172,7 @@ def audit(e):
             'duplicate firearm did not exercise the native ammo exception')
     # A fixed sequence and owner continuity prevent replaying one successful
     # action as evidence for a missing buy/sell transition.
-    trades = [a for a in e.get('actions', []) if 'quote' in a]
+    trades = [a for a in e.get('actions', []) if 'quote' in a and a.get('class') == KNIFE]
     require([(a.get('label'), a['quote'].get('direction')) for a in trades] == TRADE_STEPS[baseline],
             'missing/duplicated/out-of-order trade operations')
     prices = {'buy': set(), 'sell': set()}
@@ -246,5 +246,42 @@ def audit(e):
                                          if a['quote']['direction'] == direction},
                     'native price changed: ' + direction)
     require(len(e.get('actions', [])) >= 2, 'native UI actions not recorded')
+    if e.get('scenario_version',0)>=3:receiver_audit(e)
     return {'status': 'PASS', 'scope': 'native ownership/count plus load transition, live UI rows, '
             'action availability, native vendor policy, quoted prices and wallet'}
+
+
+def receiver_audit(e):
+    s=e['states']
+    for v in s.values():
+        hook=v.get('receiver_filter_bytes','')
+        require(hook.startswith('e9') and hook[10:]=='90'*7,'receiver capacity hook missing')
+    for prefix,owner,cls,kind,full_player in [('give',FRIDGE,KNIFE,2,2),('sell','Trip','item_g_ring_silver',4,1)]:
+        for label,player,donor,enabled in [('full-selected',full_player,10,False),('full-rejected',full_player,10,False),('space-freed',full_player+1,9,True),('space-available',full_player+1,9,True),('refilled',full_player,10,False)]:
+            v=s[prefix+'-'+label]
+            require(count(v,'player',cls)==player and count(v,owner,cls)==donor,'receiver ownership/count differs: '+prefix+'/'+label)
+            require(sum(count(v,o,cls) for o in ['player',owner])==full_player+10,'receiver conservation differs')
+            # The buy/take snapshot still has the donor selection; inspect Give/Sell when selected.
+            if label!='space-freed':
+                rows=[r for r in visible(v,'player',cls,'player') if r['selected']==1]
+                require(len(rows)==1 and rows[0]['count']==player,'receiver action selected wrong player stack')
+                require(v['ui']['action_kind']==kind and v['ui']['action']['enabled'] is enabled,'receiver action availability differs: '+prefix+'/'+label)
+        before,after=s[prefix+'-full-selected'],s[prefix+'-full-rejected']
+        for who in ['player',owner]:
+            require(inventory_counts(before,who)==inventory_counts(after,who),'disabled receiver action moved items')
+            require(before['owners'][who].get('money')==after['owners'][who].get('money'),'disabled receiver action moved money')
+    ring='item_g_ring_silver'
+    trades=[a for a in e['actions'] if 'quote' in a and a.get('class')==ring]
+    require([a['label'] for a in trades]==['sell-fill-'+str(k) for k in range(10)]+['sell-space-freed','sell-refilled'],'missing/replayed finite vendor actions')
+    for a in trades:
+        before=a['before'];after=s[a['label']];q=a['quote'];buy=q['direction']=='buy';delta=1 if buy else -1;side='donor' if buy else 'player';owner='Trip' if buy else 'player'
+        require(before['ui']['action']['enabled'] is True,'finite stock trade unavailable')
+        rows=[r for r in visible(before,owner,ring,side) if r['selected']==1]
+        require(len(rows)==1 and q['selected']==rows[0] and q['selected_global']==rows[0]['entity'] and q['ammo_flag']==0,'finite quote selection differs')
+        raw=re.findall(rb'Value:\s*\$([0-9]+)',bytes.fromhex(q['text_hex']))
+        require(len(raw)==1 and int(raw[0])==q['price'] and q['price']>0,'finite quote price differs')
+        require(count(after,'player',ring)-count(before,'player',ring)==delta and count(after,'Trip',ring)-count(before,'Trip',ring)==-delta,'finite stock trade changed quantity')
+        require(after['owners']['player']['money']-before['owners']['player']['money']==-delta*q['price'],'finite stock trade changed money')
+        records=before['vendor_policy']['records']
+        require(not any(v['name']=='Trip' and ring in v['classes'] for v in records),'finite fixture is authored infinite stock')
+    return {'status':'PASS','scope':'full receiver Give/Sell rejection, capacity recovery, finite stock quantity/price/wallet'}

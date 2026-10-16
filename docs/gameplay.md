@@ -122,7 +122,9 @@ archival Item Issue save. Use `container.transfer` for a focused confirmation
 of knife transfers and stack capacity. Run `container.baseline` without the candidate;
 set `container_baseline` to that session's observations.json before running
 `container.stacks`. Both use the same native modules, background plugins and
-save identity. They never replace a pre-existing container candidate.
+save identity. A pre-existing container plugin is temporarily replaced only when its SHA-256
+identity is explicitly pinned as container_installed_sha256; the transaction
+backs up and restores that exact file. An unpatched baseline still refuses it.
 
 The collector observes server inventory owners/counts and client row visibility,
 selection and action availability independently. Save/load is exercised after a
@@ -157,3 +159,11 @@ observations require both the visibility and payment hooks; a version1 unpatched
 baseline remains a valid original-price control. The payment correction was added
 after the original stacked-purchase price flag was proven to charge ammunition
 worth. Native UI affordability and capacity rules remain in effect.
+
+Container gameplay version3 adds receiver-capacity edges for Give and Sell.
+The fridge is filled to ten through Give, rejects the next action, accepts it
+after a Take frees space, and disables again. Trip receives ten silver rings
+through sales; this class is absent from his authored infinite stock. Barter
+is reopened with one more player ring, Sell is rejected with no inventory or
+wallet change, a finite Buy frees one slot, and Sell refills it. All transitions
+use actual native buttons, displayed quotes and independently observed owners.

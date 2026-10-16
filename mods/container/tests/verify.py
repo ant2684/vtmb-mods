@@ -58,8 +58,49 @@ def price_execute(code,start,base,helper,stackable,owned,seed):
     require([u.reg_read(r) for r in REGS]==initial,'price helper changed registers/flags/ESP')
     return end[0],bytes(u.mem_read(sp,64)),bytes(local)
 
+def capacity_execute(code,start,base,helper,kind=2,mode=0,stack=1,quantity=10,full=0,matching=True,valid=True):
+    u=Uc(UC_ARCH_X86,UC_MODE_32)
+    for a,n in [(base,0x6e9000),(helper&~4095,4096),(0x20000000,0x100000)]:u.mem_map(a,n)
+    u.mem_write(start,code);sp=0x20008000;ui=0x20001000;item=0x20002000;vt=0x20003000;getter=0x20004000;data=0x20010000;receiver=0x20090000;handles=0x200a0000;table=0x200b0000
+    u.mem_write(ui+0x181,bytes([mode]));u.mem_write(ui+0x4d4,struct.pack('<I',kind))
+    u.mem_write(item,struct.pack('<I',vt));u.mem_write(item+0x95e,b'\x17\x00')
+    u.mem_write(vt+0x3e8,struct.pack('<I',getter))
+    u.mem_write(getter,b'\xb8'+struct.pack('<I',stack)+b'\xb9\x55\x55\x55\x55\xba\xaa\xaa\xaa\xaa\xc3')
+    u.mem_write(base+0x7b160,b'\xb8'+struct.pack('<I',data)+b'\xb9\x55\x55\x55\x55\xba\xaa\xaa\xaa\xaa\xc3')
+    u.mem_write(data+0x4fea8,struct.pack('<I',10))
+    for off,val in [(0x49d984,3),(0x49d978,handles),(0x2b8e98,table)]:u.mem_write(base+off,struct.pack('<I',val))
+    # Empty, stale and valid entries ensure the scan validates handles before dereferencing.
+    u.mem_write(handles,struct.pack('<III',0xffffffff,3|(2<<13),4|(3<<13)))
+    u.mem_write(table+3*12+4,struct.pack('<II',0,1))
+    u.mem_write(table+4*12+4,struct.pack('<II',receiver,3 if valid else 2))
+    u.mem_write(receiver+0x95e,struct.pack('<H',23 if matching else 24));u.mem_write(receiver+0x954,struct.pack('<I',quantity))
+    local=bytearray(random.Random(12).randbytes(96));local[0x13]=full;u.mem_write(sp,bytes(local))
+    for reg in REGS[:-2]:u.reg_write(reg,0x12345678)
+    u.reg_write(UC_X86_REG_ESI,ui);u.reg_write(UC_X86_REG_EBX,item);u.reg_write(UC_X86_REG_ESP,sp);u.reg_write(UC_X86_REG_EFLAGS,0x246)
+    endpoint=[]
+    def stop(uc,a,n,d):
+        if a in [base+0x16fe56,base+0x16ff00]:endpoint.append(a);uc.emu_stop()
+    u.hook_add(UC_HOOK_CODE,stop);u.emu_start(start,0,count=150)
+    require(len(endpoint)==1,'capacity helper continuation missing')
+    return endpoint[0],[u.reg_read(r) for r in REGS],bytes(u.mem_read(sp,96))
+
+
+def capacity_verify(row):
+    base=row['client_base'];helper=row['cap_helper_base'];code=bytes.fromhex(row['cap_helper_hex'])
+    original=bytes.fromhex('8a44241384c00f85aa000000');cases=0
+    contexts=[dict(kind=k,quantity=q) for k in [1,2,3,4,8] for q in [9,10,11]]
+    contexts += [dict(mode=1),dict(stack=0),dict(matching=False),dict(valid=False),dict(full=1)]
+    for kw in contexts:
+        full=int(kw.get('full',0) or (kw.get('kind',2) in [2,4] and not kw.get('mode',0) and kw.get('stack',1) and kw.get('matching',True) and kw.get('valid',True) and kw.get('quantity',10)>=10))
+        end,regs,local=capacity_execute(code,helper,base,helper,**kw)
+        expected_kw={**kw,'full':full}
+        expected_end,expected_regs,expected_local=capacity_execute(original,base+0x16fe4a,base,helper,**expected_kw)
+        require((end,regs,local)==(expected_end,expected_regs,expected_local),'capacity branch/ABI/original locals differ: '+str(kw));cases+=1
+    print('PASS exact receiver capacity helper:',cases,'Give/Sell/native-path/handle/ABI contexts')
+
+
 def verify(certificate, client=None, server=None):
-    row=json.loads(Path(certificate).read_text());base=row['client_base'];helper=row['helper_base'];code=bytes.fromhex(row['helper_hex'])
+    row=json.loads(Path(certificate).read_text());capacity_verify(row);base=row['client_base'];helper=row['helper_base'];code=bytes.fromhex(row['helper_hex'])
     if client:
         data=Path(client).read_bytes();require(hashlib.sha256(data).hexdigest().upper()==PIN,'unsupported client fixture')
         mem=pefile.PE(data=data).get_memory_mapped_image()

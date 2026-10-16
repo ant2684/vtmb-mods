@@ -167,7 +167,7 @@ class Control(Driver):
                 ui['rows'].append({'side':side,'index':index,'button':button,'handle':h,'slot':p.u(ent+0x79c),'count':p.u(ent+0x954),'entity':ent,'selected':p.read(button+0xba,1)[0],'ammo_count':p.read(button+0xc4,1)[0],'panel':self.panel(button)})
         button=p.u(a+0x438)
         ui['action']={'button':button,'enabled':bool(p.u(button+0xc0)&2),'panel':self.panel(button)} if button else None
-        result={'owners':owners,'items':all_items,'ui':ui,'wall':time.time(),'filter_bytes':p.read(c+0x16dfa4,18).hex(),'price_filter_bytes':p.read(p.modules['vampire.dll']+0xda3cb,6).hex()}
+        result={'owners':owners,'items':all_items,'ui':ui,'wall':time.time(),'filter_bytes':p.read(c+0x16dfa4,18).hex(),'receiver_filter_bytes':p.read(c+0x16fe4a,12).hex(),'price_filter_bytes':p.read(p.modules['vampire.dll']+0xda3cb,6).hex()}
         if 'Trip' in owners:
             sv=p.modules['vampire.dll'];n=p.u(sv+0x74f018);table=p.u(sv+0x74f01c)
             require(0<n<1000,'invalid authored vendor table');records=[]
@@ -298,6 +298,13 @@ def collect(folder):
             from mods.container.tests.audit import audit
             audit(evidence);atomic_json(folder/'observations.json',evidence)
             return {'status':'PASS','scope':'container.transfer only; broader regression remains required'}
+        # Fill the receiving fridge through native Give, then exercise both edges.
+        for k in range(8):transfer('item_w_knife','give-fill-'+str(k),'player','player')
+        select('item_w_knife','player','player');capture('give-full-selected')
+        d.click_panel(d.state()['ui']['action']['button']);capture('give-full-rejected')
+        transfer('item_w_knife','give-space-freed')
+        select('item_w_knife','player','player');capture('give-space-available')
+        transfer('item_w_knife','give-refilled','player','player')
         transfer('item_g_bloodpack','blood-one')
         open_fridge();capture('blood-reopened')
         transfer('item_g_bloodpack','blood-two')
@@ -320,46 +327,53 @@ def collect(folder):
     if not baseline:
         d.command("__import__('__main__').FindPlayer().GiveItem('item_w_knife')",.2)
         d.command("__import__('__main__').FindPlayer().GiveAmmo('item_w_knife',9)",.2)
+    if not baseline:
+        d.command("__import__('__main__').FindPlayer().GiveItem('item_g_ring_silver')",.2)
+        d.command("__import__('__main__').FindPlayer().GiveAmmo('item_g_ring_silver',9)",.2)
     context_path=folder/'python-trade.txt'
     d.command("__import__('__builtin__').open("+repr(str(context_path))+",'w').write(str((__import__('__main__').G.Story_State,__import__('__main__').G.Trip_Drugs)))",.5)
     require(context_path.is_file(),'native story/discount receipt missing')
     d.command("__import__('__main__').FindPlayer().MoneyAdd(5000)",.5)
-    d.command("__import__('__main__').FindEntityByName('Trip').StartPlayerDialogRemote()",.3)
-    dialogue=[];end=time.monotonic()+50;chosen=False;intro_done=False;last_lines=None
-    while time.monotonic()<end:
-        if d.state()['ui']['panel']['visible']:
-            require(chosen,'barter appeared without a recorded dialogue choice');break
-        if chosen:
-            d.delay(.25);continue
-        choices=d.dialog_choices()
-        matches=[i for i,v in enumerate(choices['choices']) if re.search(r"buy something|gold for your goods",v,re.I)]
-        signature=tuple(choices.get('line_ids',[]))
-        if signature==last_lines:
-            d.delay(.25);continue
-        if not intro_done and signature==(2,):
-            dialogue.append({**choices,'chosen_index':0,'role':'intro'})
-            atomic_json(folder/'trade-dialogue.json',dialogue)
-            d.key(ord('1'));intro_done=True;last_lines=signature
-            d.delay(.5);continue
-        if matches and not chosen:
-            require(len(matches)==1 and matches[0]<10,'ambiguous native buy response')
-            index=matches[0];dialogue.append({**choices,'chosen_index':index,'role':'buy'})
-            atomic_json(folder/'trade-dialogue.json',dialogue)
-            d.key(ord(str((index+1)%10)));chosen=True;last_lines=signature
-        d.delay(.25)
-    else:raise Failure('Native Trip dialogue did not open barter')
-    capture('shop-opened')
-    def trade(side,label):
+    dialogue=[]
+    def open_shop(label):
+        nonlocal dialogue
+        d.command("__import__('__main__').FindEntityByName('Trip').StartPlayerDialogRemote()",.3)
+        dialogue=[];end=time.monotonic()+50;chosen=False;intro_done=False;last_lines=None
+        while time.monotonic()<end:
+            if d.state()['ui']['panel']['visible']:
+                require(chosen,'barter appeared without a recorded dialogue choice');break
+            if chosen:
+                d.delay(.25);continue
+            choices=d.dialog_choices()
+            matches=[i for i,v in enumerate(choices['choices']) if re.search(r"buy something|gold for your goods",v,re.I)]
+            signature=tuple(choices.get('line_ids',[]))
+            if signature==last_lines:
+                d.delay(.25);continue
+            if not intro_done and signature==(2,):
+                dialogue.append({**choices,'chosen_index':0,'role':'intro'})
+                atomic_json(folder/'trade-dialogue.json',dialogue)
+                d.key(ord('1'));intro_done=True;last_lines=signature
+                d.delay(.5);continue
+            if matches and not chosen:
+                require(len(matches)==1 and matches[0]<10,'ambiguous native buy response')
+                index=matches[0];dialogue.append({**choices,'chosen_index':index,'role':'buy'})
+                atomic_json(folder/'trade-dialogue.json',dialogue)
+                d.key(ord(str((index+1)%10)));chosen=True;last_lines=signature
+            d.delay(.25)
+        else:raise Failure('Native Trip dialogue did not open barter')
+        capture(label)
+    open_shop('shop-opened')
+    def trade(side,label,cls='item_w_knife'):
         owner='Trip' if side=='donor' else 'player'
-        before=select('item_w_knife',side,owner)
+        before=select(cls,side,owner)
         info=d.find_ui(info=True);p=d.p;c=p.modules['client.dll'];length=p.u(info+0x298);capacity=p.u(info+0x29c);buffer=p.u(info+0x2a0)
         require(0<length<=capacity<100000,'invalid native quote buffer')
         raw=p.read(buffer,length);matches=re.findall(rb'Value:\s*\$([0-9]+)',raw)
         require(len(matches)==1,'missing/ambiguous displayed price: '+repr(raw))
-        selected=row_for(before,'item_w_knife',side,owner)
+        selected=row_for(before,cls,side,owner)
         require(p.u(c+0x5fb7e8)==selected['entity'] and p.read(c+0x5fb7e4,1)==b'\0','quote belongs to another item/ammo')
         quote={'price':int(matches[0]),'text_hex':raw.hex(),'selected':selected,'selected_global':p.u(c+0x5fb7e8),'ammo_flag':p.read(c+0x5fb7e4,1)[0],'action_kind':before['ui']['action_kind'],'direction':'buy' if side=='donor' else 'sell','before':before}
-        actions.append({'label':label,'kind':'native-ui-click','class':'item_w_knife','side':side,'quote':quote,'before':before})
+        actions.append({'label':label,'kind':'native-ui-click','class':cls,'side':side,'quote':quote,'before':before})
         d.click_panel(before['ui']['action']['button']);capture(label)
     if baseline:
         trade('donor','reference-bought-one')
@@ -377,6 +391,15 @@ def collect(folder):
         trade('donor','shop-bought-two')
         trade('donor','shop-bought-three')
         pair('trade','shop-opened','shop-bought-three')
+        for k in range(10):trade('player','sell-fill-'+str(k),'item_g_ring_silver')
+        fixture("__import__('__main__').FindPlayer().GiveItem('item_g_ring_silver')")
+        open_shop('sell-ready')
+        select('item_g_ring_silver','player','player');capture('sell-full-selected')
+        d.click_panel(d.state()['ui']['action']['button']);capture('sell-full-rejected')
+        trade('donor','sell-space-freed','item_g_ring_silver')
+        select('item_g_ring_silver','player','player');capture('sell-space-available')
+        trade('player','sell-refilled','item_g_ring_silver')
+        pair('receiver_cap','give-full-selected','sell-refilled')
     evidence={**identity,'scenario_version':identity['scenario_version'],'first_result_preserved':True,'resolved_resources':identity['resources'],'observations':[checks['reproduction'],checks['trade_reference']] if baseline else list(checks.values()),'metrics':{},'states':snapshots,'actions':actions}
     evidence['shop_context']=context_path.read_text()
     evidence['trade_fixture']={'class':'npc_VDialogPedestrian','name':'Trip','arguments':[1,0,0],'map':'sm_pawnshop_2','spawned':False,'dialogue':dialogue}
