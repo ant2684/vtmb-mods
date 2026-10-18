@@ -19,7 +19,7 @@ static BOOL WINAPI test_flush(HANDLE process,LPCVOID p,SIZE_T n) {
 #undef VirtualProtect
 #undef FlushInstructionCache
 #define CHECK(x) do{if(!(x)){fprintf(stderr,"FAIL line %d: %s\n",__LINE__,#x);exit(1);}}while(0)
-static uint8_t *te,*ts;static uint8_t expected[4][5];
+static uint8_t *te,*ts;static uint8_t expected[HOOK_COUNT][5];
 static void put(void *p,uint32_t x){memcpy(p,&x,4);}
 static void image(uint8_t *p,size_t size) {
     IMAGE_DOS_HEADER *d=(void*)p;IMAGE_NT_HEADERS32 *n=(void*)(p+0x80);IMAGE_SECTION_HEADER *s;
@@ -28,7 +28,7 @@ static void image(uint8_t *p,size_t size) {
     n->OptionalHeader.Magic=IMAGE_NT_OPTIONAL_HDR32_MAGIC;n->OptionalHeader.SizeOfImage=(DWORD)size;
     s=IMAGE_FIRST_SECTION(n);s->VirtualAddress=0x1000;s->Misc.VirtualSize=(DWORD)size-0x1000;s->Characteristics=IMAGE_SCN_MEM_EXECUTE;
 }
-static uint8_t *site(unsigned i){static const unsigned r[]={CLOCK_HOOK_RVA,PAUSE_HOOK_RVA,RADIO_ACTIVATE_CALL_RVA,RADIO_CALL_RVA};return (i<2?te:ts)+r[i];}
+static uint8_t *site(unsigned i){static const unsigned r[]={CLOCK_HOOK_RVA,PAUSE_HOOK_RVA,RADIO_ACTIVATE_CALL_RVA,RADIO_CALL_RVA,RADIO_SPAWN_CALL_RVA};return (i<2?te:ts)+r[i];}
 static void reset(void) {
     unsigned i;
     if(clock_code)VirtualFree(clock_code,0,MEM_RELEASE);if(clock_state)VirtualFree(clock_state,0,MEM_RELEASE);
@@ -41,12 +41,15 @@ static void reset(void) {
     memcpy(ts+RADIO_ACTIVATE_CALL_RVA-2,"\x8b\xce\xe8\x12\x4d\xdd\xff\x83\xbe\x4c\x07\x00\x00\xff",14);
     memcpy(ts+RADIO_FAKE_SILENCE_THUNK_RVA,"\xe9\x47\x67\x0a\x00",5);
     memcpy(ts+RADIO_BASE_ACTIVATE_THUNK_RVA,"\xe9\x95\xf9\x09\x00",5);
-    for(i=0;i<4;i++)memcpy(expected[i],site(i),5);
+    memcpy(ts+RADIO_SPAWN_CALL_RVA-18,"\x8a\x86\x04\x02\x00\x00\x8b\xce\xa8\x01\x74\x04\x6a\x01\xeb\x02\x6a\x00\xe8\xb9\x6f\xdd\xff",23);
+    memcpy(ts+RADIO_SWITCH_THUNK_RVA,"\xe9\x2d\x94\x22\x00",5);
+    spawning_radio=NULL;
+    for(i=0;i<HOOK_COUNT;i++)memcpy(expected[i],site(i),5);
 }
-static void unchanged(void){unsigned i;for(i=0;i<4;i++)CHECK(!memcmp(expected[i],site(i),5));}
-static uint8_t table[8192*12],player[0x140],radio[0x140],sfx[0x108],source[0x80],mixer[0x80],globals[32];
+static void unchanged(void){unsigned i;for(i=0;i<HOOK_COUNT;i++)CHECK(!memcmp(expected[i],site(i),5));}
+static uint8_t table[8192*12],player[0x140],radio[0x800],other_radio[0x800],sfx[0x108],source[0x80],mixer[0x80],globals[32];
 static int decoded,decode_limit=-1,silence,activate_calls;
-static void __thiscall silence_stub(void *self,int value){CHECK(self==radio);silence=value;radio[0x104]=(uint8_t)value;}
+static void __thiscall silence_stub(void *self,int value){CHECK(self==radio||self==other_radio);silence=value;((uint8_t*)self)[0x104]=(uint8_t)value;}
 static void __thiscall activate_stub(void *self){CHECK(self==radio);activate_calls++;}
 static int __thiscall decode_stub(void *self,void **pcm,int count,int unknown) {
     static int sample;CHECK(self==mixer && unknown==0);
@@ -57,10 +60,11 @@ static void jump(uint8_t *p,void *target){p[0]=0xe9;put(p+1,(uint32_t)(uintptr_t
 static void logic(void) {
     uint8_t *ch;void **v,**sv;
     memset(radios,0,sizeof(radios));location_table=NULL;location_player=0xffffffff;location_generation=activation_generation=0;location_last_time=-1;
-    memset(table,0,sizeof(table));memset(radio,0,sizeof(radio));memset(player,0,sizeof(player));memset(sfx,0,sizeof(sfx));memset(mixer,0,sizeof(mixer));memset(source,0,sizeof(source));
+    memset(table,0,sizeof(table));memset(radio,0,sizeof(radio));memset(other_radio,0,sizeof(other_radio));memset(player,0,sizeof(player));memset(sfx,0,sizeof(sfx));memset(mixer,0,sizeof(mixer));memset(source,0,sizeof(source));spawning_radio=NULL;
     put(ts+0x566458,(uint32_t)(uintptr_t)table);put(ts+0x70b228,(uint32_t)(uintptr_t)globals);
     put(table+12+4,(uint32_t)(uintptr_t)player);put(player+0x11c,(uint32_t)(uintptr_t)"player");
     put(table+222*12+4,(uint32_t)(uintptr_t)radio);put(table+222*12+8,3);put(radio+0x11c,(uint32_t)(uintptr_t)"prop_radio");
+    put(table+223*12+4,(uint32_t)(uintptr_t)other_radio);put(table+223*12+8,7);put(other_radio+0x11c,(uint32_t)(uintptr_t)"prop_radio");
     *(float*)(globals+12)=0;decoded=0;decode_limit=-1;activate_calls=0;radio[0x104]=1;
     original_fake_silence=silence_stub;original_base_activate=activate_stub;engine_module=te;server_module=ts;
     ch=te+CHANNEL_ARRAY_RVA;memset(ch,0,CHANNEL_SIZE);put(te+CHANNEL_COUNT_RVA,1);put(ch,(uint32_t)(uintptr_t)sfx);put(ch+4,(uint32_t)(uintptr_t)mixer);put(ch+0x2c,222);*(float*)(ch+0x98)=100;
@@ -69,29 +73,38 @@ static void logic(void) {
     v=(void**)(te+0x188600);sv=(void**)(te+0x188394);v[12]=te+0x139c80;sv[3]=te+0x137970;
     memcpy(te+0x137970,"\x8b\x41\x08\xc3",4);jump(te+0x139c80,decode_stub);
 }
-static void on_abi(int value) {
-    uint32_t before,after;double x87=0;
+static void call_abi(FakeSilenceFn fn,void *self,int value) {
+    uint32_t before,after;double x87=0;FakeSilenceFn volatile target=fn;
     register uint32_t bx __asm__("ebx")=0x11223344,si __asm__("esi")=0x55667788,di __asm__("edi")=0x99aabbcc;
-    FakeSilenceFn volatile fn=(FakeSilenceFn)(void*)radio_fake_silence;
     __asm__ volatile("fld1; movl %%esp,%0":"=m"(before):"r"(bx),"r"(si),"r"(di));
-    fn(radio,value);
+    target(self,value);
     __asm__ volatile("movl %%esp,%0; fstpl %1":"=m"(after),"=m"(x87):"r"(bx),"r"(si),"r"(di));
     CHECK(before==after && x87==1.0 && bx==0x11223344 && si==0x55667788 && di==0x99aabbcc);
 }
+static void on_abi(int value){call_abi((FakeSilenceFn)(void*)radio_fake_silence,radio,value);}
 static void cached_loop(void) {
     RadioState *s=radio_state(radio);RadioChannel c;CHECK(s&&find_radio_stream_channel(s,&c));
     s->phase_channel=c.channel;s->phase_mixer=c.mixer;s->phase_source=c.source;s->phase_sfx=c.sfx;
     s->loop_checked=1;s->loop_samples=18801792;
 }
+#include "startup_fixture.h"
 int main(void) {
     unsigned i;RadioState *s;uint32_t activation;
+    setvbuf(stdout,NULL,_IONBF,0);
     te=VirtualAlloc(NULL,0x1400000,MEM_RESERVE|MEM_COMMIT,PAGE_EXECUTE_READWRITE);ts=VirtualAlloc(NULL,0xb00000,MEM_RESERVE|MEM_COMMIT,PAGE_EXECUTE_READWRITE);CHECK(te&&ts);
-    reset();CHECK(install_all(te,ts));CHECK(calls==14);
-    for(i=1;i<=14;i++){reset();fail_at=i;CHECK(!install_all(te,ts));unchanged();CHECK(!clock_code&&!clock_state);}
+    reset();CHECK(install_all(te,ts));CHECK(calls==17);CHECK(rollback_all());unchanged();CHECK(!clock_code&&!clock_state);
+    for(i=1;i<=17;i++){reset();fail_at=i;CHECK(!install_all(te,ts));unchanged();CHECK(!clock_code&&!clock_state);}
     reset();ts[RADIO_CALL_RVA]=0xcc;memcpy(expected[3],site(3),5);CHECK(!install_all(te,ts)&&calls==0);unchanged();
     reset();memcpy(ts+0x4000,ts+RADIO_SIGNATURE_RVA,9);CHECK(!install_all(te,ts)&&calls==0);unchanged();
     reset();occupy_at=12;CHECK(!install_all(te,ts));CHECK(site(3)[0]==0xcc);for(i=0;i<3;i++)CHECK(!memcmp(expected[i],site(i),5));
     reset();fail_from=13;CHECK(!install_all(te,ts));CHECK(clock_code&&clock_state&&!radio_installed&&!engine_installed);CHECK(hooks[3].changed);
+    reset();ts[RADIO_SPAWN_CALL_RVA]=0xcc;memcpy(expected[4],site(4),5);CHECK(!install_all(te,ts)&&calls==0);unchanged();
+    reset();memcpy(ts+0x4000,ts+RADIO_SPAWN_CALL_RVA-18,23);CHECK(!install_all(te,ts)&&calls==0);unchanged();
+    reset();ts[RADIO_SWITCH_THUNK_RVA+1]^=1;CHECK(!install_all(te,ts)&&calls==0);unchanged();
+    reset();occupy_at=15;CHECK(!install_all(te,ts));CHECK(site(4)[0]==0xcc);for(i=0;i<4;i++)CHECK(!memcmp(expected[i],site(i),5));
+    reset();fail_from=16;CHECK(!install_all(te,ts));CHECK(clock_code&&clock_state&&!radio_installed&&!engine_installed);CHECK(hooks[4].changed);
+    reset();logic();test_startup_scope();
+    test_native_startup();
     reset();logic();radio_base_activate(radio,NULL);CHECK(activate_calls==1);s=radio_state(radio);CHECK(s&&s->epoch==0&&s->epoch_valid);activation=s->activation;
     cached_loop();*(float*)(globals+12)=20;on_abi(0);CHECK(!silence&&decoded==20*44100&&*(double*)(mixer+8)==20*44100);CHECK(s->seen_on);
     on_abi(0);CHECK(decoded==20*44100&&!silence); /* duplicate */
@@ -122,5 +135,5 @@ int main(void) {
      CHECK(mpeg_loop_samples(frames,sizeof(frames),44100)==2*1152);
      CHECK(!mpeg_loop_samples(frames,sizeof(frames)-1,44100));CHECK(!mpeg_loop_samples(frames,sizeof(frames),48000));
      frames[156]=0;CHECK(!mpeg_loop_samples(frames,sizeof(frames),44100));}
-    puts("PASS compiled x86 radio ABI/x87, first/repeat catch-up, paused time, identity/stream generation, decoder failure, unique/conflicting hooks and all protection/flush/rollback failures");return 0;
+    puts("PASS compiled x86 startup scope/ABI/x87, first/repeat catch-up, paused time, identity/stream generation, decoder failure, five unique/conflicting hooks and all 17 protection/flush/rollback failures");return 0;
 }

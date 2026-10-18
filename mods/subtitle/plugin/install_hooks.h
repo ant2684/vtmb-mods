@@ -1,11 +1,12 @@
-/* All four hook sites are validated before any code write. A failed install
+/* All five hook sites are validated before any code write. A failed install
    rolls back in reverse order and retains callable helper memory if OS rollback
    cannot be certified. Rechecks after VirtualProtect detect intervening owners. */
 typedef struct {
     uint8_t *site; uint8_t original[5], patch[5]; DWORD protection;
     int changed, protected_once;
 } CallHook;
-static CallHook hooks[4];
+enum { HOOK_COUNT = 5 };
+static CallHook hooks[HOOK_COUNT];
 static int installation_failed;
 static int restore_hook(CallHook *h)
 {
@@ -46,7 +47,7 @@ static void prepare_hook(CallHook *h, uint8_t *site, uint8_t *destination)
 static int rollback_all(void)
 {
     int i, retry, ok = 1;
-    for (i = 3; i >= 0; --i) {
+    for (i = HOOK_COUNT - 1; i >= 0; --i) {
         for (retry = 0; retry < 3 && hooks[i].changed; ++retry) restore_hook(&hooks[i]);
         if (hooks[i].changed) ok = 0;
     }
@@ -64,6 +65,7 @@ static int install_all(uint8_t *engine, uint8_t *server)
     static const uint8_t pause_signature[] = {0xe8,0x5b,0xf0,0x00,0x00,0x85,0xc0,0xa3};
     static const uint8_t radio_signature[] = {0x6a,0x01,0x8b,0xce,0xe8,0x68,0x60,0xdd,0xff};
     static const uint8_t activate_signature[] = {0x8b,0xce,0xe8,0x12,0x4d,0xdd,0xff,0x83,0xbe,0x4c,0x07,0x00,0x00,0xff};
+    static const uint8_t spawn_signature[] = {0x8a,0x86,0x04,0x02,0x00,0x00,0x8b,0xce,0xa8,0x01,0x74,0x04,0x6a,0x01,0xeb,0x02,0x6a,0x00,0xe8,0xb9,0x6f,0xdd,0xff};
     DWORD old; unsigned i;
     if (engine_installed || radio_installed || installation_failed || clock_code) return 0;
     if (!engine || !server || has_old_spcode(engine) ||
@@ -71,13 +73,16 @@ static int install_all(uint8_t *engine, uint8_t *server)
         !unique_code_signature(engine, pause_signature, sizeof(pause_signature), PAUSE_HOOK_RVA) ||
         !unique_code_signature(server, radio_signature, sizeof(radio_signature), RADIO_SIGNATURE_RVA) ||
         !unique_code_signature(server, activate_signature, sizeof(activate_signature), RADIO_ACTIVATE_CALL_RVA - 2) ||
+        !unique_code_signature(server, spawn_signature, sizeof(spawn_signature), RADIO_SPAWN_CALL_RVA - 18) ||
         memcmp(server + RADIO_FAKE_SILENCE_THUNK_RVA, "\xe9\x47\x67\x0a\x00", 5) ||
-        memcmp(server + RADIO_BASE_ACTIVATE_THUNK_RVA, "\xe9\x95\xf9\x09\x00", 5)) {
+        memcmp(server + RADIO_BASE_ACTIVATE_THUNK_RVA, "\xe9\x95\xf9\x09\x00", 5) ||
+        memcmp(server + RADIO_SWITCH_THUNK_RVA, "\xe9\x2d\x94\x22\x00", 5)) {
         return 0;
     }
     engine_module = engine; server_module = server;
     original_fake_silence = (FakeSilenceFn)(server + RADIO_FAKE_SILENCE_THUNK_RVA);
     original_base_activate = (BaseActivateFn)(server + RADIO_BASE_ACTIVATE_THUNK_RVA);
+    original_radio_switch = (FakeSilenceFn)(server + RADIO_SWITCH_THUNK_RVA);
     clock_code = (uint8_t *)VirtualAlloc(NULL, 0x1000, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
     clock_state = (uint8_t *)VirtualAlloc(NULL, 0x1000, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
     if (!clock_code || !clock_state) { rollback_all(); return 0; }
@@ -89,7 +94,8 @@ static int install_all(uint8_t *engine, uint8_t *server)
     prepare_hook(&hooks[1], engine + PAUSE_HOOK_RVA, clock_code + CLOCK_PAUSE_OFFSET);
     prepare_hook(&hooks[2], server + RADIO_ACTIVATE_CALL_RVA, (uint8_t *)radio_base_activate);
     prepare_hook(&hooks[3], server + RADIO_CALL_RVA, (uint8_t *)radio_fake_silence);
-    for (i = 0; i < 4; ++i) if (!install_hook(&hooks[i])) { rollback_all(); return 0; }
+    prepare_hook(&hooks[4], server + RADIO_SPAWN_CALL_RVA, (uint8_t *)radio_spawn_switch);
+    for (i = 0; i < HOOK_COUNT; ++i) if (!install_hook(&hooks[i])) { rollback_all(); return 0; }
     engine_installed = radio_installed = 1;
     return 1;
 }

@@ -114,11 +114,25 @@ static void __fastcall radio_base_activate(void *entity, void *unused)
     s->activation = ++activation_generation; s->epoch = now; s->epoch_valid = 1;
     s->seen_on = !*((uint8_t *)entity + 0x104); /* saved radio may already be on */
 }
+/* Spawn chooses the map's initial state before Activate creates the stream.
+   Preserve that native switch, including its sound/skin effects. The scoped
+   entity also permits nested startup without relaxing ordinary sync failures. */
+static void __fastcall radio_spawn_switch(void *entity, void *unused, int active)
+{
+    void *previous = spawning_radio; (void)unused;
+    spawning_radio = entity;
+    original_radio_switch(entity, active);
+    spawning_radio = previous;
+}
 static void __fastcall radio_fake_silence(void *entity, void *unused, int silent)
 {
-    RadioState *s = radio_state(entity); RadioChannel c; double now = game_now();
+    RadioState *s; RadioChannel c; double now;
     (void)unused;
     if (!original_fake_silence) return;
+    if (entity && entity == spawning_radio) {
+        original_fake_silence(entity, silent); return;
+    }
+    s = radio_state(entity); now = game_now();
     if (!s) { original_fake_silence(entity, silent); return; }
     if (silent) {
         if (*((uint8_t *)entity + 0x104) && s->armed) {

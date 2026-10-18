@@ -10,6 +10,7 @@ enum {
     RADIO_CALL_RVA = 0x22c807, RADIO_SIGNATURE_RVA = 0x22c803,
     RADIO_FAKE_SILENCE_THUNK_RVA = 0x2874,
     RADIO_ACTIVATE_CALL_RVA = 0x22c50f, RADIO_BASE_ACTIVATE_THUNK_RVA = 0x1226,
+    RADIO_SPAWN_CALL_RVA = 0x22c360, RADIO_SWITCH_THUNK_RVA = 0x331e,
     PAUSED_RVA = 0x314874, PLAT_TIME_IAT_RVA = 0x173324,
     CHANNEL_COUNT_RVA = 0x13107d4, CHANNEL_ARRAY_RVA = 0x1310b08,
     CHANNEL_SIZE = 0xa0, MAX_CHANNELS = 128, MAX_RADIOS = 32
@@ -48,6 +49,8 @@ static double location_last_time = -1.0;
 typedef void (__thiscall *BaseActivateFn)(void *);
 static BaseActivateFn original_base_activate;
 static FakeSilenceFn original_fake_silence;
+static FakeSilenceFn original_radio_switch;
+static void *spawning_radio;
 static RadioState radios[MAX_RADIOS];
 static int engine_installed, radio_installed;
 
