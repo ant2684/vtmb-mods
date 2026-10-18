@@ -74,30 +74,42 @@ static int has_radio_loop_name(const char *name)
         if (!strncmp(name + i, "radio_loop_", 11)) return 1;
     return 0;
 }
+/* 0: initial channel absent/incomplete; 1: supported unique channel;
+   -1: malformed or ambiguous channel, never an initial-readiness exemption. */
 static int find_radio_stream_channel(RadioState *state, RadioChannel *out)
 {
-    int count, i, matches = 0;
-    if (!engine_module || !state) return 0;
+    int count, i, matches = 0, ready = 0;
+    if (!engine_module || !state) return -1;
     count = *(int *)(engine_module + CHANNEL_COUNT_RVA);
-    if (count < 0 || count > MAX_CHANNELS) return 0;
+    if (count < 0 || count > MAX_CHANNELS) return -1;
     for (i = 0; i < count; ++i) {
         uint8_t *channel = engine_module + CHANNEL_ARRAY_RVA + i * CHANNEL_SIZE;
         uint8_t *sfx = *(uint8_t **)channel, *mixer, *source; void **v, **sv;
         double position; int rate;
         if (!sfx || *(uint32_t *)(channel + 0x2c) != state->index ||
             !has_radio_loop_name((const char *)(sfx + 4))) continue;
+        if (++matches > 1) return -1;
         mixer = *(uint8_t **)(channel + 4); source = *(uint8_t **)(sfx + 0x104);
         if (!mixer || !source) continue;
         v = *(void ***)mixer; sv = *(void ***)source;
         if (v != (void **)(engine_module + 0x188600) || sv != (void **)(engine_module + 0x188394) ||
-            v[12] != engine_module + 0x139c80 || sv[3] != engine_module + 0x137970) continue;
+            v[12] != engine_module + 0x139c80 || sv[3] != engine_module + 0x137970) return -1;
         position = *(double *)(mixer + 8); rate = ((SourceIntegerFn)sv[3])(source);
-        if (!(position >= 0.0 && position < 2147483647.0) || rate < 8000 || rate > 192000) continue;
-        if (++matches > 1) return 0;
+        if (!(position >= 0.0 && position < 2147483647.0) || rate < 8000 || rate > 192000) return -1;
         out->channel = channel; out->sfx = sfx; out->source = source; out->mixer = mixer;
-        out->position = (int)position; out->rate = rate;
+        out->position = (int)position; out->rate = rate; ready = 1;
     }
-    return matches == 1;
+    return ready;
+}
+static int same_radio_stream(const RadioState *s, const RadioChannel *c)
+{
+    return c->mixer == s->mixer && c->sfx == s->sfx && c->source == s->source &&
+           c->channel == s->channel && c->rate == s->off_rate;
+}
+static void remember_radio_stream(RadioState *s, const RadioChannel *c)
+{
+    s->mixer = c->mixer; s->sfx = c->sfx; s->source = c->source; s->channel = c->channel;
+    s->off_rate = c->rate;
 }
 #include "radio_loop.h"
 /* Narrow CPropRadio::Activate call to its base Activate. This native lifecycle
@@ -113,6 +125,7 @@ static void __fastcall radio_base_activate(void *entity, void *unused)
     s->entity = entity; s->generation = location_generation;
     s->activation = ++activation_generation; s->epoch = now; s->epoch_valid = 1;
     s->seen_on = !*((uint8_t *)entity + 0x104); /* saved radio may already be on */
+    s->initial_pending = 1; /* base Activate precedes native stream creation */
 }
 /* Spawn chooses the map's initial state before Activate creates the stream.
    Preserve that native switch, including its sound/skin effects. The scoped
@@ -134,24 +147,39 @@ static void __fastcall radio_fake_silence(void *entity, void *unused, int silent
     }
     s = radio_state(entity); now = game_now();
     if (!s) { original_fake_silence(entity, silent); return; }
+    if (s->initial_pending < 0) { original_fake_silence(entity, 1); return; }
     if (silent) {
+        int found;
         if (*((uint8_t *)entity + 0x104) && s->armed) {
             original_fake_silence(entity, silent); return; /* duplicate off keeps checkpoint */
         }
         if (!*((uint8_t *)entity + 0x104)) s->seen_on = 1;
-        s->armed = 0;
-        if (s->seen_on && now >= 0.0 && find_radio_stream_channel(s, &c)) {
-            s->mixer = c.mixer; s->sfx = c.sfx; s->source = c.source; s->channel = c.channel;
-            s->off_position = c.position; s->off_rate = c.rate; s->off_time = now; s->armed = 1;
+        s->armed = 0; found = find_radio_stream_channel(s, &c);
+        if (s->initial_pending && s->epoch_valid && now >= s->epoch &&
+            ((found == 0 && s->initial_pending == 1 && !s->channel) ||
+             (found == 1 && c.position == 0 && (!s->channel || same_radio_stream(s, &c))))) {
+            /* The server queues the initial sound before the client creates
+               its channel. The client-create witness closes this exception;
+               a bound but unplayed stream still uses the Activate epoch. */
+            if (found == 1) { remember_radio_stream(s, &c); s->initial_pending = 2; }
+            s->seen_on = 0;
+        } else if (s->seen_on && now >= 0.0 && found == 1 &&
+                   (!s->initial_pending || !s->channel || same_radio_stream(s, &c))) {
+            remember_radio_stream(s, &c);
+            s->off_position = c.position; s->off_time = now; s->armed = 1;
+            s->initial_pending = 0;
+        } else if (s->initial_pending) {
+            s->initial_pending = -1; /* invalid/lost initial stream, not readiness */
         }
         original_fake_silence(entity, silent); return;
     }
     if (s->seen_on && !s->armed && !*((uint8_t *)entity + 0x104)) {
         original_fake_silence(entity, silent); return; /* duplicate on is idempotent */
     }
-    if (!s->epoch_valid || now < s->epoch || !find_radio_stream_channel(s, &c) || !ensure_loop_samples(s, &c) ||
-        (s->seen_on && (!s->armed || c.mixer != s->mixer || c.sfx != s->sfx ||
-                       c.source != s->source || c.channel != s->channel || c.rate != s->off_rate))) {
+    if (!s->epoch_valid || now < s->epoch || find_radio_stream_channel(s, &c) != 1 ||
+        (s->initial_pending && s->channel && !same_radio_stream(s, &c)) ||
+        !ensure_loop_samples(s, &c) ||
+        (s->seen_on && (!s->armed || !same_radio_stream(s, &c)))) {
         original_fake_silence(entity, 1); return;
     }
     {
@@ -174,7 +202,39 @@ static void __fastcall radio_fake_silence(void *entity, void *unused, int silent
     /* Seed a valid coordinate before the first visible dispatcher call. It
        subtracts this same value after adding the exact decoder time. */
     if (*(float *)(c.channel + 0x98) < 0.0f) *(float *)(c.channel + 0x98) = (float)logical_now();
-    s->seen_on = 1; s->armed = 0;
+    s->seen_on = 1; s->armed = 0; s->initial_pending = 0;
     s->mixer = c.mixer; s->sfx = c.sfx; s->source = c.source; s->channel = c.channel;
     original_fake_silence(entity, silent);
+}
+
+/* One guarded client svc_spawnstaticsound callsite. Forward all twelve x86
+   argument words unchanged; the native return is unused but preserved. */
+typedef uint32_t (__cdecl *StaticSoundFn)(uint32_t,uint32_t,uint32_t,uint32_t,
+    uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t);
+static StaticSoundFn original_static_sound;
+static uint32_t __cdecl radio_static_sound(uint32_t owner,uint32_t channel,
+    uint32_t sfx,uint32_t origin,uint32_t direction,uint32_t update,
+    uint32_t volume,uint32_t level,uint32_t flags,uint32_t pitch,
+    uint32_t byteflag,uint32_t soundtime)
+{
+    uint32_t result = original_static_sound(owner,channel,sfx,origin,direction,
+        update,volume,level,flags,pitch,byteflag,soundtime);
+    unsigned i; uint8_t *table; RadioChannel c;
+    if (!sfx || !has_radio_loop_name((const char *)(uintptr_t)sfx + 4)) return result;
+    refresh_location(game_now()); table = entity_table();
+    for (i = 0; table && i < MAX_RADIOS; ++i) {
+        RadioState *s = &radios[i];
+        if (!s->entity || s->index != owner || s->generation != location_generation ||
+            *(void **)(table + s->index * 12 + 4) != s->entity ||
+            *(uint32_t *)(table + s->index * 12 + 8) != s->serial) continue;
+        /* A second request must never erase evidence of a lost/replaced stream. */
+        if (s->initial_pending != 1 || !s->epoch_valid ||
+            find_radio_stream_channel(s, &c) != 1 || c.sfx != (uint8_t *)(uintptr_t)sfx) {
+            s->initial_pending = -1;
+        } else {
+            remember_radio_stream(s, &c); s->initial_pending = 2;
+        }
+        break;
+    }
+    return result;
 }

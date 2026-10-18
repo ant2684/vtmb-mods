@@ -28,7 +28,7 @@ static void image(uint8_t *p,size_t size) {
     n->OptionalHeader.Magic=IMAGE_NT_OPTIONAL_HDR32_MAGIC;n->OptionalHeader.SizeOfImage=(DWORD)size;
     s=IMAGE_FIRST_SECTION(n);s->VirtualAddress=0x1000;s->Misc.VirtualSize=(DWORD)size-0x1000;s->Characteristics=IMAGE_SCN_MEM_EXECUTE;
 }
-static uint8_t *site(unsigned i){static const unsigned r[]={CLOCK_HOOK_RVA,PAUSE_HOOK_RVA,RADIO_ACTIVATE_CALL_RVA,RADIO_CALL_RVA,RADIO_SPAWN_CALL_RVA};return (i<2?te:ts)+r[i];}
+static uint8_t *site(unsigned i){static const unsigned r[]={CLOCK_HOOK_RVA,PAUSE_HOOK_RVA,RADIO_ACTIVATE_CALL_RVA,RADIO_CALL_RVA,RADIO_SPAWN_CALL_RVA,STATIC_SOUND_CALL_RVA};return (i<2||i==5?te:ts)+r[i];}
 static void reset(void) {
     unsigned i;
     if(clock_code)VirtualFree(clock_code,0,MEM_RELEASE);if(clock_state)VirtualFree(clock_state,0,MEM_RELEASE);
@@ -43,6 +43,7 @@ static void reset(void) {
     memcpy(ts+RADIO_BASE_ACTIVATE_THUNK_RVA,"\xe9\x95\xf9\x09\x00",5);
     memcpy(ts+RADIO_SPAWN_CALL_RVA-18,"\x8a\x86\x04\x02\x00\x00\x8b\xce\xa8\x01\x74\x04\x6a\x01\xeb\x02\x6a\x00\xe8\xb9\x6f\xdd\xff",23);
     memcpy(ts+RADIO_SWITCH_THUNK_RVA,"\xe9\x2d\x94\x22\x00",5);
+    memcpy(te+STATIC_SOUND_CALL_RVA-9,"\x8d\x4c\x24\x40\x51\x50\x6a\x06\x52\xe8\xa0\x3c\x0f\x00\x83\xc4\x30",17);
     spawning_radio=NULL;
     for(i=0;i<HOOK_COUNT;i++)memcpy(expected[i],site(i),5);
 }
@@ -83,7 +84,7 @@ static void call_abi(FakeSilenceFn fn,void *self,int value) {
 }
 static void on_abi(int value){call_abi((FakeSilenceFn)(void*)radio_fake_silence,radio,value);}
 static void cached_loop(void) {
-    RadioState *s=radio_state(radio);RadioChannel c;CHECK(s&&find_radio_stream_channel(s,&c));
+    RadioState *s=radio_state(radio);RadioChannel c;CHECK(s&&find_radio_stream_channel(s,&c)==1);
     s->phase_channel=c.channel;s->phase_mixer=c.mixer;s->phase_source=c.source;s->phase_sfx=c.sfx;
     s->loop_checked=1;s->loop_samples=18801792;
 }
@@ -92,8 +93,8 @@ int main(void) {
     unsigned i;RadioState *s;uint32_t activation;
     setvbuf(stdout,NULL,_IONBF,0);
     te=VirtualAlloc(NULL,0x1400000,MEM_RESERVE|MEM_COMMIT,PAGE_EXECUTE_READWRITE);ts=VirtualAlloc(NULL,0xb00000,MEM_RESERVE|MEM_COMMIT,PAGE_EXECUTE_READWRITE);CHECK(te&&ts);
-    reset();CHECK(install_all(te,ts));CHECK(calls==17);CHECK(rollback_all());unchanged();CHECK(!clock_code&&!clock_state);
-    for(i=1;i<=17;i++){reset();fail_at=i;CHECK(!install_all(te,ts));unchanged();CHECK(!clock_code&&!clock_state);}
+    reset();CHECK(install_all(te,ts));CHECK(calls==20);CHECK(rollback_all());unchanged();CHECK(!clock_code&&!clock_state);
+    for(i=1;i<=20;i++){reset();fail_at=i;CHECK(!install_all(te,ts));unchanged();CHECK(!clock_code&&!clock_state);}
     reset();ts[RADIO_CALL_RVA]=0xcc;memcpy(expected[3],site(3),5);CHECK(!install_all(te,ts)&&calls==0);unchanged();
     reset();memcpy(ts+0x4000,ts+RADIO_SIGNATURE_RVA,9);CHECK(!install_all(te,ts)&&calls==0);unchanged();
     reset();occupy_at=12;CHECK(!install_all(te,ts));CHECK(site(3)[0]==0xcc);for(i=0;i<3;i++)CHECK(!memcmp(expected[i],site(i),5));
@@ -103,8 +104,15 @@ int main(void) {
     reset();ts[RADIO_SWITCH_THUNK_RVA+1]^=1;CHECK(!install_all(te,ts)&&calls==0);unchanged();
     reset();occupy_at=15;CHECK(!install_all(te,ts));CHECK(site(4)[0]==0xcc);for(i=0;i<4;i++)CHECK(!memcmp(expected[i],site(i),5));
     reset();fail_from=16;CHECK(!install_all(te,ts));CHECK(clock_code&&clock_state&&!radio_installed&&!engine_installed);CHECK(hooks[4].changed);
+    reset();te[STATIC_SOUND_CALL_RVA]=0xcc;memcpy(expected[5],site(5),5);CHECK(!install_all(te,ts)&&calls==0);unchanged();
+    reset();memcpy(te+0x4000,te+STATIC_SOUND_CALL_RVA-9,17);CHECK(!install_all(te,ts)&&calls==0);unchanged();
+    reset();occupy_at=18;CHECK(!install_all(te,ts));CHECK(site(5)[0]==0xcc);for(i=0;i<5;i++)CHECK(!memcmp(expected[i],site(i),5));
+    reset();fail_from=19;CHECK(!install_all(te,ts));CHECK(clock_code&&clock_state&&!radio_installed&&!engine_installed);CHECK(hooks[5].changed);
     reset();logic();test_startup_scope();
     test_native_startup();
+    test_early_landmark_off();
+    test_initial_stream_guards();
+    test_static_creation();
     reset();logic();radio_base_activate(radio,NULL);CHECK(activate_calls==1);s=radio_state(radio);CHECK(s&&s->epoch==0&&s->epoch_valid);activation=s->activation;
     cached_loop();*(float*)(globals+12)=20;on_abi(0);CHECK(!silence&&decoded==20*44100&&*(double*)(mixer+8)==20*44100);CHECK(s->seen_on);
     on_abi(0);CHECK(decoded==20*44100&&!silence); /* duplicate */
@@ -135,5 +143,5 @@ int main(void) {
      CHECK(mpeg_loop_samples(frames,sizeof(frames),44100)==2*1152);
      CHECK(!mpeg_loop_samples(frames,sizeof(frames)-1,44100));CHECK(!mpeg_loop_samples(frames,sizeof(frames),48000));
      frames[156]=0;CHECK(!mpeg_loop_samples(frames,sizeof(frames),44100));}
-    puts("PASS compiled x86 startup scope/ABI/x87, first/repeat catch-up, paused time, identity/stream generation, decoder failure, five unique/conflicting hooks and all 17 protection/flush/rollback failures");return 0;
+    puts("PASS compiled x86 startup scope/ABI/x87, first/repeat catch-up, paused time, identity/stream generation, decoder failure, six unique/conflicting hooks and all 20 protection/flush/rollback failures");return 0;
 }

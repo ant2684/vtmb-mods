@@ -108,3 +108,120 @@ static void test_native_startup(void)
     free((void*)native_file);native_file=NULL;
     puts("PASS actual relocated native Spawn flag branches, full switch sound/skin/silence, old-path failure, scoped fix, Activate and post-scope refusal");
 }
+
+static unsigned static_calls;
+static uint32_t __cdecl static_stub(uint32_t a,uint32_t b,uint32_t c,uint32_t d,
+    uint32_t e,uint32_t f,uint32_t g,uint32_t h,uint32_t i,uint32_t j,uint32_t l,uint32_t m)
+{
+    CHECK(a==222 && b==6 && c==(uint32_t)(uintptr_t)sfx && d==4 && e==5 && f==6 &&
+          g==0x3f800000 && h==8 && i==9 && j==100 && l==11 && m==0x3f000000);
+    ++static_calls;return 0x12345678;
+}
+static void witness(void)
+{
+    StaticSoundFn volatile fn=radio_static_sound;uint32_t before,after,result;double x87;
+    original_static_sound=static_stub;
+    __asm__ volatile("fld1; movl %%esp,%0":"=m"(before));
+    result=fn(222,6,(uint32_t)(uintptr_t)sfx,4,5,6,0x3f800000,8,9,100,11,0x3f000000);
+    __asm__ volatile("movl %%esp,%0; fstpl %1":"=m"(after),"=m"(x87));
+    CHECK(result==0x12345678 && before==after && x87==1.0);
+}
+
+/* Native Use toggles +734 before SetFakeSilence. Calling Activate alone
+   would miss the user-visible three-press regression. */
+static void ordinary_switch(int active)
+{
+    radio[0x734]=(uint8_t)active;
+    on_abi(!active);
+}
+static void ordinary_use(void) { ordinary_switch(!radio[0x734]); }
+static void test_early_landmark_off(void)
+{
+    RadioState *s; unsigned n;
+    for(n=0;n<2;n++) {
+        reset();logic();radio[0x104]=0;radio[0x734]=1;
+        *(float*)(globals+12)=1;radio_base_activate(radio,NULL);s=radio_state(radio);
+        put(te+CHANNEL_COUNT_RVA,0);ordinary_switch(0);
+        CHECK(radio[0x104]==1 && !radio[0x734] && !s->armed && !s->seen_on && s->initial_pending);
+        ordinary_switch(0);CHECK(!s->seen_on && s->initial_pending);
+        if(n) {ordinary_use();CHECK(silence && radio[0x734]);ordinary_switch(0);}
+        put(te+CHANNEL_COUNT_RVA,1);witness();cached_loop();*(float*)(globals+12)=21;
+        ordinary_use();CHECK(!silence && radio[0x734] && decoded==20*44100 && !s->initial_pending);
+        *(double*)(mixer+8)=22*44100;decoded=22*44100;*(float*)(globals+12)=23;
+        ordinary_use();CHECK(silence && !radio[0x734] && s->armed);
+        *(float*)(globals+12)=30;ordinary_use();CHECK(!silence && radio[0x734] && decoded==29*44100);
+    }
+    /* Observed native startup playback ends readiness before any manual
+       switch. Later stream loss must remain a checkpoint failure. */
+    reset();logic();radio[0x104]=0;radio[0x734]=1;radio_base_activate(radio,NULL);cached_loop();
+    *(double*)(mixer+8)=44100;
+    CHECK(radio_sample_phase(te+CHANNEL_ARRAY_RVA,44100,44100)==44100);
+    s=radio_state(radio);CHECK(!s->initial_pending);put(te+CHANNEL_COUNT_RVA,0);ordinary_use();
+    CHECK(silence && s->seen_on && !s->armed);put(te+CHANNEL_COUNT_RVA,1);*(float*)(globals+12)=5;
+    ordinary_use();CHECK(silence && radio[0x734]);
+    puts("PASS early landmark off before readiness, first ordinary Use, delayed readiness, repeated Use and established-stream loss refusal");
+}
+
+static void test_initial_stream_guards(void)
+{
+    RadioState *s; unsigned variant; uint8_t *ch=te+CHANNEL_ARRAY_RVA;
+    /* A created, zero-position stream is not a playback checkpoint. */
+    reset();logic();radio[0x104]=0;radio[0x734]=1;
+    *(float*)(globals+12)=100;radio_base_activate(radio,NULL);s=radio_state(radio);
+    witness();*(float*)(globals+12)=105;ordinary_use();CHECK(silence && !s->seen_on && !s->armed && s->initial_pending==2);
+    cached_loop();*(float*)(globals+12)=110;ordinary_use();CHECK(!silence && decoded==10*44100);
+    /* Initial identity must survive zero-position readiness and reject a
+       replacement, even when its decoder would otherwise be supported. */
+    reset();logic();radio[0x104]=0;radio[0x734]=1;radio_base_activate(radio,NULL);ordinary_use();
+    cached_loop();put(ch+4,(uint32_t)(uintptr_t)(mixer+4));ordinary_use();CHECK(silence);
+    put(ch+4,(uint32_t)(uintptr_t)mixer);
+    /* Malformed/ambiguous/time-invalid states cannot become readiness if a
+       different valid stream appears later. Also guard missing-after-start
+       without relying on a caption callback being enabled. */
+    for(variant=0;variant<7;variant++) {
+        reset();logic();radio[0x104]=0;radio[0x734]=1;radio_base_activate(radio,NULL);
+        if(variant==0) put(mixer,(uint32_t)(uintptr_t)te);
+        if(variant==1) put(source+8,0);
+        if(variant==2) *(double*)(mixer+8)=-1;
+        if(variant==3) {memcpy(ch+CHANNEL_SIZE,ch,CHANNEL_SIZE);put(te+CHANNEL_COUNT_RVA,2);}
+        if(variant==4) *(float*)(globals+12)=-1;
+        if(variant==5) {witness();*(float*)(globals+12)=2;put(te+CHANNEL_COUNT_RVA,0);}
+        if(variant==6) {ordinary_use();witness();put(ch+4,0);}
+        if(variant!=6) ordinary_use(); else ordinary_switch(0);
+        s=radio_state(radio);CHECK(s->initial_pending==-1 && silence);
+        put(mixer,(uint32_t)(uintptr_t)(te+0x188600));put(source+8,44100);*(double*)(mixer+8)=0;
+        put(te+CHANNEL_COUNT_RVA,1);put(ch+4,(uint32_t)(uintptr_t)mixer);*(float*)(globals+12)=3;cached_loop();
+        ordinary_switch(1);CHECK(silence);
+    }
+    /* A stream that already advanced uses its actual off checkpoint, without
+       any caption callback. This preserves saved-on playback coordinates. */
+    reset();logic();radio[0x104]=0;radio[0x734]=1;*(float*)(globals+12)=1000;
+    radio_base_activate(radio,NULL);cached_loop();*(double*)(mixer+8)=7*44100;decoded=7*44100;
+    *(float*)(globals+12)=1007;ordinary_use();s=radio_state(radio);CHECK(s->armed && !s->initial_pending);
+    *(float*)(globals+12)=1012;ordinary_use();CHECK(!silence && decoded==12*44100);
+    puts("PASS zero-position epoch, initial stream binding, malformed/ambiguous/time/loss guards and saved-on without caption callback");
+}
+
+static void test_static_creation(void)
+{
+    RadioState *s;StaticSoundFn entry;unsigned before;
+    reset();logic();radio_base_activate(radio,NULL);s=radio_state(radio);static_calls=0;
+    witness();CHECK(static_calls==1 && s->initial_pending==2 && s->mixer==mixer);
+    witness();CHECK(static_calls==2 && s->initial_pending==-1); /* duplicate cannot reopen */
+    reset();logic();radio_base_activate(radio,NULL);put(te+CHANNEL_COUNT_RVA,0);witness();
+    CHECK(radio_state(radio)->initial_pending==-1); /* native creation failed */
+    reset();logic();radio_base_activate(radio,NULL);s=radio_state(radio);
+    /* Execute the actual guarded CALL and its native 48-byte caller cleanup. */
+    prepare_hook(&hooks[5],site(5),(uint8_t*)radio_static_sound);CHECK(install_hook(&hooks[5]));
+    /* cdecl fixture copies the caller's twelve words with the same offsets
+       used by native argument pushes, then executes the real patched site. */
+    {unsigned n;uint32_t esp_before,esp_after,result;double x87;
+     for(n=0;n<12;n++)memcpy(te+STATIC_SOUND_CALL_RVA-48+n*4,"\xff\x74\x24\x30",4);
+     memcpy(te+STATIC_SOUND_CALL_RVA+5,"\x83\xc4\x30\xc3",4);
+     entry=(StaticSoundFn)(te+STATIC_SOUND_CALL_RVA-48);original_static_sound=static_stub;before=static_calls;
+     __asm__ volatile("fld1; movl %%esp,%0":"=m"(esp_before));
+     result=entry(222,6,(uint32_t)(uintptr_t)sfx,4,5,6,0x3f800000,8,9,100,11,0x3f000000);
+     __asm__ volatile("movl %%esp,%0; fstpl %1":"=m"(esp_after),"=m"(x87));
+     CHECK(result==0x12345678 && esp_before==esp_after && x87==1.0 && static_calls==before+1 && s->initial_pending==2);}
+    puts("PASS static create cdecl twelve-word forwarding/return/x87, identity binding, failed and repeated creation refusal");
+}

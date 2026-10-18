@@ -11,6 +11,7 @@ enum {
     RADIO_FAKE_SILENCE_THUNK_RVA = 0x2874,
     RADIO_ACTIVATE_CALL_RVA = 0x22c50f, RADIO_BASE_ACTIVATE_THUNK_RVA = 0x1226,
     RADIO_SPAWN_CALL_RVA = 0x22c360, RADIO_SWITCH_THUNK_RVA = 0x331e,
+    STATIC_SOUND_CALL_RVA = 0x2b97b, STATIC_SOUND_RVA = 0x11f620,
     PAUSED_RVA = 0x314874, PLAT_TIME_IAT_RVA = 0x173324,
     CHANNEL_COUNT_RVA = 0x13107d4, CHANNEL_ARRAY_RVA = 0x1310b08,
     CHANNEL_SIZE = 0xa0, MAX_CHANNELS = 128, MAX_RADIOS = 32
@@ -35,6 +36,7 @@ typedef struct {
     int epoch_valid, off_position, off_rate, seen_on, armed;
     uint8_t *phase_source, *phase_mixer, *phase_sfx, *phase_channel;
     int loop_samples, loop_checked;
+    int initial_pending; /* 1 awaiting client create, 2 bound/unplayed, 0 played, -1 invalid */
 } RadioState;
 
 typedef void (__thiscall *FakeSilenceFn)(void *, int);

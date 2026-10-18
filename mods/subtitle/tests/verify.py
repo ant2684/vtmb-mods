@@ -7,7 +7,7 @@ ROOT=Path(__file__).resolve().parents[1]
 parser=argparse.ArgumentParser();parser.add_argument('--game',default=r'LOCAL_GAME_ROOT_REQUIRED');parser.add_argument('--plugin',default=str(ROOT/'build/subtitle-pause-fix.vtm'));opt=parser.parse_args();GAME=Path(opt.game)
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest().upper()
 supported={'Bin/engine.dll':'9D00B2C1E5EDBAD052FB0B514634BA54574666E12D1B408C46CE141D51ED2313','Vampire/dlls/vampire.dll':'C546F4DE2003624D72F54D03805E0DBE1D8157231ADCC62368FF53FE6E48A76F'}
-anchors=[('Bin/engine.dll',0x1188b0,'8b11ff5238d95c24048b74241085f6',0,5),('Bin/engine.dll',0x2d130,'e85bf0000085c0a3',0,5),('Vampire/dlls/vampire.dll',0x22c50d,'8bcee8124dddff83be4c070000ff',2,5),('Vampire/dlls/vampire.dll',0x22c803,'6a018bcee86860ddff',4,5),('Vampire/dlls/vampire.dll',0x22c34e,'8a86040200008bcea80174046a01eb026a00e8b96fddff',18,5),('Vampire/dlls/vampire.dll',0x331e,'e92d942200',0,5)]
+anchors=[('Bin/engine.dll',0x2b972,'8d4c244051506a0652e8a03c0f0083c430',9,5),('Bin/engine.dll',0x1188b0,'8b11ff5238d95c24048b74241085f6',0,5),('Bin/engine.dll',0x2d130,'e85bf0000085c0a3',0,5),('Vampire/dlls/vampire.dll',0x22c50d,'8bcee8124dddff83be4c070000ff',2,5),('Vampire/dlls/vampire.dll',0x22c803,'6a018bcee86860ddff',4,5),('Vampire/dlls/vampire.dll',0x22c34e,'8a86040200008bcea80174046a01eb026a00e8b96fddff',18,5),('Vampire/dlls/vampire.dll',0x331e,'e92d942200',0,5)]
 dis=capstone.Cs(capstone.CS_ARCH_X86,capstone.CS_MODE_32);report={'supported':{},'anchors':[],'checks':[]}
 for n,h in supported.items():assert sha(GAME/n)==h;report['supported'][n]=h
 for n,rva,signature,delta,length in anchors:

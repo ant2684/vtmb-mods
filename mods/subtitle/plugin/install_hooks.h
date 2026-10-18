@@ -1,11 +1,11 @@
-/* All five hook sites are validated before any code write. A failed install
+/* All six hook sites are validated before any code write. A failed install
    rolls back in reverse order and retains callable helper memory if OS rollback
    cannot be certified. Rechecks after VirtualProtect detect intervening owners. */
 typedef struct {
     uint8_t *site; uint8_t original[5], patch[5]; DWORD protection;
     int changed, protected_once;
 } CallHook;
-enum { HOOK_COUNT = 5 };
+enum { HOOK_COUNT = 6 };
 static CallHook hooks[HOOK_COUNT];
 static int installation_failed;
 static int restore_hook(CallHook *h)
@@ -66,11 +66,13 @@ static int install_all(uint8_t *engine, uint8_t *server)
     static const uint8_t radio_signature[] = {0x6a,0x01,0x8b,0xce,0xe8,0x68,0x60,0xdd,0xff};
     static const uint8_t activate_signature[] = {0x8b,0xce,0xe8,0x12,0x4d,0xdd,0xff,0x83,0xbe,0x4c,0x07,0x00,0x00,0xff};
     static const uint8_t spawn_signature[] = {0x8a,0x86,0x04,0x02,0x00,0x00,0x8b,0xce,0xa8,0x01,0x74,0x04,0x6a,0x01,0xeb,0x02,0x6a,0x00,0xe8,0xb9,0x6f,0xdd,0xff};
+    static const uint8_t static_signature[] = {0x8d,0x4c,0x24,0x40,0x51,0x50,0x6a,0x06,0x52,0xe8,0xa0,0x3c,0x0f,0x00,0x83,0xc4,0x30};
     DWORD old; unsigned i;
     if (engine_installed || radio_installed || installation_failed || clock_code) return 0;
     if (!engine || !server || has_old_spcode(engine) ||
         !unique_code_signature(engine, clock_signature, sizeof(clock_signature), CLOCK_HOOK_RVA) ||
         !unique_code_signature(engine, pause_signature, sizeof(pause_signature), PAUSE_HOOK_RVA) ||
+        !unique_code_signature(engine, static_signature, sizeof(static_signature), STATIC_SOUND_CALL_RVA - 9) ||
         !unique_code_signature(server, radio_signature, sizeof(radio_signature), RADIO_SIGNATURE_RVA) ||
         !unique_code_signature(server, activate_signature, sizeof(activate_signature), RADIO_ACTIVATE_CALL_RVA - 2) ||
         !unique_code_signature(server, spawn_signature, sizeof(spawn_signature), RADIO_SPAWN_CALL_RVA - 18) ||
@@ -82,6 +84,7 @@ static int install_all(uint8_t *engine, uint8_t *server)
     engine_module = engine; server_module = server;
     original_fake_silence = (FakeSilenceFn)(server + RADIO_FAKE_SILENCE_THUNK_RVA);
     original_base_activate = (BaseActivateFn)(server + RADIO_BASE_ACTIVATE_THUNK_RVA);
+    original_static_sound = (StaticSoundFn)(engine + STATIC_SOUND_RVA);
     original_radio_switch = (FakeSilenceFn)(server + RADIO_SWITCH_THUNK_RVA);
     clock_code = (uint8_t *)VirtualAlloc(NULL, 0x1000, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
     clock_state = (uint8_t *)VirtualAlloc(NULL, 0x1000, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
@@ -95,6 +98,7 @@ static int install_all(uint8_t *engine, uint8_t *server)
     prepare_hook(&hooks[2], server + RADIO_ACTIVATE_CALL_RVA, (uint8_t *)radio_base_activate);
     prepare_hook(&hooks[3], server + RADIO_CALL_RVA, (uint8_t *)radio_fake_silence);
     prepare_hook(&hooks[4], server + RADIO_SPAWN_CALL_RVA, (uint8_t *)radio_spawn_switch);
+    prepare_hook(&hooks[5], engine + STATIC_SOUND_CALL_RVA, (uint8_t *)radio_static_sound);
     for (i = 0; i < HOOK_COUNT; ++i) if (!install_hook(&hooks[i])) { rollback_all(); return 0; }
     engine_installed = radio_installed = 1;
     return 1;

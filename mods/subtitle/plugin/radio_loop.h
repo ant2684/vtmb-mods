@@ -73,8 +73,14 @@ static int __cdecl radio_sample_phase(uint8_t *channel, int position, int rate)
             s->index != *(uint32_t *)(channel + 0x2c) ||
             *(void **)(table + s->index * 12 + 4) != s->entity ||
             *(uint32_t *)(table + s->index * 12 + 8) != s->serial) continue;
-        if (find_radio_stream_channel(s, &c) && c.channel == channel && c.rate == rate &&
-            ensure_loop_samples(s, &c)) return position % s->loop_samples;
+        if (find_radio_stream_channel(s, &c) == 1 && c.channel == channel && c.rate == rate) {
+            /* A running native stream ends initial readiness. Later loss must
+               never be mistaken for the early landmark-off case. */
+            if (s->initial_pending > 0 && c.position > 0 &&
+                !*((uint8_t *)s->entity + 0x104) &&
+                (!s->channel || same_radio_stream(s, &c))) s->initial_pending = 0;
+            if (ensure_loop_samples(s, &c)) return position % s->loop_samples;
+        }
         break;
     }
     return position;
