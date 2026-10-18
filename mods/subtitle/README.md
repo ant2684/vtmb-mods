@@ -1,8 +1,8 @@
-# Subtitle Pause Fix 1.3.0 maintenance source
+# Subtitle Pause Fix 1.3.1 source
 
 Synchronizes native subtitle pause and radio activation/catch-up/loop caption coordinates while preserving television and other speech paths.
 
-Based on the accepted 1.3.0 source capsule, with an unpublished startup correction. A fifth guarded callsite preserves the map's initial radio switch during Spawn, before Activate creates its stream. A sixth guarded client static-sound callsite records initial stream creation. Early landmark-off before that event, or before the bound stream has played, preserves first-on catch-up from the Activate epoch. Lost, replaced, ambiguous and unsupported streams remain muted. Public version numbers and existing release ZIPs are unchanged.
+Preserves the map's native radio state during Spawn and handles first activation after an early map-entry shutdown. A guarded client static-sound callsite records initial stream creation, so zero-position readiness keeps the broadcast epoch while later missing, replaced, ambiguous and unsupported streams remain muted. The gameplay payload contains only the clean loader plugin and manual README.
 
 From the repository root:
 

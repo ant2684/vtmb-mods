@@ -2124,76 +2124,91 @@
       "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
       "member": "plugin/install_hooks.h",
       "original_sha256": "0698CAB4118D5CBA876F45BF49C2B2CA7FC058B1337DA19E662CA635E937B4B3",
-      "classification": "original workspace source/patch recipe",
+      "classification": "original workspace source, maintained for Subtitle Pause Fix 1.3.1",
       "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
-      "published": true,
+      "published": false,
       "public_sha256": "0698CAB4118D5CBA876F45BF49C2B2CA7FC058B1337DA19E662CA635E937B4B3",
       "transforms": [
         "UTF-8/LF",
         "private-path placeholders",
-        "historical-script notice when applicable"
-      ]
+        "historical-script notice when applicable",
+        "radio startup and first activation release maintenance"
+      ],
+      "preceding_public_sha256": "0698CAB4118D5CBA876F45BF49C2B2CA7FC058B1337DA19E662CA635E937B4B3",
+      "source_sha256_lf": "ECEE32C8B7773C6341FF27FD63488440F054253C1B084F2AA67C24F38D1BB1FD"
     },
     {
       "file": "mods/subtitle/plugin/radio_loop.h",
       "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
       "member": "plugin/radio_loop.h",
       "original_sha256": "5E56591423B8ED54F14F64B952563ACF1E62D617D125B491AC21D70746362F26",
-      "classification": "original workspace source/patch recipe",
+      "classification": "original workspace source, maintained for Subtitle Pause Fix 1.3.1",
       "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
-      "published": true,
+      "published": false,
       "public_sha256": "5E56591423B8ED54F14F64B952563ACF1E62D617D125B491AC21D70746362F26",
       "transforms": [
         "UTF-8/LF",
         "private-path placeholders",
-        "historical-script notice when applicable"
-      ]
+        "historical-script notice when applicable",
+        "radio startup and first activation release maintenance"
+      ],
+      "preceding_public_sha256": "5E56591423B8ED54F14F64B952563ACF1E62D617D125B491AC21D70746362F26",
+      "source_sha256_lf": "4149C95FD92BC26BFDEB92E2BEE1DB4C140DA932BB47749A5331DEEB7341A502"
     },
     {
       "file": "mods/subtitle/plugin/radio_sync.h",
       "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
       "member": "plugin/radio_sync.h",
       "original_sha256": "99D8F1F41067F9CF06A3D590DCC8BCFF2014B39D338FB0453BBB46AE7B22FA55",
-      "classification": "original workspace source/patch recipe",
+      "classification": "original workspace source, maintained for Subtitle Pause Fix 1.3.1",
       "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
-      "published": true,
+      "published": false,
       "public_sha256": "99D8F1F41067F9CF06A3D590DCC8BCFF2014B39D338FB0453BBB46AE7B22FA55",
       "transforms": [
         "UTF-8/LF",
         "private-path placeholders",
-        "historical-script notice when applicable"
-      ]
+        "historical-script notice when applicable",
+        "radio startup and first activation release maintenance"
+      ],
+      "preceding_public_sha256": "99D8F1F41067F9CF06A3D590DCC8BCFF2014B39D338FB0453BBB46AE7B22FA55",
+      "source_sha256_lf": "6D990B607AFC047A72483A0E79F1666C4FD90F14E7BFB413B6D3CFD50446D665"
     },
     {
       "file": "mods/subtitle/plugin/subtitle_pause.c",
       "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
       "member": "plugin/subtitle_pause.c",
       "original_sha256": "79EC56BFE49B7B9DEB3AC08C8C6E8209FC95C5153E9135B95CA25CE122CF2862",
-      "classification": "original workspace source/patch recipe",
+      "classification": "original workspace source, maintained for Subtitle Pause Fix 1.3.1",
       "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
-      "published": true,
+      "published": false,
       "public_sha256": "E924B56336DFEB5356929CE75C31FB64461F188FE6F6196190960F73EB659281",
       "transforms": [
         "UTF-8/LF",
         "private-path placeholders",
-        "historical-script notice when applicable"
-      ]
+        "historical-script notice when applicable",
+        "radio startup and first activation release maintenance"
+      ],
+      "preceding_public_sha256": "E924B56336DFEB5356929CE75C31FB64461F188FE6F6196190960F73EB659281",
+      "source_sha256_lf": "CFA5C5D97DA80DE2BD2661995F682731ED25BAFF2C4413881FE3E3DB2E898BB2"
     },
     {
       "file": "mods/subtitle/README.md",
       "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
       "member": "README.md",
       "original_sha256": "A0181F3ADFA0E8E389EB10C3858C450C1ED8F757911B9BF0726909F93AFBE03F",
-      "classification": "original workspace source/patch recipe",
+      "classification": "original workspace source, maintained for Subtitle Pause Fix 1.3.1",
       "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
-      "published": true,
+      "published": false,
       "public_sha256": "96B22B0AC68B4B2AA129B3EFC85476DBE3446D10A1C29EFE8A1354F292A68239",
       "transforms": [
         "UTF-8/LF",
         "private-path placeholders",
         "historical-script notice when applicable",
-        "maintenance documentation update"
-      ]
+        "maintenance documentation update",
+        "radio startup and first activation release maintenance"
+      ],
+      "preceding_public_sha256": "96B22B0AC68B4B2AA129B3EFC85476DBE3446D10A1C29EFE8A1354F292A68239",
+      "source_sha256_lf": "4EB807749A4F8BD2DCF0DB05022FEF59C22397590D389992DC59A2C0C80A8EA5"
     },
     {
       "file": "mods/subtitle/tests/audit_evidence.py",
@@ -2489,15 +2504,18 @@
       "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
       "member": "tests/native_harness.c",
       "original_sha256": "80475018CF2FB6E7626AA3BBCA62525611250C9506669209ADB7FE759C2403BB",
-      "classification": "original workspace source/patch recipe",
+      "classification": "original workspace source, maintained for Subtitle Pause Fix 1.3.1",
       "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
-      "published": true,
+      "published": false,
       "public_sha256": "80475018CF2FB6E7626AA3BBCA62525611250C9506669209ADB7FE759C2403BB",
       "transforms": [
         "UTF-8/LF",
         "private-path placeholders",
-        "historical-script notice when applicable"
-      ]
+        "historical-script notice when applicable",
+        "radio startup and first activation release maintenance"
+      ],
+      "preceding_public_sha256": "80475018CF2FB6E7626AA3BBCA62525611250C9506669209ADB7FE759C2403BB",
+      "source_sha256_lf": "02BCD06F645F64785AB4FF66B2018D30010088526ACAF8DB358D74ED92A95DC9"
     },
     {
       "file": "mods/subtitle/tests/observe.py",
@@ -2583,15 +2601,18 @@
       "capsule": "_Source Capsules/Subtitle Pause Fix 1.3.0 Source.zip",
       "member": "tests/verify.py",
       "original_sha256": "4117A56D509C24197891952EA209D69CB0110A5DAC1A8EF814EAFE383D91C0BF",
-      "classification": "original workspace source/patch recipe",
+      "classification": "original workspace source, maintained for Subtitle Pause Fix 1.3.1",
       "license": "MIT: user-authorized original material; game signature constants excluded from ownership claim",
-      "published": true,
+      "published": false,
       "public_sha256": "A5910A32640EC9E5448A8B4486B9A6A1BF7D3704D9D952DA205768FB6DE5F6C6",
       "transforms": [
         "UTF-8/LF",
         "private-path placeholders",
-        "historical-script notice when applicable"
-      ]
+        "historical-script notice when applicable",
+        "radio startup and first activation release maintenance"
+      ],
+      "preceding_public_sha256": "A5910A32640EC9E5448A8B4486B9A6A1BF7D3704D9D952DA205768FB6DE5F6C6",
+      "source_sha256_lf": "4058229C43659A2BC194A181EB4B999C9E88AF9DE49EF118E14172ED31F8C730"
     },
     {
       "file": "mods/subtitle/tools/finalize_pe.py",

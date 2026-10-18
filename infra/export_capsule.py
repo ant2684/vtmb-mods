@@ -25,7 +25,11 @@ def export(mod,output,reference=None):
             files[path.relative_to(ROOT).as_posix()]=path.read_bytes()
     for name in ['RunTests.ps1','Setup.ps1','requirements.txt','local.example.json','LICENSE','NOTICE']:
         files[name]=(ROOT/name).read_bytes()
-    for path in (ROOT/'tests').glob('*.py'):files[path.relative_to(ROOT).as_posix()]=path.read_bytes()
+    for path in (ROOT/'tests').glob('*.py'):
+        # Container-owned tests import that mod's sources directly. Other
+        # single-mod capsules must retain only the shared infrastructure tests.
+        if path.stem.startswith('test_container_') and mod != 'container':continue
+        files[path.relative_to(ROOT).as_posix()]=path.read_bytes()
     for name in ['gameplay.md','lessons.md']:
         files['docs/'+name]=(ROOT/'docs'/name).read_bytes()
     data=catalog();data['mods']={mod:mod_info(mod)}
@@ -49,6 +53,12 @@ def export(mod,output,reference=None):
         if mod=='container':data['mods'][mod]['plugin_sha256']=digest(reference)
         files['infra/release_data.py']=('DATA = '+repr(data)+'\n').encode()
     maintenance = ('Console Pause Fix '+data['mods'][mod]['version']+' hides the Minimize button and disables its cached title-menu item using guarded native methods. For the included exact reference, use `./RunTests.ps1 -Suite offline -Mod console -Scenario console.exact -Candidate ./reference/console-pause-fix.vtm -Config ./local.json`. The embedded catalog is a dated verification input; this explicit selection avoids requiring older packages or a self-referential capsule hash. Use console.minimize with that reference for fresh gameplay observations. Recorded control coverage has an external five-second wait; an earlier menu-to-console opening failed despite engine key receipt, and its downstream cause remains unresolved. The plugin adds no wait. Sources retain cache-flush refusal probes; their known failure is not certified by passing ordinary checks.\n' if mod=='console' else 'Native code is unchanged from the current source capsule. Shared adapters and tests are maintenance updates, with no public mod version change.\n')
+    if mod=='subtitle':
+        # A capsule cannot embed its own ZIP hash. The repository catalog pins
+        # that archive; the extraction verifies its included exact reference.
+        data['archives'].pop(data['mods'][mod]['capsule'],None)
+        files['infra/release_data.py']=('DATA = '+repr(data)+'\n').encode()
+        maintenance=('Subtitle Pause Fix '+data['mods'][mod]['version']+' preserves native radio startup state and first activation after early map-entry shutdown. Sources retain clock/dispatcher, stream identity, decoder failure, startup and installation rollback regressions. For the included exact reference, use `./RunTests.ps1 -Suite offline -Mod subtitle -Scenario subtitle.exact -Candidate ./reference/subtitle-pause-fix.vtm -Config ./local.json`. The embedded catalog omits this capsule hash to avoid self-reference; the repository catalog verifies the full archive pair. `mods/subtitle/tests/transition_gameplay.py` runs the complete tutorial/dialogue/first-use/reload/Red Spot scenario automatically with explicit local save, final plugin, matching external symbol map and process-audio helper inputs; its independent auditor is `audit_transition.py`. Interactive debug mode is for diagnosis only. Technical checks do not certify fresh gameplay, and raw saves/audio/captures remain local.\n')
     if mod=='container':maintenance='Unreleased candidate. The included reference is verified with `./RunTests.ps1 -Suite offline -Mod container -Scenario container.exact -Candidate ./reference/container-stack-fix.vtm -Config ./local.json`. Run container.stacks for fresh gameplay and container.baseline to reproduce the original filter without installing the candidate. Supply saves.container and local supported game modules. No public release version is assigned.\n'
     files['README.md']=('# '+data['mods'][mod]['title']+' source capsule\n\nSelf-contained sources and regression infrastructure. This capsule is not installed into the game.\n\nUse `./RunTests.ps1 -Suite ci -Mod '+mod+' -Config ./local.json` or `-Suite offline`. Copy local.example.json to local.json and provide pinned Zig 0.15.2 and local inputs. See docs/gameplay.md for opt-in gameplay and recovery. Reference certificates are historical evidence only.\n\n'+maintenance).encode()
     output.parent.mkdir(parents=True,exist_ok=True)
