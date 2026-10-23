@@ -1,5 +1,10 @@
 # VTMB mods and regression tests
 
+Ongoing development and detailed research are maintained in the owner's private
+workbench. This repository receives selected source, tests and public documentation
+only when the owner explicitly requests publication. See
+[development and publication policy](docs/PUBLICATION_POLICY.md).
+
 Source and tests for Console Pause, Protean Improved Core and its two model
 alternatives, Frenzy Fixes, Subtitle Pause, Cutscene Subtitle Background and
 History Stat Reset. Current release archives are pinned. Subtitle Pause Fix

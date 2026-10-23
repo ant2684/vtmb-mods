@@ -1,9 +1,10 @@
 # Adding a future mod
 
-Keep related mods in this repository so a common runner, recovery protocol and
-CI have one implementation. Use a separate repository only for a different
-ownership/license boundary or an independently maintained project. Game data
-and private evidence remain local in either case.
+Develop related mods in the private workbench so source, helpers, tests and
+research have one primary history. Export selected original source and public
+instructions here only after the owner explicitly requests publication, following
+PUBLICATION_POLICY.md. Preserve shared runner/recovery helpers in that export.
+Private research, personal data and game inputs do not belong in the public tree.
 
 Start with a requirement and transition table using the format in lessons.md.
 Each scenario needs a stable ID/version, platform, mandatory inputs, finite
