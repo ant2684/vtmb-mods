@@ -22,6 +22,15 @@ jobs:
       - name: Source and synthetic regressions
         shell: pwsh
         run: ./RunTests.ps1 -Suite ci -Config .local/ci.json -Output .local/results/ci.json
+      - name: Protean Frenzy source and synthetic regressions
+        shell: pwsh
+        run: |
+          python -B mods/protean-frenzy/tests/verify_fixture_priorities.py
+          if ($LASTEXITCODE) { throw 'Fixture priorities failed' }
+          & .local/tools/ziglang/zig.exe cc -target x86-windows-gnu -O2 -g0 -s -I mods/protean-frenzy/_support mods/protean-frenzy/tests/native_claws_frenzy.c -o .local/protean-claws-synthetic.exe
+          if ($LASTEXITCODE) { throw 'Synthetic fixture compilation failed' }
+          & .local/protean-claws-synthetic.exe
+          if ($LASTEXITCODE) { throw 'Synthetic candidate isolation failed' }
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

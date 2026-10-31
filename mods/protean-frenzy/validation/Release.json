@@ -1,0 +1,26 @@
+{
+  "version": "1.3.1",
+  "plugin_sha256": "93840c22c2a8f20d137bab8cead2b2f6d1218ad5b06943252b9512951ef20e8a",
+  "native_input_identities": {
+    "Vampire/dlls/vampire.dll": "c546f4de2003624d72f54d03805e0dbe1d8157231adcc62368ff53fe6e48a76f",
+    "Vampire/cl_dlls/client.dll": "e88beae0dd03af06493c71c5e8d87a6993b54e590cb6ad37cd3513c588582870"
+  },
+  "qualification": {
+    "configuration_masks": 256,
+    "invalid_values": 8,
+    "system_fault_cases": 232,
+    "exact_model_cases": 6,
+    "stock_zero_weights_and_ordinary_combos": true,
+    "native_only_artifact": true,
+    "loader_compatibility": true,
+    "fixture_relationship_priorities": 10,
+    "complete_inventory_disabled_gameplay_processes": 1,
+    "gameplay": "Seven complete ordinary chains, air attack, block/release and eight sneak directions with InventoryFixes=0"
+  },
+  "limits": [
+    "Historical whole-project gameplay workflows were not all rerun for the final option-isolation change",
+    "Both sexes covered offline with exact DLL and models; final focused gameplay uses the male model",
+    "Arbitrary game binaries, third-party hook conflicts, clans and armor combinations are not universally certified"
+  ],
+  "privacy": "Local settings, personal saves, recordings and private validation journals are not distributed"
+}

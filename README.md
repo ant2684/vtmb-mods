@@ -1,5 +1,11 @@
 # VTMB mods and regression tests
 
+[Protean & Frenzy Improved 1.3.1](mods/protean-frenzy/README.md) combines the
+native Protean/Frenzy fixes in one complete package. See its standalone build
+and regression commands and [release notes](docs/protean-frenzy-1.3.1.md).
+Existing legacy model alternatives and separate mod releases remain available.
+
+
 Ongoing development and detailed research are maintained in the owner's private
 workbench. This repository receives selected source, tests and public documentation
 only when the owner explicitly requests publication. See
