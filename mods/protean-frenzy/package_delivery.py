@@ -16,77 +16,42 @@ cfg=json.loads(args.config.read_text());out=Path(cfg['output']);game=Path(cfg['g
 def sha(data):return hashlib.sha256(data).hexdigest()
 seal=json.loads((out/'accepted.json').read_text());assert seal['passed']
 plugin=out/'Payload/Bin/loader/protean-frenzy-improved.vtm';assert sha(plugin.read_bytes())==seal['plugin_sha256']
-game_readme='''Protean & Frenzy Improved - native runtime
+game_readme='''Protean & Frenzy Improved
 
-One native plugin with eight startup INI settings. Requires 32-bit Steam
-Bloodlines, supported Unofficial Patch 12.0 native modules and Game Mod Loader.
-All mod logic runs in the plugin. No modified Python file is supplied or required;
-the game retains its own stock scripts. Native hook ownership is checked at load.
+Improves Protean transformations, Claws combat and Frenzy behavior, including
+Claws sneak attacks and the Griffith Park werewolf encounter.
+Requires Bloodlines, Unofficial Patch 12.0 and Game Mod Loader.
 
-MANUAL INSTALLATION AND UPGRADE
-Close the game. Back up every file you replace and your current vamputil.py.
-Copy the CONTENTS of Core into the game root.
-Keep protean-frenzy-improved.ini beside protean-frenzy-improved.vtm.
-If upgrading from the earlier Python-supported release, restore your ORIGINAL,
-unmodified UP 12.0 Unofficial_Patch/python/vamputil.py from your own backup or
-matching patch installation. This package intentionally does not replace it.
-For a file customized by other mods, preserve those changes and remove only the
-previous Protean support after comparing your original; arbitrary script/native
-mod combinations are outside the tested compatibility claim.
+INSTALLATION
+1. Close the game and back up the files you will replace.
+2. Copy the contents of Core into the game folder containing Vampire.exe.
+3. Copy any chosen Optional components into the same game folder.
 
-OPTIONAL RESOURCES
-Copy the contents of the chosen Optional directory into the game root:
-ClawsModels: the matching male/female compact Claws models and their existing
-animations, combos and hit metadata. Required by ClawsComboBuffer.
-StealthSound: Broadsword success clip and original failed Claws clip.
-StealthBlood: finite Katana-equivalent blood emitter.
-FrenzyLibrary / FrenzyGriffith: Frenzy permission on the supplied supported maps.
-Native settings cannot undo copied models, sounds, particles or maps. Back up
-custom resources and do not overwrite custom map edits without review.
+OPTIONAL COMPONENTS
+ClawsModels: updated Claws animations. Install both male and female models.
+StealthSound: Claws sneak-attack sounds.
+StealthBlood: Claws sneak-attack blood effects.
+FrenzyLibrary / FrenzyGriffith: enable Frenzy on the included Library and
+Griffith Park maps. Back up existing map files before replacing them.
 
-SETTINGS IN [Fixes]
-WarformFrenzy: Protean 5/Frenzy ownership, bonuses and end ordering.
-FilterLoadFix: saved-active Protean brightness independently of RedVision.
-InventoryFixes: duplicate/nested registration, fists slot, retained Claws and
-native owned-Shadow Frenzy effects/equipment even when map Outputs are disabled.
-ProteanTransformFixes: paired scene, immediate action interruption, feeding/timer,
-return FX, load recovery and native delayed-idle ownership. Requires InventoryFixes.
-ClawsComboBuffer: fresh-click 150ms continuation buffer; holding does not combo.
-ClawsStealthPosition: shared Protean/Tiger successful paired positioning and exit.
-MeleeFrenzy: selected supported native melee weapon. Requires InventoryFixes.
-GriffithFrenzyCollision: scoped Werewolf/Shadow collision and ground support;
-map Frenzy permission is a separate resource component.
-All default to 1. Use 0 to disable; invalid values disable the affected option.
-Missing settings default to 1. Restart after edits. InventoryFixes=0 also prevents
-native transform and custom Melee binding. Historical Core aliases are not read.
-Full descriptions and dependency/disabled behavior are in the INI.
+SETTINGS
+Edit Bin/loader/protean-frenzy-improved.ini. Set an option to 1 to enable it
+or 0 to disable it, then restart the game. Descriptions are beside each option.
+InventoryFixes is required by ProteanTransformFixes and MeleeFrenzy.
+ClawsComboBuffer requires the supplied Claws models.
+Model and map changes remain installed when INI options are disabled.
 
 ROLLBACK
-Close the game. Remove protean-frenzy-improved.vtm and its INI. Restore your old
-native modules and all resources you replaced. Restore BOTH models together.
-Restore your previous vamputil.py if you changed it during upgrade. Remove an
-added loose resource only if it was absent before installation. The separate
-local rollback archive applies only to the local setup recorded in that archive.
-
-SCOPE
-No rejected guard, global idle-command suppression, Tiger pose redesign or new
-attack-speed/damage balance. Native owned timers discard stale scheduled alert
-exits; ordinary direct idle commands remain available outside an owned morph.
-Supported local setup only; arbitrary clan/armor/mod combinations and exact Frenzy
-cadence equivalence are not certified. Technical checks and owner acceptance are
-separate. This archive has no executable installer or diagnostic plugin.
+Close the game and restore the files you backed up before installation.
+Remove a supplied file only if it was absent before installation.
+Restore both Claws models together.
 '''
-rollback_readme='''Protean & Frenzy Improved - LOCAL PRE-INSTALLATION ROLLBACK
+rollback_readme='''Protean & Frenzy Improved - Local pre-installation backup
 
-This archive preserves the local setup recorded when the unified package was
-prepared. It is not a pristine game baseline and is not universal for other PCs.
-Close the game. Remove Bin/loader/protean-frenzy-improved.vtm and
-Bin/loader/protean-frenzy-improved.ini (both were absent in this recorded setup).
-Copy the contents of Original into the game directory, replacing the included
-old plugins/resources. Restore both Claws models together and restore the prior
-vamputil.py. Do not load the unified and replaced plugins simultaneously.
-Keep unrelated mods, settings and saves. For a different installation, use its
-own pre-installation backup instead. This archive contains no executable installer.
+Use this backup only with the installation it was created from.
+Close the game. Remove the added protean-frenzy-improved.vtm and its INI,
+then copy the contents of Original into the game folder.
+Restore both Claws models together.
 '''
 payload={}
 for p in (out/'Payload').rglob('*'):
@@ -111,49 +76,41 @@ if args.flat_game:
         assert rel and rel not in flat,('Duplicate complete-game destination',name)
         flat[rel]=data
     payload=flat
-    game_readme="""Protean & Frenzy Improved - Complete Native Package
+    game_readme="""Protean & Frenzy Improved
 
-Requires 32-bit Bloodlines, supported Unofficial Patch 12.0 and Game Mod Loader.
-This is the complete package, not an update requiring an earlier Protean package.
-It includes one native VTM, its INI, both matching Claws models, stealth sound and
-blood resources, and the two supported maps with Frenzy permission enabled.
+Improves Protean transformations, Claws combat and Frenzy behavior, including
+Claws sneak attacks and the Griffith Park werewolf encounter.
+Requires Bloodlines, Unofficial Patch 12.0 and Game Mod Loader.
 
 INSTALLATION
-Close the game. Preserve your previous versions of the files you replace. Extract
-the CONTENTS of this archive into the game root, beside Vampire.exe. Install both
-Claws models with this VTM. Keep existing INI values when upgrading custom settings.
-The map files replace the supplied supported variants; preserve custom map edits.
+1. Close the game and back up the files this archive will replace.
+2. Extract the archive into the game folder containing Vampire.exe, merging
+   the Bin and Unofficial_Patch folders.
+3. Start the game.
 
-Keep unrelated plugins. No additional standalone plugin, test helper, Python file
-or executable installer belongs in this package. Keep your stock UP12 vamputil.py;
-restore it from your own original when upgrading from the old Python-supported mod.
+The archive includes both Claws models, sneak-attack effects and the Library
+and Griffith Park map files. Back up custom map edits before replacing them.
 
-BEHAVIOR AND SETTINGS
-The VTM combines Protean/Frenzy lifecycle, inventory, melee, combo buffer, stealth
-positioning and Griffith collision fixes. The INI documents eight startup options.
-Use 0/1 and restart the game. InventoryFixes=0 disables dependent transform/Melee
-fixes, but model attack-pool separation stays active independently of all switches
-and inventory-hook readiness. This separation preserves ordinary custom combos
-and the stock NPC/Frenzy candidate pools. Original models without those pools forward
-unchanged. Native hunger Frenzy and its feeding rules are retained.
+UPDATING FROM 1.3.1
+Replace only Bin/loader/protean-frenzy-improved.vtm and restart the game.
+All other game files are unchanged. Keep your existing INI settings.
 
-The installed models, sounds, particles and map permissions are resource changes;
-INI switches do not restore their original bytes. Both model pools are deliberate.
+SETTINGS
+Edit Bin/loader/protean-frenzy-improved.ini. Set an option to 1 to enable it
+or 0 to disable it, then restart the game. Descriptions are beside each option.
+InventoryFixes is required by ProteanTransformFixes and MeleeFrenzy.
+Model and map changes remain installed when INI options are disabled.
 
 ROLLBACK
-Close the game. Restore your prior VTM, INI and any replaced resources from your
-existing backup/archive. Remove a supplied loose file only if it was absent before
-installation. Restore both prior models together. Do not load the unified plugin
-and the replaced native modules together. This archive has no redundant rollback
-copy, debug plugin, save, log or gameplay checklist.
+Close the game and restore the files you backed up before installation.
+Remove a supplied file only if it was absent before installation.
+Restore both Claws models together.
 """
 if args.version=='1.3.2':
     game_readme+='''
 CHANGES IN 1.3.2
-NPCs with Claws, including the Serial Killer, retain their original AI attack
-pool instead of receiving the player's directional combos. Ordinary player
-combos and owned Frenzy selection are preserved. Models, INI defaults, damage,
-speed, sounds and maps are unchanged from 1.3.1. Restart after replacing the VTM.
+Fixes missing Claws attacks on NPCs such as the Serial Killer.
+Player combos and Frenzy behavior are preserved.
 '''
 if args.version:
     first,rest=game_readme.split('\n',1);game_readme=first+' '+args.version+'\n'+rest

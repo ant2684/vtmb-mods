@@ -3,13 +3,11 @@
 One native plugin combines Protean and Frenzy lifecycle, inventory, melee,
 Claws combo input, stealth positioning and Griffith collision fixes.
 Requires 32-bit Bloodlines, supported Unofficial Patch 12.0 and Game Mod Loader.
-The game keeps its stock vamputil.py; no production Python component is supplied.
 
 The complete game archive includes the VTM, INI, both matching Claws models,
 stealth sound/blood resources and the two supported maps with Frenzy enabled.
 It installs directly into the game root and needs no previous Protean package.
-Read its English README before upgrading and preserve unrelated mods and custom
-resource changes.
+Installation and update instructions are in the game archive's README.txt.
 
 Eight INI options control the individual fixes. Matching models keep ordinary
 custom combos separate from the stock NPC/Frenzy attack pools independently of all

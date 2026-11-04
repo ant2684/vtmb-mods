@@ -21,5 +21,4 @@ third-party mod combinations have not been individually certified.
 
 The runtime is the exact finalized, clean, tested binary; it was not rebuilt for
 version metadata or packaging. Reproducible checks and precise limits are in the
-module source and validation/Release.json. No diagnostic plugin, save, log or
-modified gameplay Python belongs in the game archive.
+module source and validation/Release.json.
