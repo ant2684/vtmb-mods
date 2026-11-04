@@ -8,8 +8,8 @@ The game keeps its stock vamputil.py; no production Python component is supplied
 The complete game archive includes the VTM, INI, both matching Claws models,
 stealth sound/blood resources and the two supported maps with Frenzy enabled.
 It installs directly into the game root and needs no previous Protean package.
-Read its English README before upgrading; remove the six replaced standalone
-modules listed there and preserve unrelated mods and custom resource changes.
+Read its English README before upgrading and preserve unrelated mods and custom
+resource changes.
 
 Eight INI options control the individual fixes. Matching models keep ordinary
 custom combos separate from the stock NPC/Frenzy attack pools independently of all
@@ -60,7 +60,7 @@ qualification is described in validation/Release.json. This standalone module
 has explicit commands and is not a legacy common-runner release adapter.
 
 Historical model alternatives and separate mods remain available in their own
-directories. Do not load their replaced native implementations beside this one.
+directories.
 
 
 ## NPC correction in 1.3.2

@@ -24,8 +24,8 @@ All mod logic runs in the plugin. No modified Python file is supplied or require
 the game retains its own stock scripts. Native hook ownership is checked at load.
 
 MANUAL INSTALLATION AND UPGRADE
-Close the game. Back up every file you replace, your current vamputil.py and the
-six preceding modules listed below. Copy the CONTENTS of Core into the game root.
+Close the game. Back up every file you replace and your current vamputil.py.
+Copy the CONTENTS of Core into the game root.
 Keep protean-frenzy-improved.ini beside protean-frenzy-improved.vtm.
 If upgrading from the earlier Python-supported release, restore your ORIGINAL,
 unmodified UP 12.0 Unofficial_Patch/python/vamputil.py from your own backup or
@@ -33,16 +33,6 @@ matching patch installation. This package intentionally does not replace it.
 For a file customized by other mods, preserve those changes and remove only the
 previous Protean support after comparing your original; arbitrary script/native
 mod combinations are outside the tested compatibility claim.
-
-Remove these replaced modules from the ACTIVE Bin/loader directory:
-protean-improved.vtm
-protean-lifecycle.vtm
-frenzy-melee-katana-test.vtm
-claws-flow.vtm
-claws-stealth-position.vtm
-griffith-frenzy-werewolf-fix.vtm
-Keep them in your backup. Do not load old and unified implementations together.
-Unrelated loader modules are separate mods.
 
 OPTIONAL RESOURCES
 Copy the contents of the chosen Optional directory into the game root:
@@ -134,9 +124,6 @@ the CONTENTS of this archive into the game root, beside Vampire.exe. Install bot
 Claws models with this VTM. Keep existing INI values when upgrading custom settings.
 The map files replace the supplied supported variants; preserve custom map edits.
 
-Remove these replaced modules from the active Bin/loader folder if present:
-protean-improved.vtm, protean-lifecycle.vtm, frenzy-melee-katana-test.vtm,
-claws-flow.vtm, claws-stealth-position.vtm, griffith-frenzy-werewolf-fix.vtm.
 Keep unrelated plugins. No additional standalone plugin, test helper, Python file
 or executable installer belongs in this package. Keep your stock UP12 vamputil.py;
 restore it from your own original when upgrading from the old Python-supported mod.
