@@ -72,7 +72,8 @@ int main(int argc,char **argv){
         imports(dll,"GetModuleHandleA",modules);imports(dll,"GetModuleFileNameA",executable);imports(dll,"GetPrivateProfileStringA",profile);
         void(__cdecl*start)(void)=(void*)GetProcAddress(dll,"loaded_vampire");check(start!=NULL,"native loader export");start();
         check(memcmp(saved,server+0x8dac0,5)!=0,"pool hook installed with Inventory off/on/failed");
-        run(pc,0);put(pc+0x146c,10);run(pc,1);run(shadow,1);run(other,0);
+        run(pc,0);run(other,1);put(pc+0x146c,10);run(pc,1);run(shadow,1);run(other,1);
+        *(const char**)(other+0x11c)="npc_VVampire";run(other,1);
         put(table+2*12+8,8);run(pc,0);put(table+2*12+8,7);put(pc+0x146c,0);run(pc,0);
         start();run(pc,0);
         printf("PASS exact model sex=%d Inventory=%u conflict=%u ordinary7/Frenzy6, zero weights, ownership, ABI\n",sex,inventory,blocked);

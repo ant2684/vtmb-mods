@@ -147,7 +147,7 @@ positioning and Griffith collision fixes. The INI documents eight startup option
 Use 0/1 and restart the game. InventoryFixes=0 disables dependent transform/Melee
 fixes, but model attack-pool separation stays active independently of all switches
 and inventory-hook readiness. This separation preserves ordinary custom combos
-and the stock Frenzy candidate pool. Original models without those pools forward
+and the stock NPC/Frenzy candidate pools. Original models without those pools forward
 unchanged. Native hunger Frenzy and its feeding rules are retained.
 
 The installed models, sounds, particles and map permissions are resource changes;
@@ -160,6 +160,14 @@ installation. Restore both prior models together. Do not load the unified plugin
 and the replaced native modules together. This archive has no redundant rollback
 copy, debug plugin, save, log or gameplay checklist.
 """
+if args.version=='1.3.2':
+    game_readme+='''
+CHANGES IN 1.3.2
+NPCs with Claws, including the Serial Killer, retain their original AI attack
+pool instead of receiving the player's directional combos. Ordinary player
+combos and owned Frenzy selection are preserved. Models, INI defaults, damage,
+speed, sounds and maps are unchanged from 1.3.1. Restart after replacing the VTM.
+'''
 if args.version:
     first,rest=game_readme.split('\n',1);game_readme=first+' '+args.version+'\n'+rest
 payload['README.txt']=game_readme.encode('ascii')

@@ -10,7 +10,7 @@ receipt=out/'checks'/datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m
 env=os.environ.copy();env['PFI_CONFIG']=str(args.config.resolve());env['PYTHONPATH']=os.pathsep.join([cfg['native_dependencies'],str(HERE/'_support')])
 checks=[]
 if args.only:
-    known={'pool_isolation','fixture_priorities','configuration','lifecycle','native_support','claws_frenzy','melee_behavior','core','emitted_warform','emitted_feats','emitted_filter_sync','griffith','stealth','flow','claws_frenzy_models','loader_compatibility','native_runtime'}
+    known={'npc_pools','pool_isolation','fixture_priorities','configuration','lifecycle','native_support','claws_frenzy','melee_behavior','core','emitted_warform','emitted_feats','emitted_filter_sync','griffith','stealth','flow','claws_frenzy_models','loader_compatibility','native_runtime'}
     assert set(args.only)<=known,'Unknown check name'
 def run(label,*cmd):
     if args.only and label not in args.only:return
@@ -33,6 +33,7 @@ if args.suite in ['native','all']:
     run('claws_frenzy',out/'build/native_claws_frenzy.exe')
     models=out/'Components/ClawsModels/Unofficial_Patch/models/character/shared'
     run('pool_isolation',out/'build/exact_claws_pools.exe',plugin,game/'Vampire/dlls/vampire.dll',models/'male/claws.mdl',models/'female/claws.mdl')
+    run('npc_pools',sys.executable,'-B',HERE/'tests/verify_npc_pools.py')
     run('melee_behavior',out/'build/native_melee.exe')
     core=receipt/'emitted';core.mkdir()
     run('core',out/'build/exact_core.exe',plugin,game/'Vampire/dlls/vampire.dll',game/'Vampire/cl_dlls/client.dll',core)

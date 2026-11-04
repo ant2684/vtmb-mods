@@ -31,7 +31,8 @@ static DWORD WINAPI profile(LPCSTR section,LPCSTR key,LPCSTR fallback,LPSTR p,DW
  (void)section;(void)fallback;(void)n;(void)path;p[0]=!strcmp(key,"InventoryFixes")||!strcmp(key,"ProteanTransformFixes")?'1':'0';p[1]=0;return 1;
 }
 static BOOL WINAPI protect(LPVOID p,SIZE_T n,DWORD flags,PDWORD old){++protect_calls;return protect_calls==fail_protect?FALSE:VirtualProtect(p,n,flags,old);}
-static HMODULE open_plugin(const char *path){HMODULE h=LoadLibraryA(path);check(h!=NULL,"load exact candidate");imports(h,"GetModuleHandleA",modules);imports(h,"VirtualProtect",protect);imports(h,"GetModuleFileNameA",executable);imports(h,"GetPrivateProfileStringA",profile);protect_calls=0;return h;}
+/* Isolate this component: the independent model collector intentionally ignores INI switches. Its guards/pools are covered by exact_configuration and exact NPC fixtures. */
+static HMODULE open_plugin(const char *path){server[0x8dac0]=0xcc;HMODULE h=LoadLibraryA(path);check(h!=NULL,"load exact candidate");imports(h,"GetModuleHandleA",modules);imports(h,"VirtualProtect",protect);imports(h,"GetModuleFileNameA",executable);imports(h,"GetPrivateProfileStringA",profile);protect_calls=0;return h;}
 static void install(HMODULE h){void (__cdecl *f)(void)=(void *)GetProcAddress(h,"loaded_vampire");check(f!=NULL,"only loader API required");f();}
 static void FC add_native(B *p,void *unused,B *item){(void)unused;++add_calls;
  if(reenter_add){reenter_add=0;((Add)(server+0x3daf))(p,item);}

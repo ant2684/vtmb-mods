@@ -32,6 +32,8 @@ PLUGIN=path('output')/'Payload/Bin/loader/protean-frenzy-improved.vtm'
 class Harness:
     def __init__(self,bad=False):
         self.u=u=machine();self.desc=DESC;self.bone=0;self.root=(45,60,34)
+        # Isolate the paired-scene component from independent model-pool setup.
+        u.mem_write(base+0x8dac0,b'\xcc')
         pe=pefile.PE(data=PLUGIN.read_bytes());pe.relocate_image(MOD)
         u.mem_map(MOD,(pe.OPTIONAL_HEADER.SizeOfImage+4095)&~4095);u.mem_write(MOD,pe.get_memory_mapped_image())
         imports={}

@@ -37,12 +37,16 @@ int main(void){
     *(uintptr_t *)shadow=(uintptr_t)(image+0x4b2184);put(pc+0x1db0,7u<<13|2u);
     *(B **)(table+2*12+4)=shadow;put(table+2*12+8,7);
     original=native;label=name;
-    run(pc,0);run(shadow,0);put(pc+0x146c,10);run(pc,1);run(shadow,1);run(other,0);
-    put(table+2*12+8,8);run(pc,0);run(shadow,0);put(table+2*12+8,7);
+    *(const char **)(other+0x11c)="npc_VVampire";
+    run(pc,0);run(other,1);run(shadow,1);put(pc+0x146c,10);run(pc,1);run(shadow,1);run(other,1);
+    put(table+2*12+8,8);run(pc,0);run(shadow,1);put(table+2*12+8,7);
     *(uintptr_t *)shadow=0;run(pc,0);*(uintptr_t *)shadow=(uintptr_t)(image+0x4b2184);
     *(const char **)(shadow+0x11c)="npc_VWolfMorph";run(pc,0);*(const char **)(shadow+0x11c)="npc_VFrenzyShadow";
     mode=1;run(shadow,0);mode=-1;run(shadow,0);mode=0;
     put(pc+0x146c,0);run(pc,0);put(pc+0x146c,10);run(pc,1);
+    *(const char **)(other+0x11c)="npc_VHumanCombatant";run(other,1);
+    B *saved_pc=pc;pc=NULL;run(other,1);pc=saved_pc;
+    *(const char **)(pc+0x11c)="npc_VVampire";run(pc,1);*(const char **)(pc+0x11c)="player";
     check(filter(pc,NULL,NULL,0)==0&&filter(pc,NULL,NULL,-1)==-1&&filter(pc,NULL,NULL,2049)==2049,"bounds forwarded safely");
     puts("PASS stock/player candidate isolation, zero weights, order, local owner/serial/class, negative forwarding and x86 ABI");
     return 0;

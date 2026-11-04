@@ -8,7 +8,8 @@ static DWORD WINAPI new_profile(LPCSTR section,LPCSTR key,LPCSTR fallback,LPSTR 
 }
 
 static BOOL WINAPI protect(LPVOID p,SIZE_T n,DWORD flags,PDWORD old){calls++;return calls==fail_at?FALSE:VirtualProtect(p,n,flags,old);}
-static HMODULE open_plugin(const char *path){HMODULE h=LoadLibraryA(path);check(h!=NULL,"exact DLL load");imports(h,"GetModuleHandleA",modules);imports(h,"VirtualProtect",protect);imports(h,"GetPrivateProfileStringA",new_profile);imports(h,"GetModuleFileNameA",executable);calls=0;return h;}
+/* Isolate this component: the independent model collector intentionally ignores INI switches. Its guards/pools are covered by exact_configuration and exact NPC fixtures. */
+static HMODULE open_plugin(const char *path){server[0x8dac0]=0xcc;HMODULE h=LoadLibraryA(path);check(h!=NULL,"exact DLL load");imports(h,"GetModuleHandleA",modules);imports(h,"VirtualProtect",protect);imports(h,"GetPrivateProfileStringA",new_profile);imports(h,"GetModuleFileNameA",executable);calls=0;return h;}
 static void invoke(HMODULE h,const char *n){((void(__cdecl *)(void))GetProcAddress(h,n))();}
 static void save(const char *folder,const char *name,void *p,size_t n){char path[MAX_PATH];FILE *f;snprintf(path,sizeof(path),"%s/%s",folder,name);f=fopen(path,"wb");check(f!=NULL,"create captured emitted code");check(fwrite(p,1,n,f)==n,"capture bytes");fclose(f);}
 int main(int argc,char **argv){HMODULE h;uint32_t sites[]={0x16c558,0x33e9be,0x1f9177,0x3510d7,0x1e56e0,0x1e5b30,0x33ed75};unsigned sizes[]={6,5,6,6,5,7,1};uint8_t old[7][7],old_client[14],*sc,*cc;unsigned i,j;char metadata[512];

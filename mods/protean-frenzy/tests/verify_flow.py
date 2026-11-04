@@ -28,6 +28,8 @@ def machine():
 class Harness:
     def __init__(self,bad_signature=False):
         self.u=u=machine();self.assigned=[];self.lookups=[];self.reset_calls=0;self.allocations=0
+        # Model-pool ownership is qualified by exact NPC/configuration fixtures.
+        u.mem_write(dllbase+0x8dac0,b'\xcc')
         self.pe=pefile.PE(data=PLUGIN.read_bytes());self.pe.relocate_image(MOD)
         u.mem_map(MOD,(self.pe.OPTIONAL_HEADER.SizeOfImage+4095)&~4095);u.mem_write(MOD,self.pe.get_memory_mapped_image())
         u.mem_map(IMAGE,(len(MODEL)+4095)&~4095);u.mem_write(IMAGE,MODEL)

@@ -32,13 +32,23 @@ static int owned_frenzy(B *actor){
     return name&&!strcmp(name,"npc_VFrenzyShadow")&&(actor==player||actor==shadow);
 }
 static int stock_label(const char *name){return name&&!strncmp(name,prefix,sizeof(prefix)-1);}
+static int stock_actor(B *actor){
+    B *player=((B *(__cdecl *)(int))(image+0xac8b))(1);
+    const char *name;
+    /* Custom input-driven combos belong only to the confirmed local player.
+       Ordinary NPCs, including Killer, retain the complete native AI pool. */
+    if(!player||actor!=player)return 1;
+    name=*(const char **)(player+0x11c);
+    if(!name||strcmp(name,"player"))return 1;
+    return owned_frenzy(actor);
+}
 static int filter(B *actor,int *ids,int *weights,int count){
     int j,n=0,has_stock=0,use_stock;
     if(count<=0||count>2048||!ids||!weights)return count;
     for(j=0;j<count;++j)if(stock_label(label(actor,ids[j]))){has_stock=1;break;}
     /* Old/other models and activities retain their exact native answer. */
     if(!has_stock)return count;
-    use_stock=owned_frenzy(actor);
+    use_stock=stock_actor(actor);
     for(j=0;j<count;++j)if(stock_label(label(actor,ids[j]))==use_stock){
         ids[n]=ids[j];weights[n]=weights[j];++n;
     }

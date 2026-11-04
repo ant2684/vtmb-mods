@@ -6,10 +6,10 @@ dependent transform and custom melee features. Matching model-pool isolation
 has its own signature/ownership guards and does not depend on those options.
 
 The collector calls the native implementation once, retains original order and
-weights (including zero), and selects stock-prefixed records only for the local
-player/serial-valid exact FrenzyShadow while native Frenzy is active. Ordinary
-selection excludes those records; other models without the prefix forward
-unchanged. Models preserve authored ordinary combos and append the stock pool.
+weights (including zero). Only the confirmed local player outside owned Frenzy
+receives custom combos. Other actors receive stock-prefixed records; player
+Frenzy retains the counter/controller/serial/class checks. Other models without
+the prefix forward unchanged. Models preserve authored ordinary combos and append the stock pool.
 
 Native event/task ownership replaces the old mod Python support. Effects and
 inventory remain bound to validated actors/serials; stale queued exits cannot

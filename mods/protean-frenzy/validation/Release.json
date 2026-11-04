@@ -1,26 +1,127 @@
 {
-  "version": "1.3.1",
-  "plugin_sha256": "93840c22c2a8f20d137bab8cead2b2f6d1218ad5b06943252b9512951ef20e8a",
+  "version": "1.3.2",
+  "plugin_sha256": "19b96a4917c8858c0b303f8a37c157df4520c8c95a16280457af4c3eba928111",
   "native_input_identities": {
     "Vampire/dlls/vampire.dll": "c546f4de2003624d72f54d03805e0dbe1d8157231adcc62368ff53fe6e48a76f",
-    "Vampire/cl_dlls/client.dll": "e88beae0dd03af06493c71c5e8d87a6993b54e590cb6ad37cd3513c588582870"
+    "Vampire/cl_dlls/client.dll": "e88beae0dd03af06493c71c5e8d87a6993b54e590cb6ad37cd3513c588582870",
+    "Vampire.exe": "0625c6b5986d76a8b8f4f2b0447a08c1d1faba7655d417b07d8fa1fdcc076a76"
   },
   "qualification": {
+    "native_resource_checks": [
+      {
+        "name": "configuration",
+        "passed": true
+      },
+      {
+        "name": "lifecycle",
+        "passed": true
+      },
+      {
+        "name": "native_support",
+        "passed": true
+      },
+      {
+        "name": "claws_frenzy",
+        "passed": true
+      },
+      {
+        "name": "pool_isolation",
+        "passed": true
+      },
+      {
+        "name": "npc_pools",
+        "passed": true
+      },
+      {
+        "name": "melee_behavior",
+        "passed": true
+      },
+      {
+        "name": "core",
+        "passed": true
+      },
+      {
+        "name": "emitted_warform",
+        "passed": true
+      },
+      {
+        "name": "emitted_feats",
+        "passed": true
+      },
+      {
+        "name": "emitted_filter_sync",
+        "passed": true
+      },
+      {
+        "name": "griffith",
+        "passed": true
+      },
+      {
+        "name": "stealth",
+        "passed": true
+      },
+      {
+        "name": "flow",
+        "passed": true
+      },
+      {
+        "name": "claws_frenzy_models",
+        "passed": true
+      },
+      {
+        "name": "loader_compatibility",
+        "passed": true
+      },
+      {
+        "name": "native_runtime",
+        "passed": true
+      },
+      {
+        "name": "fixture_priorities",
+        "passed": true
+      }
+    ],
+    "npc_stock_activities_per_claws_model": 33,
+    "existing_custom_only_activities_forwarded": 2,
+    "non_claws_control_activities": 26,
+    "npc_control_types": [
+      "npc_VVampire",
+      "npc_VHumanCombatant",
+      "npc_VFrenzyShadow"
+    ],
     "configuration_masks": 256,
-    "invalid_values": 8,
-    "system_fault_cases": 232,
-    "exact_model_cases": 6,
-    "stock_zero_weights_and_ordinary_combos": true,
-    "native_only_artifact": true,
-    "loader_compatibility": true,
-    "fixture_relationship_priorities": 10,
-    "complete_inventory_disabled_gameplay_processes": 1,
-    "gameplay": "Seven complete ordinary chains, air attack, block/release and eight sneak directions with InventoryFixes=0"
+    "exact_pool_cases": 6,
+    "native_original_order_and_weights": true,
+    "ordinary_player": "Seven direction-selected full chains, continuation, air/guard/release and eight sneak directions",
+    "natural_frenzy": "Warform hunger Frenzy: native far-left/low attacks, effects and normal cleanup",
+    "killer": "Actual hostile callback including Beastform and repeated Claws damage",
+    "fixed_killer_observed_attacks": [
+      "pfi_frenzy_claws_attack_far_left",
+      "pfi_frenzy_claws_attack_low"
+    ],
+    "owner_acceptance": "Installed correction accepted 2026-11-04"
   },
-  "limits": [
-    "Historical whole-project gameplay workflows were not all rerun for the final option-isolation change",
-    "Both sexes covered offline with exact DLL and models; final focused gameplay uses the male model",
-    "Arbitrary game binaries, third-party hook conflicts, clans and armor combinations are not universally certified"
+  "unchanged": {
+    "ini_sha256": "e53970f215fc87fa90bd79dbfc3832614ce515ad6034c7ff6ff54553af5d00cf",
+    "resources": {
+      "ClawsModels/Unofficial_Patch/models/character/shared/female/claws.mdl": "b51f1d20916f393911426bae69b65f8b2efee45520987ce2bdfad254cacdaf86",
+      "ClawsModels/Unofficial_Patch/models/character/shared/male/claws.mdl": "93c55229b2bb9b687f7fe0d6c0e1b511de4c250680190a25118ca7e23d06a0f8",
+      "FrenzyGriffith/Unofficial_Patch/maps/sp_observatory_2.bsp": "6690798013dd82432a4c94f199111e35c5ca581bbc5ad351b0ba626ffec05cb7",
+      "FrenzyLibrary/Unofficial_Patch/maps/la_library_1.bsp": "557c5138c2b56739897b0f8bb7650b24f0fb06f00c2ea4b117df4608fb6ce403",
+      "StealthBlood/Unofficial_Patch/particles/stealth_claws_emitter.txt": "ab49c785f8f6ede8f063df053a71f1d267102158e4642eb74ebef19768c4d25a",
+      "StealthSound/Unofficial_Patch/vdata/items/item_w_claws.txt": "523be478cff0a075d2b9bce5e4006043b70c017be088c739195df4446b61b5a1"
+    },
+    "damage_speed_models_maps": true
+  },
+  "fixture_maintenance": [
+    "Isolated component fixtures from the independently installed model collector; initial lifecycle failure also reproduced with released 1.3.1",
+    "Pinned the current inspected loader table at a new RVA; legacy size values and counterexample are unchanged",
+    "Preserved custom-only player activities as exact native forwarding, rather than inventing absent vanilla candidates"
   ],
-  "privacy": "Local settings, personal saves, recordings and private validation journals are not distributed"
+  "limits": [
+    "No complete historical gameplay rerun for unchanged subsystems",
+    "No per-enemy/quest/third-party mod matrix",
+    "Automated fixed-Killer far attack was not observed; original full stock pool is preserved and installed behavior was owner-accepted"
+  ],
+  "privacy": "No local paths, personal saves, raw memory data, journals or recordings in this public qualification"
 }

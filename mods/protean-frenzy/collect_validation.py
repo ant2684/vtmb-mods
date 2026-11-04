@@ -57,7 +57,7 @@ assert counterexample['plugin_sha256']=='478bf4cb5e763e7b13553570a22bee429677837
 native=[]
 for file in sorted((out/'checks').glob('*/result.json')):
     r=json.loads(file.read_text())
-    expected={'configuration','lifecycle','melee_behavior','core','emitted_warform','emitted_feats','emitted_filter_sync','griffith','stealth','flow','native_support','loader_compatibility','native_runtime','claws_frenzy','claws_frenzy_models'}
+    expected={'npc_pools','pool_isolation','fixture_priorities','configuration','lifecycle','melee_behavior','core','emitted_warform','emitted_feats','emitted_filter_sync','griffith','stealth','flow','native_support','loader_compatibility','native_runtime','claws_frenzy','claws_frenzy_models'}
     if r.get('passed') and r['plugin_sha256']==identity and {c['name'] for c in r['checks']}==expected:native.append((file,r))
 assert native,'No complete exact-candidate native/resource receipt'
 guards=json.loads((out/'lifecycle-guards.json').read_text())
