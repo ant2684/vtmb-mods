@@ -1,0 +1,27 @@
+{
+  "version": "1.2",
+  "tag": "fixes-adjustments-v1.2",
+  "package": {
+    "version": "1.2",
+    "game": {
+      "file": "ant2684-fixes-adjustments 1.2.zip",
+      "sha256": "d8d18f8bc4be6b09c00432a3d3b8c9ae5205a615397426320fdb773293318206",
+      "bytes": 39250
+    },
+    "source": {
+      "file": "ant2684-fixes-adjustments 1.2 - Source.zip",
+      "sha256": "f4610cb7c63ee42e9f4a26da8e9b96b4ca37ba11821c9defc75521a9d8c1f1fd",
+      "bytes": 122773
+    },
+    "plugin_sha256": "07f4805a48055f685471c778892c85e60b170edc9eb28f4f2617fe5ed05922c4",
+    "guard_sha256": "2f9b26347616c0cf1311b34e6cc58b091e24c6ee8c72f0c387bf726d44d3804b",
+    "payload": {
+      "README.txt": "2f829b3acf56306d31220e4f1208de6f8faa76f58a4fc34b8b36397b8a6b97c0",
+      "Bin/loader/ant2684-fixes-adjustments.vtm": "07f4805a48055f685471c778892c85e60b170edc9eb28f4f2617fe5ed05922c4",
+      "Bin/loader/ant2684-fixes-adjustments.ini": "3e969ed462ac303af2c7fe15ebc2df679d4fd4ed0e47967626da92de7b37130c",
+      "Bin/loader/vtmb-loading-input-guard.vtm": "2f9b26347616c0cf1311b34e6cc58b091e24c6ee8c72f0c387bf726d44d3804b",
+      "Bin/loader/vtmb-loading-input-guard.ini": "f498e811f4ecad0b42abc11bee0950830b3a76492399666294c418651150ca59"
+    }
+  },
+  "verification_scope": "Existing qualified binaries and native/gameplay evidence reused. Publication checks verify archive identity and source-tree hygiene; no binary rebuild or new gameplay certification."
+}

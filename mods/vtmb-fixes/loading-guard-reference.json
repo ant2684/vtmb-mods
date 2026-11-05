@@ -1,0 +1,105 @@
+{
+  "plugin_sha256": "c2886fd2fabd2105688828f3fc11e5012998bfa36ae9c283e9e37b3551801e65",
+  "bytes": 19456,
+  "source_sha256": "f24a2c444424298b94fcfeed668ed0b387349e9f5b34acf0518cf64cdb1c816a",
+  "modules": {
+    "engine": "9d00b2c1e5edbad052fb0b514634ba54574666e12d1b408c46ce141d51ed2313",
+    "client": "e88beae0dd03af06493c71c5e8d87a6993b54e590cb6ad37cd3513c588582870"
+  },
+  "hooks": [
+    {
+      "module": "engine",
+      "rva": 669856,
+      "length": 6,
+      "call_offset": 4294967295,
+      "signature": "81ec00040000",
+      "instructions": [
+        [
+          "sub",
+          "esp, 0x400"
+        ]
+      ]
+    },
+    {
+      "module": "engine",
+      "rva": 551552,
+      "length": 9,
+      "call_offset": 4,
+      "signature": "51536a01e837960900",
+      "instructions": [
+        [
+          "push",
+          "ecx"
+        ],
+        [
+          "push",
+          "ebx"
+        ],
+        [
+          "push",
+          "1"
+        ],
+        [
+          "call",
+          "0x201200c0"
+        ]
+      ]
+    },
+    {
+      "module": "engine",
+      "rva": 552304,
+      "length": 6,
+      "call_offset": 4294967295,
+      "signature": "83ec1c566a01",
+      "instructions": [
+        [
+          "sub",
+          "esp, 0x1c"
+        ],
+        [
+          "push",
+          "esi"
+        ],
+        [
+          "push",
+          "1"
+        ]
+      ]
+    },
+    {
+      "module": "client",
+      "rva": 1057392,
+      "length": 6,
+      "call_offset": 4294967295,
+      "signature": "8b0d58ba2710",
+      "instructions": [
+        [
+          "mov",
+          "ecx, dword ptr [0x1027ba58]"
+        ]
+      ]
+    },
+    {
+      "module": "client",
+      "rva": 1066080,
+      "length": 7,
+      "call_offset": 4294967295,
+      "signature": "5153a1383e4d10",
+      "instructions": [
+        [
+          "push",
+          "ecx"
+        ],
+        [
+          "push",
+          "ebx"
+        ],
+        [
+          "mov",
+          "eax, dword ptr [0x104d3e38]"
+        ]
+      ]
+    }
+  ],
+  "dispatch_iat": 1520144
+}

@@ -1,0 +1,64 @@
+[
+  {
+    "source": "mods/console/plugin/console_pause.c",
+    "snapshot": "native/console/console_pause.c",
+    "sha256": "cb5b307d02a1a70509bc1a4dc68bc2db6309a966ce13d3821202634c2a088929"
+  },
+  {
+    "source": "mods/subtitle/plugin/generated_clock.h",
+    "snapshot": "native/subtitle/generated_clock.h",
+    "sha256": "5795505b627b257dbf134b8e8f90ad0d7e72cd0aa830849e886074a2c563f2a7"
+  },
+  {
+    "source": "mods/subtitle/plugin/install_hooks.h",
+    "snapshot": "native/subtitle/install_hooks.h",
+    "sha256": "ecee32c8b7773c6341ff27fd63488440f054253c1b084f2aa67c24f38d1bb1fd"
+  },
+  {
+    "source": "mods/subtitle/plugin/radio_loop.h",
+    "snapshot": "native/subtitle/radio_loop.h",
+    "sha256": "4149c95fd92bc26bfdeb92e2bee1db4c140da932bb47749a5331deeb7341a502"
+  },
+  {
+    "source": "mods/subtitle/plugin/radio_sync.h",
+    "snapshot": "native/subtitle/radio_sync.h",
+    "sha256": "6d990b607afc047a72483a0e79f1666c4fd90f14e7bfb413b6d3cfd50446d665"
+  },
+  {
+    "source": "mods/subtitle/plugin/subtitle_pause.c",
+    "snapshot": "native/subtitle/subtitle_pause.c",
+    "sha256": "cfa5c5d97da80de2bd2661995f682731ed25baff2c4413881fe3e3db2e898bb2"
+  },
+  {
+    "source": "mods/history/plugin/history_stat_reset_fix.c",
+    "snapshot": "native/history/history_stat_reset_fix.c",
+    "sha256": "6aceeb9c0ae96c329189944b80f1da2496666e8681e017e69ef6869e2dc78f85"
+  },
+  {
+    "source": "mods/history/plugin/install_hooks.h",
+    "snapshot": "native/history/install_hooks.h",
+    "sha256": "da6a0ce901e74766769520659c0eb44e3717866f981d01d7df2a2d072453488e"
+  },
+  {
+    "source": "mods/container/plugin/container_stack.c",
+    "snapshot": "native/container/container_stack.c",
+    "sha256": "9762e91110b6f8b4ddc6992d2ce397e0425a26ca8c595ee00648a1a6bd498de2"
+  },
+  {
+    "source": "mods/flamethrower/plugin/flamethrower_numbers.c",
+    "snapshot": "native/flame/flamethrower_numbers.c",
+    "sha256": "b471095c8ac4263222da54e5eec2b31cb11219767020741f7c13fcfa6d4bb2d9"
+  },
+  {
+    "source": "mods/loading-input-guard/loading_input_guard.c",
+    "snapshot": "native/loading/loading_input_guard.c",
+    "sha256": "f24a2c444424298b94fcfeed668ed0b387349e9f5b34acf0518cf64cdb1c816a",
+    "adapted_sha256": "4634c825d22ae2b864a5910e31ff4ab3d306e7ef49b613dc752f7cfbc442a048",
+    "adaptation": "Use the reviewed dialogue-mouse trampoline and read the standalone guard option once at startup. Use build-time relocation offsets for native fingerprints so runtime never reads the loaded relocation directory."
+  },
+  {
+    "source": "mods/casting-animation-cleanup/plugin.c",
+    "snapshot": "native/cast/plugin.c",
+    "sha256": "f0a5978660838f9089113c72f18d5bd1db8df1d9bbe47fd18940d2139fec659a"
+  }
+]

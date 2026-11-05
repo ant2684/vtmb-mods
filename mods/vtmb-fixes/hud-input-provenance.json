@@ -1,0 +1,7 @@
+{
+  "original_sources": {
+    "mods/hud-indicators/native/plugin.c": "417fa5fe09436d12ac25ebf893312e7af443278d8cf0648c91f5947ae71ca681",
+    "mods/victim-bloodbar/native/plugin.c": "0f8a28ec1f592d53784e4c14e4b97840ac8b9e38dc99cf9d2cdb4cc11a5709c1"
+  },
+  "transform": "Remove standalone INI/DllMain; central switch owns both callbacks. Native fixes unchanged."
+}

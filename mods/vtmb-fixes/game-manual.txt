@@ -1,0 +1,44 @@
+Fixes & Adjustments 1.2
+=======================
+
+Nine fixes for Vampire: The Masquerade - Bloodlines.
+Requires Unofficial Patch 12.0 with the Advanced EXE / VTM loader.
+
+Installation
+------------
+Close the game and back up any files you replace.
+When updating, remove previous standalone versions of the included fixes.
+Copy the Bin folder into the game directory and merge it with the existing
+Bin folder.
+
+Keep the supplied plugin filenames. If you use vtmb-dialogue-mouse,
+Loading Input Guard loads after it.
+
+Settings
+--------
+Edit the INI files in Bin/loader. Set an option to 1 to enable it or 0 to
+disable it, then restart the game. All options are enabled by default.
+
+ant2684-fixes-adjustments.ini
+* ConsolePauseFix - fixes console pause and input, and removes Minimize.
+* SubtitlePauseRadioFix - keeps subtitles and radio playback in sync.
+* HistoryStatResetFix - restores character creation points when changing
+  History or gender.
+* ContainerStackFix - fixes stack visibility, repeat purchase prices, and
+  transfers to full stacks.
+* ContainerInputGuard - prevents unintended container closure and disables
+  Enter/Space activation on barter buttons.
+* FlamethrowerDamageNumbers - shows flamethrower hit numbers when Damage
+  Floaters are enabled.
+* CastingAnimationCleanup - clears a stuck casting animation after reloading.
+* HUDIndicatorsFix - fixes stuck blood/health animations and incomplete-looking
+  fill, smooths the victim blood bar during dialogue feeding, and corrects its
+  initial fill. Full player blood remains static as in the original game.
+
+vtmb-loading-input-guard.ini
+* LoadingInputGuard - blocks accidental attacks caused by input during loading.
+
+Uninstall
+---------
+Close the game, remove both supplied VTM and INI pairs from Bin/loader, and
+restore any files you backed up.

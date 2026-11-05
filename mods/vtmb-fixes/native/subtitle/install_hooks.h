@@ -1,0 +1,117 @@
+/* All six hook sites are validated before any code write. A failed install
+   rolls back in reverse order and retains callable helper memory if OS rollback
+   cannot be certified. Rechecks after VirtualProtect detect intervening owners. */
+typedef struct {
+    uint8_t *site; uint8_t original[5], patch[5]; DWORD protection;
+    int changed, protected_once;
+} CallHook;
+enum { HOOK_COUNT = 6 };
+static CallHook hooks[HOOK_COUNT];
+static int installation_failed;
+static int restore_hook(CallHook *h)
+{
+    DWORD old, ignored; int ok = 1;
+    if (!h->changed) return 1;
+    if (memcmp(h->site, h->patch, 5) && memcmp(h->site, h->original, 5)) return 0;
+    if (!VirtualProtect(h->site, 5, PAGE_EXECUTE_READWRITE, &old)) return 0;
+    if (memcmp(h->site, h->patch, 5) && memcmp(h->site, h->original, 5)) {
+        VirtualProtect(h->site, 5, h->protection, &ignored); return 0;
+    }
+    memcpy(h->site, h->original, 5);
+    if (!FlushInstructionCache(GetCurrentProcess(), h->site, 5)) ok = 0;
+    if (!VirtualProtect(h->site, 5, h->protection, &ignored)) ok = 0;
+    if (ok) h->changed = 0;
+    return ok;
+}
+static int install_hook(CallHook *h)
+{
+    DWORD ignored;
+    if (memcmp(h->site, h->original, 5)) return 0;
+    if (!VirtualProtect(h->site, 5, PAGE_EXECUTE_READWRITE, &h->protection)) return 0;
+    h->protected_once = 1;
+    if (memcmp(h->site, h->original, 5)) {
+        if (!VirtualProtect(h->site, 5, h->protection, &ignored)) installation_failed = 1;
+        return 0;
+    }
+    memcpy(h->site, h->patch, 5); h->changed = 1;
+    if (!FlushInstructionCache(GetCurrentProcess(), h->site, 5)) return 0;
+    if (!VirtualProtect(h->site, 5, h->protection, &ignored)) return 0;
+    return 1;
+}
+static void prepare_hook(CallHook *h, uint8_t *site, uint8_t *destination)
+{
+    memset(h, 0, sizeof(*h)); h->site = site; memcpy(h->original, site, 5);
+    h->patch[0] = 0xe8;
+    put_u32(h->patch + 1, (uint32_t)(uintptr_t)destination - (uint32_t)(uintptr_t)(site + 5));
+}
+static int rollback_all(void)
+{
+    int i, retry, ok = 1;
+    for (i = HOOK_COUNT - 1; i >= 0; --i) {
+        for (retry = 0; retry < 3 && hooks[i].changed; ++retry) restore_hook(&hooks[i]);
+        if (hooks[i].changed) ok = 0;
+    }
+    if (!ok || installation_failed) {
+        return 0;
+    }
+    if (clock_code) VirtualFree(clock_code, 0, MEM_RELEASE);
+    if (clock_state) VirtualFree(clock_state, 0, MEM_RELEASE);
+    clock_code = clock_state = NULL; engine_installed = radio_installed = 0;
+    return 1;
+}
+static int install_all(uint8_t *engine, uint8_t *server)
+{
+    static const uint8_t clock_signature[] = {0x8b,0x11,0xff,0x52,0x38,0xd9,0x5c,0x24,0x04,0x8b,0x74,0x24,0x10,0x85,0xf6};
+    static const uint8_t pause_signature[] = {0xe8,0x5b,0xf0,0x00,0x00,0x85,0xc0,0xa3};
+    static const uint8_t radio_signature[] = {0x6a,0x01,0x8b,0xce,0xe8,0x68,0x60,0xdd,0xff};
+    static const uint8_t activate_signature[] = {0x8b,0xce,0xe8,0x12,0x4d,0xdd,0xff,0x83,0xbe,0x4c,0x07,0x00,0x00,0xff};
+    static const uint8_t spawn_signature[] = {0x8a,0x86,0x04,0x02,0x00,0x00,0x8b,0xce,0xa8,0x01,0x74,0x04,0x6a,0x01,0xeb,0x02,0x6a,0x00,0xe8,0xb9,0x6f,0xdd,0xff};
+    static const uint8_t static_signature[] = {0x8d,0x4c,0x24,0x40,0x51,0x50,0x6a,0x06,0x52,0xe8,0xa0,0x3c,0x0f,0x00,0x83,0xc4,0x30};
+    DWORD old; unsigned i;
+    if (engine_installed || radio_installed || installation_failed || clock_code) return 0;
+    if (!engine || !server || has_old_spcode(engine) ||
+        !unique_code_signature(engine, clock_signature, sizeof(clock_signature), CLOCK_HOOK_RVA) ||
+        !unique_code_signature(engine, pause_signature, sizeof(pause_signature), PAUSE_HOOK_RVA) ||
+        !unique_code_signature(engine, static_signature, sizeof(static_signature), STATIC_SOUND_CALL_RVA - 9) ||
+        !unique_code_signature(server, radio_signature, sizeof(radio_signature), RADIO_SIGNATURE_RVA) ||
+        !unique_code_signature(server, activate_signature, sizeof(activate_signature), RADIO_ACTIVATE_CALL_RVA - 2) ||
+        !unique_code_signature(server, spawn_signature, sizeof(spawn_signature), RADIO_SPAWN_CALL_RVA - 18) ||
+        memcmp(server + RADIO_FAKE_SILENCE_THUNK_RVA, "\xe9\x47\x67\x0a\x00", 5) ||
+        memcmp(server + RADIO_BASE_ACTIVATE_THUNK_RVA, "\xe9\x95\xf9\x09\x00", 5) ||
+        memcmp(server + RADIO_SWITCH_THUNK_RVA, "\xe9\x2d\x94\x22\x00", 5)) {
+        return 0;
+    }
+    engine_module = engine; server_module = server;
+    original_fake_silence = (FakeSilenceFn)(server + RADIO_FAKE_SILENCE_THUNK_RVA);
+    original_base_activate = (BaseActivateFn)(server + RADIO_BASE_ACTIVATE_THUNK_RVA);
+    original_static_sound = (StaticSoundFn)(engine + STATIC_SOUND_RVA);
+    original_radio_switch = (FakeSilenceFn)(server + RADIO_SWITCH_THUNK_RVA);
+    clock_code = (uint8_t *)VirtualAlloc(NULL, 0x1000, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+    clock_state = (uint8_t *)VirtualAlloc(NULL, 0x1000, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+    if (!clock_code || !clock_state) { rollback_all(); return 0; }
+    memcpy(clock_code, kClockCode, CLOCK_CODE_SIZE); relocate_helpers(clock_code, clock_state, engine);
+    ((ClockState *)clock_state)->radio_phase = radio_sample_phase;
+    if (!VirtualProtect(clock_code, 0x1000, PAGE_EXECUTE_READ, &old) ||
+        !FlushInstructionCache(GetCurrentProcess(), clock_code, CLOCK_CODE_SIZE)) { rollback_all(); return 0; }
+    prepare_hook(&hooks[0], engine + CLOCK_HOOK_RVA, clock_code + CLOCK_CLOCK_OFFSET);
+    prepare_hook(&hooks[1], engine + PAUSE_HOOK_RVA, clock_code + CLOCK_PAUSE_OFFSET);
+    prepare_hook(&hooks[2], server + RADIO_ACTIVATE_CALL_RVA, (uint8_t *)radio_base_activate);
+    prepare_hook(&hooks[3], server + RADIO_CALL_RVA, (uint8_t *)radio_fake_silence);
+    prepare_hook(&hooks[4], server + RADIO_SPAWN_CALL_RVA, (uint8_t *)radio_spawn_switch);
+    prepare_hook(&hooks[5], engine + STATIC_SOUND_CALL_RVA, (uint8_t *)radio_static_sound);
+    for (i = 0; i < HOOK_COUNT; ++i) if (!install_hook(&hooks[i])) { rollback_all(); return 0; }
+    engine_installed = radio_installed = 1;
+    return 1;
+}
+__declspec(dllexport) void loaded_engine(void)
+{
+    /* Loader callback order may differ. Installation waits for both modules. */
+    uint8_t *engine = (uint8_t *)GetModuleHandleA("engine.dll");
+    uint8_t *server = (uint8_t *)GetModuleHandleA("vampire.dll");
+    if (engine && server) install_all(engine, server);
+}
+__declspec(dllexport) void loaded_vampire(void) { loaded_engine(); }
+BOOL WINAPI DllMain(HINSTANCE instance, DWORD reason, LPVOID reserved)
+{
+    (void)instance; (void)reason; (void)reserved; return TRUE;
+}

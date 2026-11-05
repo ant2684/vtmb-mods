@@ -1,5 +1,10 @@
 # VTMB mods and regression tests
 
+[Fixes & Adjustments 1.2](mods/vtmb-fixes/README.md) provides nine configurable
+fixes, including health/blood HUD animations, fill alignment and dialogue feeding
+bars. See the [description and installation](docs/fixes-adjustments-1.2.md) and
+[download the release](https://github.com/ant2684/vtmb-mods/releases/tag/fixes-adjustments-v1.2).
+
 [Protean & Frenzy Improved 1.3.2](mods/protean-frenzy/README.md) combines the
 native Protean/Frenzy fixes in one complete package. See its standalone build
 and regression commands and [release notes](docs/protean-frenzy-1.3.2.md).

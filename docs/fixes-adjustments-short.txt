@@ -1,0 +1,1 @@
+Nine configurable fixes for Bloodlines: console input, subtitle/radio sync, character creation, inventory/trading, HUD and feeding bars, flamethrower damage numbers, stuck casting animations, and accidental attacks after loading. Requires Unofficial Patch 12.0 with the Advanced EXE / VTM loader.
