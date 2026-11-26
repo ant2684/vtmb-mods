@@ -1,0 +1,61 @@
+Protean & Frenzy Improved 1.4
+
+Requires Vampire: The Masquerade - Bloodlines, Unofficial Patch 12.0 and
+Game Mod Loader. Start the game with Unofficial Patch active.
+
+Protean
+
+- You can enter Frenzy while Protean 5 is active. When one effect ends,
+  the other continues. This prevents duplicate forms and repeated stat bonuses.
+- Loading a save with Protean active restores the correct screen effect.
+- The Protean 5 transformation scene plays in walking mode and after you close
+  a menu. Taking an action interrupts it immediately. Feeding still transfers
+  blood and extends the discipline timer as usual.
+- The effects play on the return to human form, and loading a save made during
+  a transformation lets the scene recover correctly.
+- Fists and Claws stay in the right slots without duplicate entries. Claws
+  stay available when Frenzy ends while Protean is still active. When Protean 5
+  ends, you re-equip your previous weapon if you can still use it.
+- The camera switches to third person before you transform. Your original view
+  returns once you're fully human, unless you choose another view in the meantime.
+
+Claws
+
+- Male and female Claws have revised directional combos, a stationary four-hit
+  chain, faster heavy finishers and revised recovery. Air attacks keep your
+  horizontal position, and wide swings hit consistently across combo stages.
+- Unarmed crouch movement works in all eight directions. Hand poses are improved,
+  including during successful sneak attacks. The revised blocking stance keeps
+  the familiar heavy block.
+- Click attack up to 150 ms early to continue a combo. Each continuation needs
+  a fresh click.
+- NPCs such as the Serial Killer retain their original Claws attacks. Frenzy
+  keeps its own Claws attacks alongside the revised player combos.
+- Protean Claws and Tiger's Claws sneak attacks line up the attacker and victim
+  and place you correctly afterward. Successful attacks have new sounds for the
+  strike and withdrawal, and blood follows the wound.
+
+Frenzy
+
+- Frenzy uses suitable attacks for your selected supported melee weapon and
+  restores normal weapon handling afterward. Claws and visual effects activate
+  correctly when Frenzy takes over.
+- Movement and collision work correctly during Frenzy in the Griffith Werewolf
+  fight. Frenzy can occur in that encounter and in the Public Library.
+
+Installation and updates
+
+1. Close the game and back up the files the archive will replace.
+2. Extract into the folder containing Vampire.exe and merge the folders.
+3. If updating, copy any custom settings from your backup into the new
+   Bin/loader/protean-frenzy-improved.ini before starting the game.
+
+Settings
+
+Edit Bin/loader/protean-frenzy-improved.ini. Set an option to 1 to enable it
+or 0 to disable it, then restart the game. Each option is described in the file.
+
+Uninstall
+
+Close the game. Restore the files you backed up and remove the files added
+by the archive.

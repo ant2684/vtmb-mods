@@ -42,5 +42,8 @@ if args.fixtures:
     assert set(args.fixtures)<={p.stem for p in fixtures},'Unknown fixture'
     fixtures=[p for p in fixtures if p.stem in args.fixtures]
 for source in fixtures:
-    run(*base,source,'-o',build/(source.stem+'.exe'))
+    inputs = [source]
+    if source.stem == 'native_support':
+        inputs.append(HERE / 'native/morph_camera.c')
+    run(*base, *inputs, '-o', build / (source.stem + '.exe'))
 print('Build finished. No game files changed.')

@@ -1,0 +1,44 @@
+{
+  "version": "1.4",
+  "tag": "protean-frenzy-v1.4",
+  "title": "Protean & Frenzy Improved 1.4",
+  "plugin_sha256": "8d9d069640e8e6c309e9b9a97852b3e8013143abadbc6305032d7cadc52f9f3b",
+  "assets": {
+    "game": {
+      "filename": "VTMB.Protean.and.Frenzy.Improved.1.4.zip",
+      "sha256": "b1865662f86c3172d30c38befa446401137be4a8e2716b7debd7863d7e5ab42d",
+      "size": 131241829
+    },
+    "source": {
+      "filename": "Protean.and.Frenzy.Improved.1.4.Source.zip",
+      "sha256": "627da4ee416beff56ed66609e512cdb76883d46c4a01b0140e9cfdb68a7b3796",
+      "size": 297290
+    }
+  },
+  "automatic_checks": [
+    "claws_frenzy",
+    "claws_frenzy_models",
+    "configuration",
+    "core",
+    "emitted_feats",
+    "emitted_filter_sync",
+    "emitted_warform",
+    "fixture_priorities",
+    "flow",
+    "griffith",
+    "lifecycle",
+    "loader_compatibility",
+    "melee_behavior",
+    "native_runtime",
+    "native_support",
+    "npc_pools",
+    "pool_isolation",
+    "stealth"
+  ],
+  "gameplay": [
+    "First paired finisher and both sound cues with one delivery module",
+    "Blood particle creation on the first attack",
+    "Four Protean 5 camera scenarios",
+    "Six equipment return scenarios"
+  ]
+}

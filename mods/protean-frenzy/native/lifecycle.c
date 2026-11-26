@@ -26,6 +26,9 @@ typedef struct Insert {B *player,*item;struct Insert *previous;} Insert;
 static Insert *inserting;
 static B *creating_fists;
 static B *creating_claws;
+static B *wield_player_ptr;
+static unsigned wield_player=0xffffffffu,wield_weapon;
+__attribute__((used)) static uintptr_t resume_wield,skip_wield;
 __attribute__((used)) static uintptr_t resume_start,done_start,resume_end,done_end,wolf_name;
 __attribute__((used)) static uintptr_t resume_tick,tick_native;
 __attribute__((used)) static uintptr_t event_native;
@@ -97,6 +100,7 @@ static int idle_command(const char *name){
         contains(name,"lost")||contains(name,"armscrossed")||contains(name,"disposition")||contains(name,"pray"));
 }
 static void clear_scene(void){scene_player=scene_actor=0xffffffffu;scene_ptr=NULL;}
+static void clear_wield(void){wield_player=0xffffffffu;wield_player_ptr=NULL;}
 static B *valid_actor(B *p){
     B *a=resolve(u(p,0x1db0));
     if(!isclass(a,"npc_VWolfMorph")||u(p,0x168)!=30||u(a,0x168)!=31||
@@ -107,6 +111,7 @@ static void arm_scene(B *p,int target){
     ++morph_epoch;equip_player=deferred_player=0xffffffffu;equip_player_ptr=NULL;equip_visual=0;
     scene_ptr=p;scene_player=handle_of(p);scene_actor=0xffffffffu;scene_epoch=morph_epoch;
     scene_target=target;scene_duck=u(p,0x2088)&4u;scene_pose_duck=u(p,0x434)&2u;scene_time=now();memcpy(scene_origin,p+0x404,sizeof(scene_origin));
+    pfi_morph_camera_scene(p,target);
 }
 static int bind_scene(B *p){
     B *a;if(scene_ptr!=p||resolve(scene_player)!=p||scene_epoch!=morph_epoch)return 0;
@@ -117,8 +122,10 @@ static int bind_scene(B *p){
 static void sync_world(B *p,int stable_clock){
     unsigned h=handle_of(p);float t=now();B *table,*a;unsigned j;int removed=0;
     if(!world_player||world_player!=p||world_handle!=h||(stable_clock&&t+.001f<world_time)){
+        pfi_morph_camera_reset();
         world_wolf=p[0x1edc];world_frenzy=(int)u(p,0x146c)>0;fx_player=0xffffffffu;fx_player_ptr=NULL;
         clear_scene();++morph_epoch;equip_player=deferred_player=feeding_player=0xffffffffu;
+        clear_wield();
         equip_player_ptr=feeding_player_ptr=NULL;equip_visual=0;command_ptr=NULL;
         world_player=p;world_handle=h;world_time=t;
         inventory_frenzy_seen=(int)u(p,0x146c)>0||isclass(resolve(u(p,0x1db0)),"npc_VFrenzyShadow");
@@ -164,6 +171,52 @@ static B *inventory(B *p,const char *name){
     unsigned j;B *item;
     for(j=0;j<224;++j){item=resolve(u(p,0x1624+j*4));if(item&&u(item,0x73c)==j&&isclass(item,name))return item;}
     return NULL;
+}
+static B *owned_weapon_slot(B *p,unsigned handle,unsigned owner){
+    B *item=resolve(handle);
+    if(!item)return NULL;
+    unsigned slot=u(item,0x73c);
+    return slot<21&&u(p,0x1624+slot*4)==handle&&u(item,0x88c)==owner?item:NULL;
+}
+static int unwieldable_item(B *p,B *item){
+    if(!item)return 0;
+    unsigned slot=u(item,0x73c);
+    const char *name=*(const char **)(item+0x11c);
+    if(slot<21||slot>=224||!name||strncmp(name,"item_w_",7)||
+       resolve(u(p,0x1624+slot*4))!=item||resolve(u(item,0x88c))!=p)return 0;
+    B *data=((B *(TC *)(void *))(module+0x2517b0))(item);
+    return data&&!u(data,0x4fee4); /* Parsed is_wieldable. */
+}
+static unsigned previous_weapon(B *p,unsigned owner){
+    unsigned last=u(p,0xea4);
+    return owned_weapon_slot(p,last,owner)?last:u(p,0xea8);
+}
+/* Inventory_Wield_Update is about to switch to the result of its native
+   fallback search. Defer only a rejected result for a player leaving Protean. */
+USED static int __cdecl reject_wield_candidate(B *p,B *item){
+    if(!isclass(p,"player")||u(p,0x1380)||(int)u(p,0x146c)>0||!unwieldable_item(p,item))return 0;
+    unsigned owner=handle_of(p);
+    if(owner==0xffffffffu)return 0;
+    if(wield_player_ptr!=p||wield_player!=owner){
+        wield_player=owner;wield_player_ptr=p;wield_weapon=previous_weapon(p,owner);
+    }
+    return 1;
+}
+static void restore_wield(B *p){
+    if(u(p,0x1380)||p[0x1edc]||u(p,0x168)||p[0x200]||
+       (int)u(p,0x146c)>0||resolve(u(p,0x1db0))||paired(p))return;
+    B *equipped=resolve(u(p,0x19a4));
+    int pending=wield_player_ptr==p&&resolve(wield_player)==p;
+    int invalid=unwieldable_item(p,equipped);
+    if(!pending&&!invalid)return;
+    unsigned owner=pending?wield_player:handle_of(p);
+    unsigned saved=pending?wield_weapon:previous_weapon(p,owner);
+    clear_wield();
+    if(owner==0xffffffffu||(equipped&&!invalid))return;
+    B *weapon=owned_weapon_slot(p,saved,owner);
+    if(!weapon)weapon=inventory(p,"item_w_fists");
+    if(weapon&&resolve(u(weapon,0x88c))==p)
+        ((unsigned char (TC *)(void *,void *,int))(*(uintptr_t **)p)[0x610/4])(p,weapon,0);
 }
 /* Several discipline groups independently grant/remove the same weapon class.
    Once their native transactions settle, keep one equipment pair for the actual
@@ -233,6 +286,7 @@ static void inventory_tick(B *p){
         }
     }
     equip_tick(p);reconcile_claws(p);
+    restore_wield(p);
 }
 static void fists_first(B *p,B *fists){
     unsigned j,k,slot,handle;B *item;
@@ -435,6 +489,7 @@ USED static void __cdecl scene_tick(B *p){
         unsigned h=handle_of(p);float t=now();
         if(world_player!=p||world_handle!=h||t+.001f<world_time){
             ++morph_epoch;equip_player=deferred_player=0xffffffffu;equip_player_ptr=NULL;
+            clear_wield();
             inventory_frenzy_seen=(int)u(p,0x146c)>0||isclass(resolve(u(p,0x1db0)),"npc_VFrenzyShadow");
         }
         world_player=p;world_handle=h;world_time=t;
@@ -452,6 +507,21 @@ USED static void __cdecl scene_tick(B *p){
     }
     observe_form_fx(p);
     inventory_tick(p);
+    if(pfi_morph_camera_owns(p)){
+        if(p[0x200]||(int)u(p,0x146c)>0||paired(p))pfi_morph_camera_reset();
+        else {
+            int returning=u(p,0x1380)==0;
+            int human=returning&&!p[0x1edc]&&!u(p,0x168)&&!resolve(u(p,0x1db0));
+            unsigned firearm=0xffffffffu;
+            if(human){
+                unsigned active=u(p,0x19a4);
+                B *weapon=owned_weapon_slot(p,active,world_handle);
+                B *data=weapon?((B *(TC *)(void *))(module+0x2517b0))(weapon):NULL;
+                if(data&&(u(data,0x2440)&6))firearm=active;
+            }
+            pfi_morph_camera_update(p,returning,human,firearm,now());
+        }
+    }
 }
 USED static void __cdecl raw_input(B *p,B *cmd){
     B *g;float x,y,z;if(!isclass(p,"player")||!cmd)return;
@@ -513,6 +583,14 @@ __attribute__((naked)) static void end_bridge(void){
       "popal\n\tpopfl\n\tjmp *_done_end\n\t"
       "1: popal\n\tpopfl\n\tpushl %ebx\n\tpushl %edi\n\tmovl %eax,%esi\n\tcall *_event_native\n\tjmp *_resume_end\n\t");
 }
+__attribute__((naked)) static void wield_bridge(void){
+    __asm__ volatile(
+      "pushfl\n\tpushal\n\tmovl %esp,%ebx\n\tsubl $528,%esp\n\tandl $-16,%esp\n\tfxsave (%esp)\n\t"
+      "pushl 28(%ebx)\n\tpushl 4(%ebx)\n\tcall _reject_wield_candidate\n\taddl $8,%esp\n\t"
+      "fxrstor (%esp)\n\tmovl %ebx,%esp\n\ttestl %eax,%eax\n\tjnz 1f\n\t"
+      "popal\n\tpopfl\n\tmovl (%esi),%edx\n\tpushl $0\n\tpushl %eax\n\tjmp *_resume_wield\n\t"
+      "1: popal\n\tpopfl\n\tjmp *_skip_wield\n\t");
+}
 typedef struct {unsigned rva,size;B bytes[10];void *target;} Hook;
 static Hook hooks[]={
     {0x1f88eb,7,{0x68,0xe0,0x6b,0x5a,0x10,0x8b,0xcf},start_bridge},
@@ -531,11 +609,12 @@ static Hook hooks[]={
     {0x227a30,6,{0x53,0x8b,0xd9,0x56,0x33,0xf6},event_dispatch},
     {0x196ec3,5,{0x8b,0x44,0x24,0x10,0x50},schedule_bridge},
     {0xcee53,8,{0x50,0x8b,0xcb,0xe8,0x89,0x65,0xf3,0xff},queued_bridge},
-    {0x2c2ec0,6,{0x53,0x55,0x56,0x57,0x8b,0xf9},scripted_corpus}
+    {0x2c2ec0,6,{0x53,0x55,0x56,0x57,0x8b,0xf9},scripted_corpus},
+    {0x335cee,5,{0x8b,0x16,0x6a,0x00,0x50},wield_bridge}
 };
 enum {HOOK_COUNT=sizeof(hooks)/sizeof(hooks[0])};
 static int hook_selected(unsigned index){
-    return index==2||index==3||index==4||index==5||index==7||index==13||index==16||pfi_options[PFI_TRANSFORM];
+    return index==2||index==3||index==4||index==5||index==7||index==13||index==16||index==17||pfi_options[PFI_TRANSFORM];
 }
 #include "native_guards.h"
 static int dependencies_match(void){
@@ -544,7 +623,8 @@ static int dependencies_match(void){
         const struct Guard *g=guards+j;
         if(!pfi_options[PFI_TRANSFORM]&&g->rva!=0x334e70&&g->rva!=0x335780&&
            g->rva!=0x33589d&&g->rva!=0x33dde0&&g->rva!=0x21fe50&&
-           g->rva!=0x1f9a80&&g->rva!=0x1f9af0&&g->rva!=0x430e)continue;
+           g->rva!=0x1f9a80&&g->rva!=0x1f9af0&&g->rva!=0x430e&&
+           g->rva!=0x2517b0&&g->rva!=0x335cf3&&g->rva!=0x126ed)continue;
         for(k=0;k<g->size;++k){
             if(g->mask[k]=='r'){
                 unsigned expected;memcpy(&expected,g->bytes+k,4);
@@ -592,6 +672,7 @@ void pfi_lifecycle_server(void){
     resume_input=(uintptr_t)(module+0x351095);resume_command=(uintptr_t)(module+0x348603);
     skip_command=(uintptr_t)(module+0x348612);resume_fx=(uintptr_t)(module+0x1f9272);
     original_fx=(uintptr_t)(module+0x3931);
+    resume_wield=(uintptr_t)(module+0x335cf3);skip_wield=(uintptr_t)(module+0x335cf9);
     resume_tick=(uintptr_t)(module+0x16c41d);tick_native=(uintptr_t)(module+0x430e);
     PfiPatch batch[HOOK_COUNT];unsigned count=0;int committed;
     for(j=0;j<HOOK_COUNT;++j)if(hook_selected(j))

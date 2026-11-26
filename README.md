@@ -5,9 +5,9 @@ fixes, including health/blood HUD animations, fill alignment and dialogue feedin
 bars. See the [description and installation](docs/fixes-adjustments-1.2.md) and
 [download the release](https://github.com/ant2684/vtmb-mods/releases/tag/fixes-adjustments-v1.2).
 
-[Protean & Frenzy Improved 1.3.2](mods/protean-frenzy/README.md) combines the
+[Protean & Frenzy Improved 1.4](mods/protean-frenzy/README.md) combines the
 native Protean/Frenzy fixes in one complete package. See its standalone build
-and regression commands and [release notes](docs/protean-frenzy-1.3.2.md).
+and regression commands and [release notes](docs/protean-frenzy-1.4.md).
 Existing legacy model alternatives and separate mod releases remain available.
 
 

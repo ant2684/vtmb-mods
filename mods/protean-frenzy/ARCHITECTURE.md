@@ -16,6 +16,10 @@ inventory remain bound to validated actors/serials; stale queued exits cannot
 outlive their owning scene. Legitimate direct commands remain available outside
 owned scenes. The game still runs its own original scripts.
 
+The main server module registers finisher particles during map precaching.
+The transformation camera restores the selected view after the human
+return finishes.
+
 Hook groups verify supported bytes before transaction, restore original page
 protection and instruction visibility, and retain reachable helper storage if
 rollback cannot safely detach it. Production has no diagnostic plugin or logging.

@@ -23,6 +23,10 @@ def start():
     except:log(('ERROR',str(sys.exc_info()[1])))
 def prepare():
     p=__main__.FindPlayer()
+    if mode=='protean-camera':later(.5,'camera_setup(0)');return
+    if mode=='tiger-general':later(.5,'general_wield_setup(0)');return
+    if mode in ['tiger-return','tiger-equipment-baseline']:later(.5,'tiger_before()');return
+    if mode=='tiger-recover':later(.5,'tiger_recovered()');return
     if mode.startswith('native-hunger'):later(.3,'native_hunger_start()');return
     if mode=='filter-restore':later(.5,'filter_loaded()');return
     if mode.startswith('frenzy-maps'):
@@ -64,6 +68,80 @@ def prepare():
         else:__main__.ScheduleTask(1.0,"__import__('p5_probe').cast()")
         return
     __main__.ScheduleTask(.3,"__import__('p5_probe').prepare()")
+def tiger_before():
+    mark('TIGER_BEFORE');command('p5_cast');later(3.,'tiger_during()')
+
+def tiger_during():
+    mark('TIGER_DURING');command('p5_end');later(3.,'tiger_recovered()')
+
+def tiger_recovered():
+    mark('TIGER_AFTER')
+    if mode=='tiger-equipment-baseline':command('p5_bubble_save')
+    finish()
+
+camera_cases=['drawn_first','holstered_first','already_third','manual_toggle']
+
+def camera_setup(index):
+    label=camera_cases[index]
+    command('p5_revolver')
+    if label=='holstered_first':later(.4,"command('holster')")
+    if label=='already_third':later(.75,"command('thirdperson')")
+    else:later(.75,"command('firstperson')")
+    later(1.4,'camera_cast(%d)'%index)
+
+def camera_shot(label):
+    mark(label);log(('CAMERA_SHOT',label));command('snapshot')
+
+def camera_cast(index):
+    label=camera_cases[index]
+    mark(label+'_before');command('p5_cast')
+    later(.15,"mark(%r)"%(label+'_entry_start'))
+    later(.55,'camera_shot(%r)'%(label+'_entry'))
+    if label=='manual_toggle':later(2.45,"command('togglecamera')")
+    later(2.95,'camera_end(%d)'%index)
+
+def camera_end(index):
+    label=camera_cases[index]
+    mark(label+'_warform');command('p5_end')
+    later(.7,'camera_shot(%r)'%(label+'_return'))
+    later(3.35,'camera_finished(%d)'%index)
+
+def camera_finished(index):
+    mark(camera_cases[index]+'_human')
+    if index+1<len(camera_cases):later(.6,'camera_setup(%d)'%(index+1))
+    else:finish()
+
+general_wield_cases=[
+    ('license','item_w_claws_ghoul','p5_tiger'),
+    ('card','item_w_claws_protean4','p5_tiger'),
+    ('tubes','item_w_claws_protean5','p5_tiger'),
+    ('gum','item_w_mingxiao_tentacle','p5_tiger'),
+    ('katana','item_w_mingxiao_tentacle','p5_sword'),
+    ('revolver','item_w_mingxiao_tentacle','p5_revolver'),
+]
+
+def general_wield_setup(index):
+    label,candidate,equip=general_wield_cases[index]
+    p=__main__.FindPlayer()
+    if index==0:p.GiveItem('item_w_katana')
+    for name in [row[1] for row in general_wield_cases[:4]]:
+        if name!=candidate and p.HasItem(name):p.RemoveItem(name)
+    if not p.HasItem(candidate):p.GiveItem(candidate)
+    command(equip);later(.6,'general_wield_cast(%d)'%index)
+
+def general_wield_cast(index):
+    mark(general_wield_cases[index][0]+'_BEFORE')
+    command('p5_cast');later(2.8,'general_wield_end(%d)'%index)
+
+def general_wield_end(index):
+    mark(general_wield_cases[index][0]+'_ACTIVE')
+    command('p5_end');later(2.8,'general_wield_after(%d)'%index)
+
+def general_wield_after(index):
+    mark(general_wield_cases[index][0]+'_AFTER')
+    if index+1<len(general_wield_cases):later(.4,'general_wield_setup(%d)'%(index+1))
+    else:finish()
+
 def cast():
     snapshot('BEFORE_CAST');command('p5_cast')
     __main__.ScheduleTask(.1,"__import__('p5_probe').snapshot('CAST_100MS')")

@@ -15,8 +15,9 @@ static void FC gender_set(B *group,void *unused,int trait,int value){(void)unuse
 
 static void FC refresh_native(B *p,void *unused,int action,int flags){(void)unused;(void)action;(void)flags;++refresh_calls;p[0x65c]=1;}
 static int reenter_add,reenter_create,reenter_ensure,retarget_alias_failure;
-static const unsigned sites[]={0x1f88eb,0x1f9193,0x3daf,0x33dde0,0x16c416,0x11fdb,0xd91d,0x1f9a80,0x351090,0x3485fd,0x1f926d,0xcc93,0x1005a,0x227a30,0x196ec3,0xcee53,0x2c2ec0};
-static const unsigned sizes[]={7,9,5,5,7,5,5,5,5,6,5,5,5,6,5,8,6};
+static const unsigned sites[]={0x1f88eb,0x1f9193,0x3daf,0x33dde0,0x16c416,0x11fdb,0xd91d,0x1f9a80,0x351090,0x3485fd,0x1f926d,0xcc93,0x1005a,0x227a30,0x196ec3,0xcee53,0x2c2ec0,0x335cee};
+static const unsigned sizes[]={7,9,5,5,7,5,5,5,5,6,5,5,5,6,5,8,6,5};
+enum {SITE_COUNT=sizeof(sites)/sizeof(*sites)};
 static unsigned U(B *p,unsigned o){return *(unsigned *)(p+o);}
 static void P(B *p,unsigned o,unsigned v){*(unsigned *)(p+o)=v;}
 static void *R(unsigned h){if(h==0xffffffffu)return NULL;B *e=table+(h&8191)*12;return U(e,8)==h>>13?*(void **)(e+4):NULL;}
@@ -32,7 +33,11 @@ static DWORD WINAPI profile(LPCSTR section,LPCSTR key,LPCSTR fallback,LPSTR p,DW
 }
 static BOOL WINAPI protect(LPVOID p,SIZE_T n,DWORD flags,PDWORD old){++protect_calls;return protect_calls==fail_protect?FALSE:VirtualProtect(p,n,flags,old);}
 /* Isolate this component: the independent model collector intentionally ignores INI switches. Its guards/pools are covered by exact_configuration and exact NPC fixtures. */
-static HMODULE open_plugin(const char *path){server[0x8dac0]=0xcc;HMODULE h=LoadLibraryA(path);check(h!=NULL,"load exact candidate");imports(h,"GetModuleHandleA",modules);imports(h,"VirtualProtect",protect);imports(h,"GetModuleFileNameA",executable);imports(h,"GetPrivateProfileStringA",profile);protect_calls=0;return h;}
+static HMODULE open_plugin(const char *path){
+ /* Independent always-on hooks are exercised by exact_configuration. */
+ server[0x8dac0]=0xcc;server[0x33fd45]=0xcc;
+ HMODULE h=LoadLibraryA(path);check(h!=NULL,"load exact candidate");imports(h,"GetModuleHandleA",modules);imports(h,"VirtualProtect",protect);imports(h,"GetModuleFileNameA",executable);imports(h,"GetPrivateProfileStringA",profile);protect_calls=0;return h;
+}
 static void install(HMODULE h){void (__cdecl *f)(void)=(void *)GetProcAddress(h,"loaded_vampire");check(f!=NULL,"only loader API required");f();}
 static void FC add_native(B *p,void *unused,B *item){(void)unused;++add_calls;
  if(reenter_add){reenter_add=0;((Add)(server+0x3daf))(p,item);}
@@ -56,6 +61,14 @@ static void __stdcall remove_trait_native(B *p,const char *name){
  }
 }
 static void FC select_native(B *p,void *unused,const char *name,int flags){(void)unused;(void)flags;check(!strcmp(name,"item_w_claws"),"ordinary claws selection");++select_calls;P(p,0x19a4,H(claws));}
+static unsigned return_calls;
+static B bad_item_data[0x4fee8],good_item_data[0x4fee8],*nonweapon;
+static B *FC item_data(B *item,void *unused){
+ (void)unused;P(good_item_data,0x4fee4,1);return item==nonweapon?bad_item_data:good_item_data;
+}
+static unsigned char FC switch_native(B *p,void *unused,B *weapon,int flags){
+ (void)unused;check(p==pc&&!flags,"native weapon switch ABI");++return_calls;P(p,0x19a4,H(weapon));return 1;
+}
 static void FC ensure_native(B *p,void *unused){(void)unused;++ensure_calls;
  if(reenter_ensure){reenter_ensure=0;((void (TC *)(void *))(server+0x33dde0))(p);}
  for(unsigned i=0;i<224;i++)if(R(U(p,0x1624+i*4))==fists)return;
@@ -103,6 +116,9 @@ static void FC tick_native(B *p,void *unused){(void)unused;check(p==pc,"native f
 __attribute__((naked)) static void run_start(B *p __attribute__((unused))){__asm__ volatile("pushl %ebp\n\tpushl %ebx\n\tpushl %esi\n\tpushl %edi\n\tmovl 20(%esp),%edi\n\tcall *_entry\n\tpopl %edi\n\tpopl %esi\n\tpopl %ebx\n\tpopl %ebp\n\tret\n\t");}
 __attribute__((naked)) static void run_end(B *p __attribute__((unused))){__asm__ volatile("pushl %ebp\n\tpushl %ebx\n\tpushl %esi\n\tpushl %edi\n\tmovl 20(%esp),%edi\n\tmovl _actor_for_end,%eax\n\tmovl $2,%ebx\n\tcall *_entry\n\tpopl %edi\n\tpopl %esi\n\tpopl %ebx\n\tpopl %ebp\n\tret\n\t");}
 __attribute__((naked)) static void run_tick(B *p __attribute__((unused))){__asm__ volatile("pushl %ebp\n\tpushl %ebx\n\tpushl %esi\n\tpushl %edi\n\tmovl 20(%esp),%ebp\n\tcall *_entry\n\tpopl %edi\n\tpopl %esi\n\tpopl %ebx\n\tpopl %ebp\n\tret\n\t");}
+__attribute__((naked)) static void run_wield(B *p __attribute__((unused)),B *item __attribute__((unused))){
+ __asm__ volatile("pushl %esi\n\tmovl 8(%esp),%esi\n\tmovl %esi,%ecx\n\tmovl 12(%esp),%eax\n\tcall *_entry\n\tpopl %esi\n\tret\n\t");
+}
 
 __attribute__((naked)) static void run_command(B *p __attribute__((unused)),int seq __attribute__((unused))){__asm__ volatile("pushl %ebp\n\tpushl %ebx\n\tpushl %esi\n\tpushl %edi\n\tmovl 20(%esp),%esi\n\tmovl 24(%esp),%eax\n\tcall *_entry\n\tpopl %edi\n\tpopl %esi\n\tpopl %ebx\n\tpopl %ebp\n\tret\n\t");}
 
@@ -125,13 +141,15 @@ static void check_registers(void){
  check(!memcmp(fx_before,fx_after,24)&&!memcmp(fx_before+24,fx_after+24,8)&&!memcmp(fx_before+32,fx_after+32,128)&&!memcmp(fx_before+160,fx_after+160,128),"bridge preserves x87, MXCSR and SSE registers");
 }
 
-static void hooks_unchanged(B old[17][10]){for(unsigned j=0;j<17;j++)check(!memcmp(server+sites[j],old[j],sizes[j]),"failed install left all hooks unchanged");}
+static void hooks_unchanged(B old[SITE_COUNT][10]){for(unsigned j=0;j<SITE_COUNT;j++)check(!memcmp(server+sites[j],old[j],sizes[j]),"failed install left all hooks unchanged");}
 static void setup(void){
  table=calloc(8192,12);check(table!=NULL,"entity table");P(server,0x566458,(unsigned)(uintptr_t)table);P(server,0x70b228,(unsigned)(uintptr_t)globals);*(float *)(globals+12)=100.f;
  pc=entity("player",1);fists=entity("item_w_fists",2);sword=entity("item_w_katana",3);knife=entity("item_w_knife",4);claws=entity("item_w_claws",5);P(pc,0,(unsigned)(uintptr_t)player_vt);
  for(unsigned i=0;i<224;i++)P(pc,0x1624+4*i,0xffffffffu);P(pc,0x6f0,42);P(pc,0x650,42);*(float *)(pc+0x6f4)=1.f;*(float *)(pc+0x6f8)=.35f;
  strcpy((char *)header+12,"character/pc/male/gangrel/armor_0/Gangrel_Male_Armor_0.mdl");
  player_vt[0x4d8/4]=(uintptr_t)activity_one;player_vt[0x4dc/4]=(uintptr_t)activity_three;player_vt[0x724/4]=(uintptr_t)select_native;player_vt[0x1a4/4]=(uintptr_t)set_model;proxy_vt[0x1a4/4]=(uintptr_t)set_model;proxy_vt[0x4d8/4]=(uintptr_t)activity_one;proxy_vt[0x4dc/4]=(uintptr_t)activity_three;
+ player_vt[0x610/4]=(uintptr_t)switch_native;
+ jump(server+0x2517b0,item_data);server[0x335cf9]=0xc3;
  server[0x1f9a85]=0x5e;jump(server+0x1f9a86,trait_native);jump(server+0x336920,gender_native);jump(server+0x2008e0,gender_set);jump(server+0xd8830,discipline_native);jump(server+0x1618e0,cleanup_native);jump(server+0x181680,refresh_native);jump(server+0x334e70,add_native);jump(server+0x335780,front_native);jump(server+0x21fe50,create_native);server[0x33dde5]=0x5e;jump(server+0x33dde6,ensure_native);
  jump(server+0x19ce00,filter_ctor);jump(server+0x19d210,filter_pas);jump(server+0xf5fc0,filter_dtor);jump(server+0x69e80,temp_fx);jump(server+0x1644f0,pose_native);jump(server+0x1f9af0,remove_trait_native);jump(server+0xa0420,name_native);jump(server+0x952d0,get_model);jump(server+0x8fe80,seq_name);jump(server+0xe057,seq_lookup);jump(server+0x161a70,proxy_native);jump(server+0x24f7b0,remove_native);jump(server+0x227a30,event_native);jump(server+0x50d90,fx_native);jump(server+0x125c1,heaviest);jump(server+0x430e,tick_native);
  server[0x1f8a26]=0xc3;server[0x1f8fa3]=0xc3;server[0x1f88f2]=0xe8;P(server,0x1f88f3,(unsigned)((B *)start_scene_native-(server+0x1f88f7)));server[0x1f88f7]=0xc3;memcpy(server+0x351095,"\x5e\xc2\x04\x00",4);server[0x348603]=server[0x348612]=server[0x1f9272]=0xc3;server[0x1f919c]=0xc3;server[0x16c41d]=0xc3;
@@ -164,15 +182,15 @@ static void frenzy_inventory_cases(void){
  puts("PASS unified inventory: 14 profiles/player/owned FrenzyShadow, nested first insert, stale controller, unrelated NPC, mismatched slot, stock claws");
 }
 int main(int argc,char **argv){
- check(argc==3,"plugin and supported native DLL arguments");B old[17][10];HMODULE h;
+ check(argc==3,"plugin and supported native DLL arguments");B old[SITE_COUNT][10];HMODULE h;
  /* OS fault coverage is in exact_configuration, with original RX protections. */
  fail_protect=0;
- for(unsigned i=0;i<17;i++){
-  server=map_image(argv[2]);server[sites[i]]^=1;for(unsigned j=0;j<17;j++)memcpy(old[j],server+sites[j],sizes[j]);h=open_plugin(argv[1]);install(h);check(!protect_calls,"occupied hook refused before mutation");hooks_unchanged(old);FreeLibrary(h);VirtualFree(server,0,MEM_RELEASE);
+ for(unsigned i=0;i<SITE_COUNT;i++){
+  server=map_image(argv[2]);server[sites[i]]^=1;for(unsigned j=0;j<SITE_COUNT;j++)memcpy(old[j],server+sites[j],sizes[j]);h=open_plugin(argv[1]);install(h);check(!protect_calls,"occupied hook refused before mutation");hooks_unchanged(old);FreeLibrary(h);VirtualFree(server,0,MEM_RELEASE);
  }
- const unsigned dependencies[]={0x334e70,0x335780,0x33589d,0x33dde0,0x21fe50,0x161a70,0x952d0,0x8fe80,0xe057,0x227a30,0x50d90,0x24f7b0,0x125c1,0x430e,0x181680,0x1f9a80,0xb7fe0,0xa0420,0x1f9af0,0x1644f0,0x19ce00,0x19d210,0xf5fc0,0x69e80,0x1618e0,0xd8830,0x336920,0x2008e0,0x2c2ec6,0x2c31f7,0x31c1d3,0x117b1};
+ const unsigned dependencies[]={0x334e70,0x335780,0x33589d,0x33dde0,0x21fe50,0x161a70,0x952d0,0x8fe80,0xe057,0x227a30,0x50d90,0x24f7b0,0x125c1,0x430e,0x181680,0x1f9a80,0xb7fe0,0xa0420,0x1f9af0,0x1644f0,0x19ce00,0x19d210,0xf5fc0,0x69e80,0x1618e0,0xd8830,0x336920,0x2008e0,0x2c2ec6,0x2c31f7,0x31c1d3,0x117b1,0x2517b0,0x126ed,0x335cf3};
  for(unsigned i=0;i<sizeof(dependencies)/sizeof(dependencies[0]);i++){
-  server=map_image(argv[2]);server[dependencies[i]]^=1;for(unsigned j=0;j<17;j++)memcpy(old[j],server+sites[j],sizes[j]);h=open_plugin(argv[1]);install(h);check(!protect_calls,"dependency mismatch refused before mutation");hooks_unchanged(old);FreeLibrary(h);VirtualFree(server,0,MEM_RELEASE);
+  server=map_image(argv[2]);server[dependencies[i]]^=1;for(unsigned j=0;j<SITE_COUNT;j++)memcpy(old[j],server+sites[j],sizes[j]);h=open_plugin(argv[1]);install(h);check(!protect_calls,"dependency mismatch refused before mutation");hooks_unchanged(old);FreeLibrary(h);VirtualFree(server,0,MEM_RELEASE);
  }
  server=map_image(argv[2]);
  /* Reproduce the actual shared RX code page: end and trait hooks share it. */
@@ -180,7 +198,7 @@ int main(int argc,char **argv){
  h=open_plugin(argv[1]);install(h);
  MEMORY_BASIC_INFORMATION page_info;check(VirtualQuery(server+0x1f9000,&page_info,sizeof(page_info))!=0&&page_info.Protect==PAGE_EXECUTE_READ,"shared page original protection restored");
  check(VirtualProtect(server+0x1f9000,0x1000,image_old,&image_tmp),"fixture writable helpers");
- for(unsigned i=0;i<17;i++)check(server[sites[i]]==0xe9,"all seventeen Lifecycle hooks installed");unsigned count=protect_calls;install(h);check(count==protect_calls,"repeated loader callback");
+ for(unsigned i=0;i<SITE_COUNT;i++)check(server[sites[i]]==0xe9,"all Lifecycle hooks installed");unsigned count=protect_calls;install(h);check(count==protect_calls,"repeated loader callback");
  check(server[0xb0b4]==0xe9&&U(server,0xb0b5)==0x323067,"presentation weapon factory untouched");setup();
  entry=server+0x16c416;run_tick(pc);
  check(U(pc,0x168)==0,"native lifecycle ready with no Python module or handshake");
@@ -307,7 +325,29 @@ int main(int argc,char **argv){
  B *finish_partner=entity("npc_VHumanCombatant",7101);P(pc,0x1538,H(finish_partner));P(pc,0x153c,0);P(pc,0x146c,0);P(pc,0x1db0,0xffffffffu);run_tick(pc);
  check(select_calls==1&&U(pc,0x1538)==H(finish_partner),"Frenzy-end restoration preserves an existing feeding pair");
  P(pc,0x1538,0xffffffffu);P(pc,0x153c,0xffffffffu);run_tick(pc);check(select_calls==2&&U(pc,0x19a4)==H(claws),"Frenzy-end Claws selection occurs once after feeding release");
+
+ setup();entry=server+0x16c416;run_tick(pc);
+ B *tiger=entity("item_w_chang_claw",6),*generic=entity("item_w_test_generic",7);
+ place(fists,0);place(tiger,3);place(generic,37);nonweapon=generic;
+ P(pc,0x19a4,0xffffffffu);P(pc,0xea4,H(tiger));P(pc,0xea8,H(tiger));
+ P(pc,0x168,30);pc[0x1edc]=1;
+ entry=server+0x335cee;run_wield(pc,generic);
+ check(!return_calls&&U(pc,0x19a4)==0xffffffffu,"non-wieldable generic fallback never equips during return");
+ entry=server+0x16c416;run_tick(pc);
+ check(!return_calls,"wait for human form");
+ P(pc,0x168,0);pc[0x1edc]=0;run_tick(pc);run_tick(pc);
+ check(return_calls==1&&U(pc,0x19a4)==H(tiger)&&U(pc,0x1624+37*4)==H(generic),"restore the exact previous weapon and retain the generic item");
+ P(pc,0x19a4,H(generic));P(pc,0xea4,H(tiger)+0x2000);run_tick(pc);
+ check(return_calls==2&&U(pc,0x19a4)==H(tiger),"loaded broken equipment uses the second valid previous handle");
+ P(pc,0x19a4,H(generic));P(tiger,0x88c,0xffffffffu);run_tick(pc);
+ check(return_calls==3&&U(pc,0x19a4)==H(fists),"foreign or stale previous handles fall back to fists");
+ nonweapon=NULL;entry=server+0x335cee;run_wield(pc,generic);
+ entry=server+0x16c416;run_tick(pc);
+ check(return_calls==4&&U(pc,0x19a4)==H(generic),"wieldable native option in a later slot is forwarded");
+ P(pc,0x19a4,0xffffffffu);nonweapon=generic;entry=server+0x335cee;run_wield(pc,generic);
+ run_wield(pc,fists);entry=server+0x16c416;run_tick(pc);
+ check(return_calls==5&&U(pc,0x19a4)==H(fists),"deferred restoration preserves intervening valid equipment");
  frenzy_inventory_cases();
- puts("PASS exact candidate: 17 hook conflicts, 32 dependency conflicts; repeated/nested inventory, shared RX page, ABI preservation, feeding event continuity, original scene delegation and same-command input interruption, stationary speed/interface state, stale loaded-scene ticket with motion/attack priority; integrated configuration and OS faults checked separately.");
+ printf("PASS exact candidate: %u hook conflicts, %u dependency conflicts; inventory fallback rejection, exact restoration, repeated/nested inventory, shared RX page, ABI preservation, feeding event continuity, original scene delegation and same-command input interruption, stationary speed/interface state, stale loaded-scene ticket with motion/attack priority.\n",(unsigned)SITE_COUNT,(unsigned)(sizeof(dependencies)/sizeof(*dependencies)));
  return 0;
 }

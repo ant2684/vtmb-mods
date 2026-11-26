@@ -1,5 +1,5 @@
 """One exact-candidate runner. A failure retains its first receipt and stops."""
-import argparse,datetime,hashlib,json,os,subprocess,sys
+import argparse,datetime,hashlib,json,os,re,subprocess,sys
 from pathlib import Path
 HERE=Path(__file__).resolve().parent
 ap=argparse.ArgumentParser();ap.add_argument('--config',type=Path,default=HERE/'local.json')
@@ -23,9 +23,10 @@ def run(label,*cmd):
     print(label,'PASS' if not result.returncode else 'FAIL',flush=True)
     if result.returncode:
         print(result.stdout+result.stderr);raise SystemExit(result.returncode)
-    if label=='lifecycle' and '17 hook conflicts, 32 dependency conflicts' in result.stdout:
+    conflicts=re.search(r'(\d+) hook conflicts, (\d+) dependency conflicts',result.stdout) if label=='lifecycle' else None
+    if conflicts:
         (out/'lifecycle-guards.json').write_text(json.dumps(dict(passed=True,plugin_sha256=before,
-            created=started,hook_conflicts=17,dependency_conflicts=32,stdout=result.stdout,stderr=result.stderr),indent=2)+'\n')
+            created=started,hook_conflicts=int(conflicts[1]),dependency_conflicts=int(conflicts[2]),stdout=result.stdout,stderr=result.stderr),indent=2)+'\n')
 if args.suite in ['native','all']:
     run('configuration',out/'build/exact_configuration.exe',plugin,game/'Vampire/dlls/vampire.dll',game/'Vampire/cl_dlls/client.dll',game/'Bin/engine.dll')
     run('lifecycle',out/'build/exact_lifecycle.exe',plugin,game/'Vampire/dlls/vampire.dll')

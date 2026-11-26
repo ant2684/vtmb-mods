@@ -43,11 +43,13 @@ static void add(uint8_t *image,unsigned rva,unsigned size){
  MEMORY_BASIC_INFORMATION info;check(VirtualQuery(image+rva,&info,sizeof(info))!=0,"native page protection");s->protection=info.Protect;
 }
 static unsigned core[]={0x16c558,0x33e9be,0x1f9177,0x3510d7,0x1e56e0,0x1e5b30,0x33ed75};
-static unsigned inventory[]={0x3daf,0x33dde0,0x16c416,0x11fdb,0x1f9a80,0x227a30,0x2c2ec0};
+static unsigned inventory[]={0x3daf,0x33dde0,0x16c416,0x11fdb,0x1f9a80,0x227a30,0x2c2ec0,0x335cee};
 static unsigned transform[]={0x1f88eb,0x1f9193,0xd91d,0x351090,0x3485fd,0x1f926d,0xcc93,0x1005a,0x196ec3,0xcee53};
 static unsigned melee[]={0x161fc0,0x162038,0x375c80,0x8dc40,0x12503,0x376f20,0xf03d,0xc036,0x8dd30,0x32b0,0xd4e0,0x2725d0,0xd0b2,0x3e9e00,0x343020,0x33f6d0,0x329a70,0x94b70,0x12512,0xb230,0x6fbe};
 static unsigned melee_sizes[]={9,17,7,5,5,8,5,5,5,5,5,7,5,5,5,10,9,6,5,5,5};
 static unsigned stealth[]={0x329298,0x329c24};
+static unsigned morph_camera[]={0x9c250,0xff1ce,0x4d255c,0x4d2584,0x4d1858};
+static unsigned camera_entries[]={0xfbd70,0xfbd80,0xfbd90};
 static HMODULE open(const char *path){
  HMODULE h=LoadLibraryA(path);check(h!=NULL,"load unified exact candidate");
  imports(h,"GetModuleHandleA",modules);imports(h,"GetModuleFileNameA",executable);
@@ -71,22 +73,27 @@ static void expect(unsigned mask){
  group(core,sizeof(core)/sizeof(*core),(mask&1)!=0);
  group(inventory,sizeof(inventory)/sizeof(*inventory),inv);
  check(changed(server,0x8dac0),"model pool isolation independent of every optional setting");
+ check(changed(server,0x33fd45),"stealth particle registration independent of optional positioning");
  group(transform,sizeof(transform)/sizeof(*transform),trans);
  group(melee,sizeof(melee)/sizeof(*melee),mel);
  group(stealth,2,(mask&32)!=0);
  check(changed(server,0x254250)==((mask&16)!=0),"buffer flag");
  check(changed(server,0x16c5be)==((mask&128)!=0),"Griffith flag");
  check(changed(client,0x19da73)==((mask&2)!=0),"filter flag");
+ for(unsigned i=0;i<5;++i)check(changed(client,morph_camera[i])==trans,"morph camera follows transform flag");
  check(server[0x1618e0]==0x53,"original controller body retained");
 }
 int main(int argc,char **argv){
  check(argc==5,"plugin/server/client/engine arguments");server=map_image(argv[2]);client=map_image(argv[3]);engine=map_image(argv[4]);
  unsigned i;for(i=0;i<7;++i)add(server,core[i],i==6?1:i==5?7:i==1||i==4?5:6);
- for(i=0;i<7;++i)add(server,inventory[i],i==2?7:i>=5?6:5);
+ for(i=0;i<sizeof(inventory)/sizeof(*inventory);++i)add(server,inventory[i],i==2?7:i==5||i==6?6:5);
  for(i=0;i<10;++i)add(server,transform[i],i==0?7:i==1?9:i==4?6:i==9?8:5);
  for(i=0;i<21;++i)add(server,melee[i],melee_sizes[i]);
  add(server,0x254250,5);add(server,stealth[0],8);add(server,stealth[1],7);add(server,0x16c5be,6);add(client,0x19da73,5);
  add(server,0x8dac0,5);
+ add(server,0x33fd45,5);
+ for(i=0;i<3;++i)*(uint8_t **)(client+morph_camera[i+2])=client+camera_entries[i];
+ for(i=0;i<5;++i)add(client,morph_camera[i],i==0?6:i==1?5:4);
  /* All original hook pages are real RX pages, not a permissive RWX fixture. */
  for(i=0;i<count;++i){DWORD old;check(VirtualProtect(sites[i].image+sites[i].rva,sites[i].size,PAGE_EXECUTE_READ,&old),"RX fixture");sites[i].protection=PAGE_EXECUTE_READ;}
  for(selected=0;selected<256;++selected){HMODULE h=open(argv[1]);invoke(h,"loaded_vampire");invoke(h,"loaded_client");expect(selected);protections();unsigned calls=protect_calls;invoke(h,"loaded_vampire");invoke(h,"loaded_client");check(calls==protect_calls,"idempotent loader callbacks");reset(h);}
@@ -99,8 +106,10 @@ int main(int argc,char **argv){
    fail_protect=kind?0:fault;fail_flush=kind?fault:0;
    h=open(argv[1]);invoke(h,"loaded_vampire");invoke(h,"loaded_client");protections();
    /* Each independently installed group must be all-original or all-new. */
-   unsigned *groups[]={core,inventory,transform,melee,stealth};unsigned lengths[]={7,7,10,21,2};
+   unsigned *groups[]={core,inventory,transform,melee,stealth};unsigned lengths[]={7,8,10,21,2};
    for(unsigned g=0;g<5;++g){int first=changed(server,groups[g][0]);for(i=1;i<lengths[g];++i)check(changed(server,groups[g][i])==first,"atomic group under OS failure");}
+   int camera=changed(client,morph_camera[0]);
+   for(i=1;i<5;++i)check(changed(client,morph_camera[i])==camera,"atomic camera group under OS failure");
    reset(h);++faults;
   }
   fail_protect=fail_flush=0;

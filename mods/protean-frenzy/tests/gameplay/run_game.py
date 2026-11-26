@@ -80,6 +80,22 @@ def run():
     try:
         (HERE/'native-events.log').write_text('',encoding='ascii')
         tx.begin()
+        if mode in ('tiger-return','tiger-recover','tiger-equipment-baseline','tiger-general','protean-camera'):
+            # These launchers can pause before the in-engine scenario can run.
+            # The transaction already holds the complete original loader tree.
+            for name,key in [('loader.ini',b'Loading Wait For Enter'),('loading-pause.ini',b'Enabled')]:
+                ini=GAME/'Bin/loader'/name
+                if not ini.is_file():continue
+                raw=ini.read_bytes()
+                changed,count=re.subn(rb'(?mi)^(\s*'+key+rb'\s*=\s*)1(?=[ \t;\r\n]|$)',rb'\g<1>0',raw)
+                assert count<=1,('Ambiguous launch wait setting',name)
+                if count:ini.write_bytes(changed)
+        if CONFIG.get('tiger_isolate_loader') and mode in ('tiger-general','tiger-recover'):
+            for peer in (GAME/'Bin/loader').glob('*.vtm'):
+                if peer.name!='protean-frenzy-improved.vtm':peer.unlink()
+        if CONFIG.get('camera_isolate_loader') and mode=='protean-camera':
+            for peer in (GAME/'Bin/loader').glob('*.vtm'):
+                if peer.name!='protean-frenzy-improved.vtm':peer.unlink()
         stock=path('original_resource_root')/'Unofficial_Patch/python/vamputil.py'
         assert sha(stock)=='6a98c7da7b2e3aba816091f363763109fb6420ae9d2ef3fd82767162439dbd3a'
         shutil.copy2(stock,GAME/'Unofficial_Patch/python/vamputil.py')
@@ -109,7 +125,10 @@ def run():
                     result['payload_sha256'][source.relative_to(payload).as_posix()]=sha(target)
         seed_key='feeding_seed' if mode.startswith(('feeding','stealth','frenzy','transitions')) else 'claws_seed'
         seed=path(seed_key);assert sha(seed)==CONFIG[seed_key+'_sha256']
-        if mode.startswith('native-hunger'):
+        if mode in ('tiger-return','tiger-recover','tiger-equipment-baseline','tiger-general','protean-camera'):
+            seed_key='tiger_recover_seed' if mode=='tiger-recover' else 'tiger_return_seed'
+            seed=path(seed_key);assert sha(seed)==CONFIG[seed_key+'_sha256']
+        elif mode.startswith('native-hunger'):
             seed=path('native_frenzy_seed');assert sha(seed)==CONFIG['native_frenzy_seed_sha256']
         elif mode in ('latest-interface','latest-midload'):
             seed=path('interface_seed');assert sha(seed)==CONFIG['interface_seed_sha256']
@@ -152,6 +171,10 @@ def run():
         if mode=='filter-save':
             assert not (GAME/'Unofficial_Patch/save/ProteanFilterOwned.sav').exists()
             commands.append('alias p5_filter_save "save ProteanFilterOwned"')
+        if mode=='tiger-equipment-baseline':
+            assert not (GAME/'Unofficial_Patch/save/ProteanBubbleOwned.sav').exists()
+            commands.append('alias p5_bubble_save "save ProteanBubbleOwned"')
+        if mode in ('tiger-general','protean-camera'):commands.append('alias p5_revolver "use item_w_thirtyeight"')
         commands.extend(['alias p5_unarmed "use item_w_fists"','alias p5_claws "use item_w_claws"','alias p5_tiger "use item_w_chang_claw"'])
         for verb in ['forward','back','moveleft','moveright','attack','jump','duck','use','feed']:
             commands.extend(['alias p5_'+verb+' "+'+verb+'"','alias p5_stop'+verb+' "-'+verb+'"'])
@@ -169,7 +192,7 @@ def run():
         dump(session/'launch.json',dict(command=cmd,game=str(GAME)));proc=subprocess.Popen(cmd,cwd=GAME)
         dump(session/'owned.json',dict(pid=proc.pid));print('OWNED',proc.pid,session,flush=True)
         launch_started=time.monotonic()
-        deadline=time.monotonic()+(150 if mode.startswith('frenzy-maps') else 170 if mode.startswith('claws-actions') or mode in ('feeding-expiry','latest-midload') or mode.startswith('frenzy') or mode.startswith('transitions') else 90 if mode.startswith('stealth') or mode in ('actions','morph-visual') or mode.startswith('feeding') else 45);bound=None;done=None;seq_names={};class_cache={}
+        deadline=time.monotonic()+(110 if mode in ('tiger-general','protean-camera') else 150 if mode.startswith('frenzy-maps') else 170 if mode.startswith('claws-actions') or mode in ('feeding-expiry','latest-midload') or mode.startswith('frenzy') or mode.startswith('transitions') else 90 if mode.startswith('stealth') or mode in ('actions','morph-visual') or mode.startswith('feeding') else 45);bound=None;done=None;seq_names={};class_cache={}
         checked_compat=False
         while time.monotonic()<deadline:
             try:snapshot_request=(session/'snapshot-request.txt').read_text()
@@ -178,7 +201,7 @@ def run():
             if reader is None:
                 try:
                     reader=Process(proc.pid)
-                    if 'vampire.dll' not in reader.modules or (mode in ('filter-save','filter-restore') and 'client.dll' not in reader.modules):k.CloseHandle(reader.h);reader=None
+                    if 'vampire.dll' not in reader.modules or (mode in ('filter-save','filter-restore','protean-camera') and 'client.dll' not in reader.modules):k.CloseHandle(reader.h);reader=None
                 except (OSError,RuntimeError):reader=None
             if reader:
                 try:
@@ -302,6 +325,11 @@ def run():
                                 if actor['cls']=='npc_VFrenzyShadow':actor['inventory_items']=inventory_graph(actor['inventory'])
                             (session/'gate.txt').write_text(row['sequence_name']+'|'+row['partner'],encoding='ascii')
                             detail={key:row[key] for key in ['sequence_name','cycle','origin','wolf','state','controller','buttons','weapon','inventory','effects','protean','partner','role']}
+                            if mode=='protean-camera':
+                                from camera_state import camera_state
+                                camera=camera_state(reader)
+                                if camera is None:continue
+                                detail['camera']=row['camera']=camera
                             detail['view_angles']=list(struct.unpack_from('<3f',r,0x206c))
                             detail['snapshot_request']=snapshot_request
                             detail['discipline_durations']=row['discipline_durations'];detail['discipline_begin']=row['discipline_begin'];detail['game_time']=row['game_time'];detail['observer_time']=row['t'];detail['player_flags']=hex(row['player_flags'])
@@ -337,7 +365,7 @@ def run():
             if log.exists() and "'DONE'" in log.read_text():
                 if done is None:done=time.monotonic()
                 if time.monotonic()-done>.5:
-                    saved_name={'save-active':'ProteanLifecycleActiveOwned','save-original-baseline':'ProteanLifecycleActiveOwned','filter-save':'ProteanFilterOwned'}.get(mode)
+                    saved_name={'save-active':'ProteanLifecycleActiveOwned','save-original-baseline':'ProteanLifecycleActiveOwned','filter-save':'ProteanFilterOwned','tiger-equipment-baseline':'ProteanBubbleOwned'}.get(mode)
                     if saved_name and not (GAME/('Unofficial_Patch/save/'+saved_name+'.sav')).exists():
                         if time.monotonic()-done>5:raise RuntimeError('Engine did not create the owned save')
                     else:break

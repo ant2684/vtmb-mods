@@ -2,6 +2,60 @@
 import ast
 
 def audit(mode,log,rows):
+ if mode=='protean-camera':
+  marks={event[1]:event[2] for event in (ast.literal_eval(line) for line in log.splitlines() if line.startswith("('NATIVE',"))}
+  for label,prior,restored in [('drawn_first',0,0),('holstered_first',0,0),('already_third',1,1),('manual_toggle',0,1)]:
+   before,entry_start,entry,warform,returning,human=[marks[label+'_'+phase] for phase in ('before','entry_start','entry','warform','return','human')]
+   assert before['camera']['third']==prior and before['camera']['raw']==prior,(label,before['camera'])
+   assert before['item_classes'].get(before['weapon'])==('item_w_unarmed' if label=='holstered_first' else 'item_w_thirtyeight'),label
+   assert entry_start['state']==entry['state']==returning['state']==30 and entry['protean']==5 and returning['protean']==0,label
+   assert warform['protean']==5 and warform['wolf']==1 and warform['state']==0,label
+   assert human['protean']==human['wolf']==human['state']==0,label
+   assert human['camera']['raw']==human['camera']['third']==restored,(label,human['camera'])
+   assert human['item_classes'].get(human['weapon'])==before['item_classes'].get(before['weapon']),label
+   sampled=[r for r in rows if before['observer_time']<r['t']<=human['observer_time'] and r['state']==30]
+   assert sampled and all(r['camera']['third'] for r in sampled),(label,[(r['game_time'],r['camera']) for r in sampled if not r['camera']['third']])
+  return ['Third person from the first sampled entry frame through the return; first person, preselected third person and manual toggle restored with the original equipment']
+ if mode=='tiger-general':
+  scenarios=[('license','item_w_claws_ghoul','item_w_chang_claw'),
+             ('card','item_w_claws_protean4','item_w_chang_claw'),
+             ('tubes','item_w_claws_protean5','item_w_chang_claw'),
+             ('gum','item_w_mingxiao_tentacle','item_w_chang_claw'),
+             ('katana','item_w_mingxiao_tentacle','item_w_katana'),
+             ('revolver','item_w_mingxiao_tentacle','item_w_thirtyeight')]
+  details={event[1]:event[2] for event in (ast.literal_eval(line) for line in log.splitlines() if line.startswith("('NATIVE',"))}
+  generic={candidate for _,candidate,_ in scenarios}
+  for label,candidate,weapon in scenarios:
+   before,active,after=[details[label+'_'+phase] for phase in ('BEFORE','ACTIVE','AFTER')]
+   assert before['protean']==0 and before['item_classes'].get(before['weapon'])==weapon,label
+   assert active['protean']==5 and active['item_classes'].get(active['weapon'])=='item_w_claws',label
+   assert after['protean']==after['wolf']==after['state']==after['morphs']==0,label
+   item=[h for h,name in before['item_classes'].items() if name==candidate]
+   assert len(item)==1 and generic.intersection(before['item_classes'].values())=={candidate},label
+   assert after['item_classes'].get(item[0])==candidate,label
+   assert after['weapon']==before['weapon'],(label,weapon,after['item_classes'].get(after['weapon']))
+   during_return=[r for r in rows if active['observer_time']<r['t']<=after['observer_time'] and r['protean']==0]
+   assert during_return and all(r['weapon']!=int(item[0],16) for r in during_return),label
+  return ['All six full P5 returns retained the original weapon handle, preserved the generic item, and never sampled it equipped during return']
+ if mode in ('tiger-return','tiger-recover','tiger-equipment-baseline'):
+  events=[ast.literal_eval(line) for line in log.splitlines() if line.startswith("('NATIVE',")]
+  details={event[1]:event[2] for event in events}
+  tiger='item_w_chang_claw';gum='item_w_mingxiao_tentacle'
+  after=details['TIGER_AFTER']
+  assert after['protean']==after['wolf']==after['state']==after['morphs']==0,after
+  expected=gum if mode=='tiger-equipment-baseline' else tiger
+  assert after['item_classes'].get(after['weapon'])==expected,(expected,after['item_classes'].get(after['weapon']))
+  assert list(after['item_classes'].values()).count(gum)==1,after
+  if mode!='tiger-recover':
+   before=details['TIGER_BEFORE'];during=details['TIGER_DURING']
+   assert before['item_classes'].get(before['weapon'])==tiger and before['protean']==0,before
+   assert during['item_classes'].get(during['weapon'])=='item_w_claws' and during['protean']==5,during
+   assert next(h for h,c in before['item_classes'].items() if c==gum)==next(h for h,c in after['item_classes'].items() if c==gum)
+   if mode=='tiger-equipment-baseline':
+    return ['The old module equips the existing Bubble Bum on return and writes the broken-state fixture']
+   assert after['weapon']==before['weapon'],(before,after)
+   return ['The settled Protean 5 return equips the exact original Tiger Claws and preserves Bubble Bum in inventory']
+  return ['An existing save with Bubble Bum equipped recovers Tiger Claws without a manual equip command']
  if mode.startswith('native-hunger'):
   events=[ast.literal_eval(x) for x in log.splitlines()]
   details={x[1]:x[2] for x in events if x[0]=='NATIVE'}

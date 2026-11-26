@@ -36,6 +36,7 @@ int pfi_transform_active(void){return pfi_options[PFI_TRANSFORM]&&pfi_inventory_
 
 __declspec(dllexport) void loaded_vampire(void){
  static int attempted;if(attempted)return;attempted=1;pfi_configure();
+ pfi_stealth_precache_server();
  if(pfi_options[PFI_WARFORM])pfi_core_server();
  if(pfi_options[PFI_INVENTORY])pfi_lifecycle_server();
  /* Matching models contain both pools even with all optional fixes off. */
@@ -48,5 +49,6 @@ __declspec(dllexport) void loaded_vampire(void){
 __declspec(dllexport) void loaded_client(void){
  static int attempted;if(attempted)return;attempted=1;pfi_configure();
  if(pfi_options[PFI_FILTER])pfi_core_client();
+ if(pfi_options[PFI_TRANSFORM])pfi_morph_camera_client();
 }
 BOOL WINAPI DllMain(HINSTANCE h,DWORD reason,LPVOID reserved){(void)h;(void)reason;(void)reserved;return TRUE;}

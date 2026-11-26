@@ -62,7 +62,7 @@ for file in sorted((out/'checks').glob('*/result.json')):
 assert native,'No complete exact-candidate native/resource receipt'
 guards=json.loads((out/'lifecycle-guards.json').read_text())
 assert guards['passed'] and guards['plugin_sha256']==identity
-assert guards['hook_conflicts']==17 and guards['dependency_conflicts']==32
+assert guards['hook_conflicts']==18 and guards['dependency_conflicts']==35
 for name in ['resources.json','maps.json']:assert (out/name).exists()
 resources={}
 for component in (out/'Components').iterdir():

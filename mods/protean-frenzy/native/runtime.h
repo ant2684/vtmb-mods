@@ -26,7 +26,13 @@ void pfi_core_server(void);
 void pfi_core_client(void);
 void pfi_flow_server(void);
 void pfi_stealth_server(void);
+void pfi_stealth_precache_server(void);
 void pfi_melee_server(void);
 void pfi_claws_frenzy_server(void);
 void pfi_griffith_server(void);
+void pfi_morph_camera_client(void);
+void pfi_morph_camera_scene(unsigned char *actor,int entering);
+void pfi_morph_camera_reset(void);
+int pfi_morph_camera_owns(unsigned char *actor);
+void pfi_morph_camera_update(unsigned char *actor,int returning,int human,unsigned weapon,float now);
 #endif

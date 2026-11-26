@@ -1,12 +1,12 @@
 {
-  "name": "Protean & Frenzy Improved",
-  "version": "1.3.2",
-  "plugin": "protean-frenzy-improved.vtm",
-  "plugin_sha256": "19b96a4917c8858c0b303f8a37c157df4520c8c95a16280457af4c3eba928111",
-  "supported_patch": "Unofficial Patch 12.0",
   "exports": [
     "loaded_client",
     "loaded_vampire"
   ],
-  "package_layout": "Complete game root; eight game files and one English README"
+  "name": "Protean & Frenzy Improved",
+  "package_layout": "Game root; 242 game files including one VTM, plus one English README",
+  "plugin": "protean-frenzy-improved.vtm",
+  "plugin_sha256": "8d9d069640e8e6c309e9b9a97852b3e8013143abadbc6305032d7cadc52f9f3b",
+  "supported_patch": "Unofficial Patch 12.0",
+  "version": "1.4"
 }
